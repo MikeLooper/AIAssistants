@@ -1,0 +1,8 @@
+# Example search URLs — one per line.
+# Lines starting with # are ignored.
+
+https://www.dice.com/jobs?filters.postedDate=THREE&filters.employmentType=FULLTIME&filters.workplaceTypes=Remote%7COn-Site%7CHybrid&radius=30&location=Lone+Tree%2C+CO%2C+USA&q=Solutions+Architect&latitude=39.5362858&longitude=-104.8855322&countryCode=US&locationPrecision=City&adminDistrictCode=CO
+#https://www.glassdoor.com/Job/lone-tree-solutions-architect-jobs-SRCH_IL.0,9_IC1164306_KO10,29.htm?fromAge=3&maxSalary=300000&minSalary=200000
+#https://my.greenhouse.io/jobs?query=Solutions%20Architect&location=Lone%20Tree%2C%20Colorado%2C%20United%20States&lat=39.522307&lon=-104.867045&location_type=locality&country_short_name=US&state_short_name=CO&date_posted=past_five_days&salary=more_than_200k&employment_type[]=full_time
+https://www.linkedin.com/jobs/search/?currentJobId=4422024997&distance=25&f_JT=F&f_SB2=9&f_TPR=r86400&f_WT=1%2C2%2C3&geoId=106194045&keywords=solutions%20architect&origin=JOB_SEARCH_PAGE_JOB_FILTER
+https://remotive.com/remote-jobs?query=Solutions+Architect&location=USA&employment-type=full-time&min_salary=200000
