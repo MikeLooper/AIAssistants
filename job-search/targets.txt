@@ -6,6 +6,6 @@
 #
 # Salary amounts can be written as: 200000, 200K, $200K, $200,000
 
-Job Title=Solutions Architect
-Programming Language=Python OR Java OR C#
+Job Title=Solutions Architect OR Software Engineering Manager OR Software Engineer
+Programming Language=C# OR .NET
 Salary Range Includes 200K
