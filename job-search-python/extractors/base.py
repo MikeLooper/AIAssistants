@@ -20,12 +20,33 @@ from webdriver_manager.chrome import ChromeDriverManager
 # Attribute extraction helpers
 # ---------------------------------------------------------------------------
 
-# Programming languages / frameworks to scan for in job text
-KNOWN_LANGUAGES = [
-    ".NET", "C#", "C++", "Java", "Python", "Go", "Golang", "Rust",
-    "TypeScript", "JavaScript", "Ruby", "Scala", "Kotlin", "Swift",
-    "PHP", "Perl", "R", "COBOL", "F#", "Clojure", "Haskell",
+# Default aliases used until the runtime settings files are loaded.
+DEFAULT_LANGUAGE_ALIASES: list[tuple[str, str]] = [
+    (".NET", ".NET"),
+    ("C#", "C#"),
+    ("C++", "C++"),
+    ("Java", "Java"),
+    ("Python", "Python"),
+    ("Go", "Go"),
+    ("Golang", "Golang"),
+    ("Rust", "Rust"),
+    ("TypeScript", "TypeScript"),
+    ("JavaScript", "JavaScript"),
+    ("Ruby", "Ruby"),
+    ("Scala", "Scala"),
+    ("Kotlin", "Kotlin"),
+    ("Swift", "Swift"),
+    ("PHP", "PHP"),
+    ("Perl", "Perl"),
+    ("R", "R"),
+    ("COBOL", "COBOL"),
+    ("F#", "F#"),
+    ("Clojure", "Clojure"),
+    ("Haskell", "Haskell"),
 ]
+
+_LANGUAGE_ALIASES: list[tuple[str, str]] = DEFAULT_LANGUAGE_ALIASES.copy()
+_TOOL_ALIASES: list[tuple[str, str]] = []
 
 # Common job-title patterns
 TITLE_PATTERNS = [
@@ -47,15 +68,49 @@ def extract_job_title(text: str) -> str:
     return ""
 
 
+def configure_extraction_aliases(
+    language_aliases: list[tuple[str, str]] | None,
+    tool_aliases: list[tuple[str, str]] | None,
+) -> None:
+    """Configure discovery/reporting aliases loaded from settings files."""
+    global _LANGUAGE_ALIASES
+    global _TOOL_ALIASES
+
+    _LANGUAGE_ALIASES = language_aliases.copy() if language_aliases else DEFAULT_LANGUAGE_ALIASES.copy()
+    _TOOL_ALIASES = tool_aliases.copy() if tool_aliases else []
+
+
+def _term_regex(term: str) -> str:
+    """Build a safe regex for matching technology terms in free-form text."""
+    escaped = re.escape(term)
+    if re.fullmatch(r"[A-Za-z0-9_]+", term):
+        return rf"\b{escaped}\b"
+    return rf"(?<!\w){escaped}(?!\w)"
+
+
+def _extract_alias_values(text: str, aliases: list[tuple[str, str]]) -> str:
+    """Return unique reporting values whose discovery term appears in text."""
+    found: list[str] = []
+    seen: set[str] = set()
+    for discovery, reporting in aliases:
+        if not discovery or not reporting:
+            continue
+        if re.search(_term_regex(discovery), text, re.IGNORECASE):
+            key = reporting.lower()
+            if key not in seen:
+                seen.add(key)
+                found.append(reporting)
+    return ", ".join(found)
+
+
 def extract_programming_languages(text: str) -> str:
-    """Return a comma-separated string of recognised languages found in the text."""
-    found = []
-    for lang in KNOWN_LANGUAGES:
-        # Use word boundary; handle special chars like C# / C++
-        pattern = re.escape(lang) + r"(?:\b|(?=[^a-zA-Z]))"
-        if re.search(pattern, text, re.IGNORECASE):
-            found.append(lang)
-    return ", ".join(found) if found else ""
+    """Return a comma-separated list of configured programming languages."""
+    return _extract_alias_values(text, _LANGUAGE_ALIASES)
+
+
+def extract_tools(text: str) -> str:
+    """Return a comma-separated list of configured tools."""
+    return _extract_alias_values(text, _TOOL_ALIASES)
 
 
 def extract_salary(text: str) -> str:
@@ -98,6 +153,8 @@ def extract_attributes(text: str, attribute_names: list[str]) -> dict[str, str]:
             result[attr] = extract_job_title(text)
         elif "language" in attr_lower or "programming" in attr_lower:
             result[attr] = extract_programming_languages(text)
+        elif "tool" in attr_lower:
+            result[attr] = extract_tools(text)
         elif "salary" in attr_lower or "range" in attr_lower:
             result[attr] = extract_salary(text)
         else:

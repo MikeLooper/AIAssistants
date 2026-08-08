@@ -11,6 +11,99 @@ def _split_or_values(text: str) -> list[str]:
     return [part.strip() for part in re.split(r"\s+OR\s+", text, flags=re.IGNORECASE) if part.strip()]
 
 
+def parse_exclusion_rules(exclusions: list[str]) -> tuple[list[dict[str, Any]], list[str]]:
+    """
+    Parse exclusion rules in the form: AttributeName=Value OR Value2
+
+    Returns:
+      - valid rule dicts
+      - warnings for ignored invalid lines
+    """
+    rules: list[dict[str, Any]] = []
+    warnings: list[str] = []
+
+    for index, raw in enumerate(exclusions, start=1):
+        line = raw.strip()
+        if not line:
+            continue
+        if "=" not in line:
+            warnings.append(
+                f"Ignored exclusions line {index}: missing '=' ({line})"
+            )
+            continue
+
+        attr_name, raw_value = line.split("=", 1)
+        attr_name = attr_name.strip()
+        raw_value = raw_value.strip()
+
+        if not attr_name or not raw_value:
+            warnings.append(
+                f"Ignored exclusions line {index}: missing attribute name or value ({line})"
+            )
+            continue
+
+        options = _split_or_values(raw_value)
+        if not options:
+            warnings.append(
+                f"Ignored exclusions line {index}: no comparison values found ({line})"
+            )
+            continue
+
+        rules.append(
+            {
+                "raw": line,
+                "attribute": attr_name,
+                "options": options,
+            }
+        )
+
+    return rules, warnings
+
+
+def apply_exclusions(
+    extracted: dict[str, Any],
+    exclusion_rules: list[dict[str, Any]],
+) -> tuple[bool, list[dict[str, str]]]:
+    """
+    Evaluate exclusions against extracted attributes.
+
+    Matching behavior:
+      - Attribute title compare is case-insensitive exact match.
+      - Value compare is case-insensitive and supports equals or contains.
+      - OR values are supported in exclusion options.
+    """
+    if not exclusion_rules:
+        return False, []
+
+    attr_lookup = {str(name).strip().lower(): str(value) for name, value in extracted.items()}
+    matched_details: list[dict[str, str]] = []
+
+    for rule in exclusion_rules:
+        rule_attr = str(rule.get("attribute", "")).strip()
+        if not rule_attr:
+            continue
+
+        extracted_val = attr_lookup.get(rule_attr.lower())
+        if extracted_val is None:
+            continue
+
+        extracted_lc = extracted_val.lower()
+        for option in rule.get("options", []):
+            option_lc = option.lower()
+            if extracted_lc == option_lc or option_lc in extracted_lc:
+                matched_details.append(
+                    {
+                        "rule": str(rule.get("raw", "")),
+                        "attribute": rule_attr,
+                        "matched_value": option,
+                        "extracted": extracted_val,
+                    }
+                )
+                break
+
+    return bool(matched_details), matched_details
+
+
 def _parse_salary_amount(text: str) -> int | None:
     """Parse a salary token like '$200K', '200,000', '200000' into an integer."""
     text = text.replace(",", "").replace("$", "").strip()

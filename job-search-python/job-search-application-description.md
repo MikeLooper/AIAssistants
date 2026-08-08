@@ -11,9 +11,11 @@ The **Job Search Agent** is a Python-based application that automates job search
 The orchestrator that ties everything together:
 
 - **Load Configuration Files**
-  - `urls.txt` - List of job search URLs to scrape (supports comments with `#`)
-  - `attributes.txt` - Which job attributes to extract (e.g., Job Title, Programming Language, Salary Range)
-  - `targets.txt` - Matching rules to score jobs
+  - `settings/urls.txt` - List of job search URLs to scrape (supports comments with `#`)
+  - `settings/attributes.txt` - Which job attributes to extract (e.g., Job Title, Programming Language, Tools, Salary Range)
+  - `settings/targets.txt` - Matching rules to score jobs
+  - `settings/programminglanguages.txt` - Programming-language discovery/reporting aliases
+  - `settings/tools.txt` - Tool discovery/reporting aliases
 
 - **Process Flow**
   1. For each URL:
@@ -29,9 +31,11 @@ The orchestrator that ties everything together:
   6. Auto-open HTML report in default browser
 
 - **Command-Line Arguments**
-  - `--urls` - Path to URLs file (default: `urls.txt`)
-  - `--attributes` - Path to attributes file (default: `attributes.txt`)
-  - `--targets` - Path to targets file (default: `targets.txt`)
+  - `--urls` - Path to URLs file (default: `settings/urls.txt`)
+  - `--attributes` - Path to attributes file (default: `settings/attributes.txt`)
+  - `--targets` - Path to targets file (default: `settings/targets.txt`)
+  - `--programminglanguages` - Path to language aliases file (default: `settings/programminglanguages.txt`)
+  - `--tools` - Path to tools aliases file (default: `settings/tools.txt`)
   - `--match-pct` - Minimum recommendation threshold 0-100 (default: 75)
 
 ---
@@ -60,8 +64,14 @@ The orchestrator that ties everything together:
 
 **Attribute Extraction Helpers:**
 - **Job Title**: Regex patterns or first non-empty line
-- **Programming Languages**: Scans for 20+ known languages (Java, Python, C#, TypeScript, Go, Rust, etc.)
+- **Programming Language**: Uses `settings/programminglanguages.txt` aliases as the source of truth
+- **Tools**: Uses `settings/tools.txt` aliases as the source of truth
 - **Salary Range**: Extracts patterns like "$100,000 - $200,000", "100K–200K", "Up to $300K", "$150K+"
+
+**Alias Parsing Rules:**
+- A line without a colon uses the same value for discovery and reporting
+- A line with a colon uses `discovery:reporting`
+- For tool aliases, only the first colon is treated as the separator
 
 ---
 
@@ -123,7 +133,7 @@ Generates visual HTML reports using Jinja2 templates.
 
 ### **Scenario: Find C# Developer Jobs**
 
-#### Step 1: Create `urls.txt`
+#### Step 1: Create `settings/urls.txt`
 ```
 # Remote C# jobs from Dice
 https://www.dice.com/jobs?q=C%23&filters.workplaceTypes=Remote
@@ -135,14 +145,31 @@ https://www.linkedin.com/jobs/search/?keywords=C%23
 https://remotive.com/remote-jobs?query=%22.net%22
 ```
 
-#### Step 2: Create `attributes.txt`
+#### Step 2: Create `settings/attributes.txt`
 ```
 Job Title
 Programming Language
+Tools
 Salary Range
 ```
 
-#### Step 3: Create `targets.txt`
+#### Step 3: Create `settings/programminglanguages.txt` and `settings/tools.txt`
+```
+# programminglanguages.txt
+C#
+.NET
+Java
+Python
+JavaScript
+
+# tools.txt
+Amazon Web Services:AWS
+Google Cloud Platform:GCP
+Model Context Protocol:MCP
+CI/CD
+```
+
+#### Step 4: Create `settings/targets.txt`
 ```
 # Target rules for scoring
 Programming Language=C# OR .NET
@@ -150,12 +177,18 @@ Job Title=Developer OR Engineer OR Architect
 Salary Range Includes 120K
 ```
 
-#### Step 4: Run the Agent
+#### Step 5: Run the Agent
 ```bash
-python job_search_agent.py --match-pct 70
+python job_search_agent.py \
+  --urls settings/urls.txt \
+  --attributes settings/attributes.txt \
+  --targets settings/targets.txt \
+  --programminglanguages settings/programminglanguages.txt \
+  --tools settings/tools.txt \
+  --match-pct 70
 ```
 
-#### Step 5: Output
+#### Step 6: Output
 - **Dice.com**: Finds 45 C# developer jobs, ~70% match rate on average
 - **LinkedIn**: Finds 32 positions, 15% blocked by login walls
 - **Remotive**: Finds 28 remote .NET roles, 85% match rate
@@ -170,51 +203,92 @@ python job_search_agent.py --match-pct 70
 
 ### Example 1: Full-Stack Role with Experience Requirements
 ```
-# urls.txt
+# settings/urls.txt
 https://www.dice.com/jobs?q=Full+Stack&filters.experienceLevel=Senior
 https://www.linkedin.com/jobs/search/?keywords=full%20stack
 
-# attributes.txt
+# settings/attributes.txt
 Job Title
 Programming Language
+Tools
 Salary Range
 
-# targets.txt
+# settings/programminglanguages.txt
+JavaScript
+TypeScript
+ReactJS:React
+Node.js
+Java
+Python
+
+# settings/tools.txt
+Amazon Web Services:AWS
+Google Cloud Platform:GCP
+Kubernetes
+Docker
+
+# settings/targets.txt
 Job Title=Full Stack
 Programming Language=JavaScript OR TypeScript OR React
 Programming Language=Java OR Python OR Node.js
+Tools=AWS OR Kubernetes OR Docker
 Salary Range Includes 150K
 ```
 
 ### Example 2: Solutions Architect in Denver
 ```
-# urls.txt
+# settings/urls.txt
 https://www.dice.com/jobs?q=Solutions+Architect&location=Denver%2C+CO
 https://www.glassdoor.com/Job/denver-solutions-architect-jobs
 
-# attributes.txt
+# settings/attributes.txt
 Job Title
 Programming Language
+Tools
 Salary Range
 
-# targets.txt
+# settings/programminglanguages.txt
+Java
+C#
+Python
+
+# settings/tools.txt
+Azure
+Amazon Web Services:AWS
+GCP
+
+# settings/targets.txt
 Job Title=Solutions Architect OR Principal Architect
 Programming Language=Java OR C# OR Python
+Tools=Azure OR AWS OR GCP
 Salary Range Includes 200K
 ```
 
 ### Example 3: Remote DevOps Position
 ```
-# urls.txt
+# settings/urls.txt
 https://remotive.com/remote-jobs?query=DevOps&employment-type=full-time
 
-# attributes.txt
+# settings/attributes.txt
 Job Title
 Programming Language
+Tools
 
-# targets.txt
+# settings/programminglanguages.txt
+Python
+Go
+Rust
+
+# settings/tools.txt
+CI/CD
+CloudWatch
+Kubernetes
+Linux
+
+# settings/targets.txt
 Job Title=DevOps OR Platform Engineer
 Programming Language=Python OR Go OR Rust
+Tools=CI/CD OR Kubernetes OR Linux
 ```
 
 ---
@@ -228,7 +302,7 @@ Programming Language=Python OR Go OR Rust
 ✅ **Batch Processing** - Process 100+ URLs in one run  
 ✅ **Rich Reporting** - HTML visualization + JSON export  
 ✅ **Extensible Extractors** - Add new job boards by creating a new extractor class  
-✅ **Configuration-Driven** - No code changes needed; configure via text files  
+✅ **Configuration-Driven Extraction** - Programming Language and Tools are driven by alias files, not hard-coded lists  
 
 ---
 
@@ -238,9 +312,12 @@ job-search/
 ├── job_search_agent.py          # Main entry point
 ├── matcher.py                   # Job scoring logic
 ├── reporter.py                  # Report generation
-├── urls.txt                     # Search URLs (config)
-├── attributes.txt               # Extraction targets (config)
-├── targets.txt                  # Matching rules (config)
+├── settings/
+│   ├── urls.txt                 # Search URLs (config)
+│   ├── attributes.txt           # Extraction targets (config)
+│   ├── targets.txt              # Matching rules (config)
+│   ├── programminglanguages.txt # Language aliases (discovery/reporting)
+│   └── tools.txt                # Tool aliases (discovery/reporting)
 ├── requirements.txt             # Python dependencies
 ├── extractors/
 │   ├── base.py                  # Base class + helpers
@@ -271,4 +348,5 @@ job-search/
 2. **Salary extraction** uses regex; ambiguous formats may be missed
 3. **Generic extractor** uses CSS class heuristics; may miss jobs on non-standard sites
 4. **Selenium drivers** auto-managed but require Chrome/Chromium installed
-5. **Report timestamps** use format: `1YYYY-MM-DD_HH-MM` (note leading "1" for sorting)
+5. **Report timestamps** use format: `YYYY-MM-DD_HH-MM` (note leading "1" for sorting)
+6. **Alias-based extraction**: `programminglanguages.txt` and `tools.txt` support `discovery:reporting` values; if no colon is present, the same value is used for both

@@ -13,14 +13,19 @@ from datetime import datetime
 from pathlib import Path
 
 from extractors.dispatcher import get_extractor
-from matcher import compute_match
+from extractors.base import configure_extraction_aliases
+from matcher import apply_exclusions, compute_match, parse_exclusion_rules
 from reporter import generate_report
 
 BASE_DIR = Path(__file__).resolve().parent
-REPORT_BASE = Path(r"C:\Working\Storage\Dev\GitHub\AIAssistants\job-search\reports")
-DEFAULT_URLS_PATH = BASE_DIR / "urls.txt"
-DEFAULT_ATTRIBUTES_PATH = BASE_DIR / "attributes.txt"
-DEFAULT_TARGETS_PATH = BASE_DIR / "targets.txt"
+SETTINGS_DIR = BASE_DIR / "settings"
+REPORT_BASE = Path(r"C:\Working\Storage\Dev\GitHub\AIAssistants\job-search-python\reports")
+DEFAULT_URLS_PATH = SETTINGS_DIR / "urls.txt"
+DEFAULT_ATTRIBUTES_PATH = SETTINGS_DIR / "attributes.txt"
+DEFAULT_TARGETS_PATH = SETTINGS_DIR / "targets.txt"
+DEFAULT_EXCLUSIONS_PATH = SETTINGS_DIR / "exclusions.txt"
+DEFAULT_PROGRAMMING_LANGUAGES_PATH = SETTINGS_DIR / "programminglanguages.txt"
+DEFAULT_TOOLS_PATH = SETTINGS_DIR / "tools.txt"
 DEFAULT_MATCH_PCT = 75
 
 
@@ -33,6 +38,25 @@ def load_lines(path: str) -> list[str]:
             if stripped and not stripped.startswith("#"):
                 result.append(stripped)
     return result
+
+
+def load_alias_lines(path: str) -> list[tuple[str, str]]:
+    """Return discovery/reporting aliases from non-blank, non-comment lines."""
+    aliases: list[tuple[str, str]] = []
+    for line in load_lines(path):
+        if ":" in line:
+            discovery, reporting = line.split(":", 1)
+            discovery = discovery.strip()
+            reporting = reporting.strip()
+            if discovery and reporting:
+                aliases.append((discovery, reporting))
+            elif discovery:
+                aliases.append((discovery, discovery))
+            elif reporting:
+                aliases.append((reporting, reporting))
+        else:
+            aliases.append((line, line))
+    return aliases
 
 
 def main() -> None:
@@ -53,6 +77,24 @@ def main() -> None:
         help=f"Path to target rules file (default: {DEFAULT_TARGETS_PATH})",
     )
     parser.add_argument(
+        "--exclusions",
+        default=str(DEFAULT_EXCLUSIONS_PATH),
+        help=f"Path to exclusions rules file (default: {DEFAULT_EXCLUSIONS_PATH})",
+    )
+    parser.add_argument(
+        "--programminglanguages",
+        default=str(DEFAULT_PROGRAMMING_LANGUAGES_PATH),
+        help=(
+            "Path to programming languages alias file "
+            f"(default: {DEFAULT_PROGRAMMING_LANGUAGES_PATH})"
+        ),
+    )
+    parser.add_argument(
+        "--tools",
+        default=str(DEFAULT_TOOLS_PATH),
+        help=f"Path to tools alias file (default: {DEFAULT_TOOLS_PATH})",
+    )
+    parser.add_argument(
         "--match-pct",
         default=DEFAULT_MATCH_PCT,
         type=int,
@@ -66,13 +108,19 @@ def main() -> None:
     urls       = load_lines(args.urls)
     attributes = load_lines(args.attributes)
     targets    = load_lines(args.targets)
+    exclusion_lines = load_lines(args.exclusions)
+    language_aliases = load_alias_lines(args.programminglanguages)
+    tool_aliases = load_alias_lines(args.tools)
     match_pct  = args.match_pct
+    exclusion_rules, exclusion_warnings = parse_exclusion_rules(exclusion_lines)
+
+    configure_extraction_aliases(language_aliases, tool_aliases)
 
     if not urls:
         print("ERROR: No URLs found in", args.urls, file=sys.stderr)
         sys.exit(1)
 
-    timestamp = datetime.now().strftime("1%Y-%m-%d_%H-%M")
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
     report_dir = REPORT_BASE / timestamp
     report_dir.mkdir(parents=True, exist_ok=True)
 
@@ -94,11 +142,23 @@ def main() -> None:
         scored_jobs = []
         for job in jobs:
             score, details = compute_match(job["attributes"], targets)
+            preliminary_recommended = score >= match_pct
+            if preliminary_recommended:
+                excluded, exclusion_details = apply_exclusions(job["attributes"], exclusion_rules)
+            else:
+                excluded, exclusion_details = False, []
             job["match_score"]   = score
             job["match_details"] = details
-            job["recommended"]   = score >= match_pct
+            job["excluded"]      = excluded
+            job["exclusion_details"] = exclusion_details
+            job["recommended"]   = preliminary_recommended and (not excluded)
             scored_jobs.append(job)
-            flag = "✅ RECOMMENDED" if job["recommended"] else ""
+            if job["recommended"]:
+                flag = "✅ RECOMMENDED"
+            elif excluded:
+                flag = "🚫 EXCLUDED"
+            else:
+                flag = ""
             print(f"  [{score:3d}%] {job['attributes'].get('Job Title','(no title)')}"
                   f"  {flag}")
 
@@ -107,11 +167,21 @@ def main() -> None:
     # Write JSON
     json_path = report_dir / "report.json"
     with open(json_path, "w", encoding="utf-8") as fh:
-        json.dump({"generated": timestamp, "match_pct": match_pct,
-                   "results": all_results}, fh, indent=2)
+        json.dump({
+            "generated": timestamp,
+            "match_pct": match_pct,
+            "exclusion_warnings": exclusion_warnings,
+            "results": all_results,
+        }, fh, indent=2)
 
     # Write HTML
-    html_path = generate_report(all_results, match_pct, timestamp, report_dir)
+    html_path = generate_report(
+        all_results,
+        match_pct,
+        timestamp,
+        report_dir,
+        exclusion_warnings=exclusion_warnings,
+    )
     os.startfile(str(html_path))
 
     print(f"\n{'='*60}")

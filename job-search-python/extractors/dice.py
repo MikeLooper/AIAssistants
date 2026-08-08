@@ -8,6 +8,7 @@ the HTML. Parsing that data is more reliable than clicking the UI.
 import json
 import re
 from typing import Any
+from html import unescape
 
 import requests
 
@@ -24,6 +25,35 @@ HEADERS = {
 
 class DiceExtractor(BaseExtractor):
     HEADLESS = True
+
+    @staticmethod
+    def _collect_text(value: Any) -> list[str]:
+        """Flatten nested payload data into searchable text fragments."""
+        if value is None:
+            return []
+        if isinstance(value, str):
+            return [value]
+        if isinstance(value, (int, float, bool)):
+            return [str(value)]
+        if isinstance(value, dict):
+            parts: list[str] = []
+            for item in value.values():
+                parts.extend(DiceExtractor._collect_text(item))
+            return parts
+        if isinstance(value, (list, tuple, set)):
+            parts: list[str] = []
+            for item in value:
+                parts.extend(DiceExtractor._collect_text(item))
+            return parts
+        return [str(value)]
+
+    @staticmethod
+    def _strip_html(text: str) -> str:
+        """Convert HTML content to plain text for extraction matching."""
+        no_script = re.sub(r"<script[\\s\\S]*?</script>", " ", text, flags=re.IGNORECASE)
+        no_style = re.sub(r"<style[\\s\\S]*?</style>", " ", no_script, flags=re.IGNORECASE)
+        no_tags = re.sub(r"<[^>]+>", " ", no_style)
+        return re.sub(r"\s+", " ", unescape(no_tags)).strip()
 
     def extract(self, url: str, attributes: list[str]) -> list[dict[str, Any]]:
         jobs = self._static_extract(url, attributes)
@@ -53,15 +83,9 @@ class DiceExtractor(BaseExtractor):
         jobs: list[dict[str, Any]] = []
         print(f"  [Dice] Found {len(jobs_data)} jobs (static)")
         for item in jobs_data:
-            detail_text_parts = [
-                item.get("jobTitle", "") or item.get("title", ""),
-                item.get("companyName", ""),
-                item.get("jobDescription", "") or item.get("summary", ""),
-                item.get("skills", ""),
-                item.get("employmentType", ""),
-                item.get("workplaceType", ""),
-            ]
-            detail_text = "\n".join(part for part in detail_text_parts if part)
+            detail_text = "\n".join(
+                part for part in self._collect_text(item) if part and str(part).strip()
+            )
             attrs = extract_attributes(detail_text, attributes)
             if "Job Title" in attrs:
                 attrs["Job Title"] = item.get("jobTitle", "") or item.get("title", "")
@@ -72,6 +96,24 @@ class DiceExtractor(BaseExtractor):
                     or item.get("salaryRange")
                     or ""
                 )
+
+            # If aliases aren't present in search-result payload fields, fetch detail page text.
+            needs_language = "Programming Language" in attrs and not attrs["Programming Language"]
+            needs_tools = "Tools" in attrs and not attrs["Tools"]
+            if needs_language or needs_tools:
+                job_url = item.get("detailsPageUrl", "")
+                if job_url:
+                    try:
+                        detail_resp = requests.get(job_url, headers=HEADERS, timeout=30)
+                        detail_resp.raise_for_status()
+                        page_text = self._strip_html(detail_resp.text)
+                        page_attrs = extract_attributes(page_text, attributes)
+                        if needs_language and page_attrs.get("Programming Language"):
+                            attrs["Programming Language"] = page_attrs["Programming Language"]
+                        if needs_tools and page_attrs.get("Tools"):
+                            attrs["Tools"] = page_attrs["Tools"]
+                    except Exception:
+                        pass
 
             jobs.append({
                 "job_url": item.get("detailsPageUrl", ""),

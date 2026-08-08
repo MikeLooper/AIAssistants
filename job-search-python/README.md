@@ -11,7 +11,7 @@ An automated job search agent that visits multiple job sites, extracts job descr
 ## Installation
 
 ```bash
-cd C:\Working\Storage\Dev\GitHub\AIAssistants\job-search
+C:\Working\Storage\Dev\GitHub\AIAssistants\job-search-python
 pip install -r requirements.txt
 ```
 
@@ -23,18 +23,24 @@ python job_search_agent.py
 
 The script defaults to:
 
-- `urls.txt`
-- `attributes.txt`
-- `targets.txt`
+- `settings/urls.txt`
+- `settings/attributes.txt`
+- `settings/targets.txt`
+- `settings/exclusions.txt`
+- `settings/programminglanguages.txt`
+- `settings/tools.txt`
 - `--match-pct 75`
 
 All values can still be overridden:
 
 ```bash
 python job_search_agent.py \
-  --urls urls.txt \
-  --attributes attributes.txt \
-  --targets targets.txt \
+  --urls settings/urls.txt \
+  --attributes settings/attributes.txt \
+  --targets settings/targets.txt \
+  --exclusions settings/exclusions.txt \
+  --programminglanguages settings/programminglanguages.txt \
+  --tools settings/tools.txt \
   --match-pct 75
 ```
 
@@ -42,14 +48,17 @@ python job_search_agent.py \
 
 | Argument | Description |
 |----------|-------------|
-| `--urls` | Path to a file containing one search URL per line. Defaults to `urls.txt` in the script directory |
-| `--attributes` | Path to a file listing the attributes to extract (e.g. `Job Title`, `Programming Language`, `Salary Range`). Defaults to `attributes.txt` |
-| `--targets` | Path to a file listing target attribute values (e.g. `Job Title=Solutions Architect`). Defaults to `targets.txt` |
+| `--urls` | Path to a file containing one search URL per line. Defaults to `settings/urls.txt` |
+| `--attributes` | Path to a file listing the attributes to extract (e.g. `Job Title`, `Programming Language`, `Tools`, `Salary Range`). Defaults to `settings/attributes.txt` |
+| `--targets` | Path to a file listing target attribute values (e.g. `Job Title=Solutions Architect`). Defaults to `settings/targets.txt` |
+| `--exclusions` | Path to a file listing exclusion rules. Defaults to `settings/exclusions.txt` |
+| `--programminglanguages` | Path to programming-language aliases used for discovery/reporting. Defaults to `settings/programminglanguages.txt` |
+| `--tools` | Path to tool aliases used for discovery/reporting. Defaults to `settings/tools.txt` |
 | `--match-pct` | Integer 0–100. Jobs scoring ≥ this value are flagged as **recommended**. Defaults to `75` |
 
 ## Input File Formats
 
-### urls.txt
+### settings/urls.txt
 One URL per line. Blank lines and lines starting with `#` are ignored.
 
 ```
@@ -57,16 +66,17 @@ https://www.dice.com/jobs?q=Solutions+Architect&...
 https://www.linkedin.com/jobs/search/?keywords=solutions+architect&...
 ```
 
-### attributes.txt
+### settings/attributes.txt
 One attribute name per line.
 
 ```
 Job Title
 Programming Language
+Tools
 Salary Range
 ```
 
-### targets.txt
+### settings/targets.txt
 One target rule per line. Supported operators:
 
 | Syntax | Meaning |
@@ -82,19 +92,73 @@ Programming Language=Python OR Java OR C#
 Salary Range Includes 200K
 ```
 
+### settings/exclusions.txt
+One exclusion rule per line. Any matching exclusion marks the job as excluded and not recommended.
+
+Rules must include `=`:
+
+- Left side: attribute name to compare (case-insensitive exact name match)
+- Right side: value to compare against extracted attribute value (case-insensitive equals or contains)
+- Right side may include ` OR ` for logical OR matching
+
+Lines missing `=` are ignored and listed as notes in the HTML report.
+
+```
+Job Title=Intern OR Junior
+Programming Language=COBOL
+Tools=Not specified
+```
+
+### settings/programminglanguages.txt
+One alias per line. These values are the source of truth for `Programming Language` extraction.
+
+- No colon: the same value is used for discovery and reporting.
+- With colon: `discovery:reporting`.
+
+```
+JavaScript
+Node.js
+CSharp:C#
+ReactJS:React
+```
+
+### settings/tools.txt
+One alias per line. These values are the source of truth for `Tools` extraction.
+
+- No colon: the same value is used for discovery and reporting.
+- With colon: `discovery:reporting`.
+- Only the first colon is treated as the separator.
+
+```
+Amazon Web Services:AWS
+Google Cloud Platform:GCP
+Model Context Protocol:MCP
+PostgreSQL
+```
+
 ## Output
 
 Reports are written to:
 
 ```
-C:\Working\Storage\Dev\GitHub\AIAssistants\job-search\reports\1YYYY-MM-DD_HH-MM\
+C:\Working\Storage\Dev\GitHub\AIAssistants\job-search\reports\YYYY-MM-DD_HH-MM\
 ```
 
 Each run produces:
 - `report.html` — human-readable HTML report
 - `report.json` — machine-readable JSON of all results
 
+`report.json` also includes:
+- `exclusion_warnings` — ignored exclusion lines and reasons
+- Per-job `excluded` and `exclusion_details`
+
 After the files are written, the script opens `report.html` in your browser.
+
+### Exclusion Behavior
+
+- A job can match target rules and still be excluded by `settings/exclusions.txt`.
+- Excluded jobs are flagged as excluded and never recommended for follow-up.
+- Exclusions are evaluated by attribute name and value with case-insensitive equals/contains matching.
 
 ## Supported Job Sites
 

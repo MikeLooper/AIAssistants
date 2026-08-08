@@ -13,7 +13,7 @@ from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
 
-from extractors.base import BaseExtractor, extract_attributes
+from extractors.base import BaseExtractor, extract_attributes, extract_programming_languages, extract_tools
 
 HEADERS = {
     "User-Agent": (
@@ -27,6 +27,34 @@ BASE_URL = "https://remotive.com"
 
 class RemotiveExtractor(BaseExtractor):
     HEADLESS = True
+
+    @staticmethod
+    def _metadata_text(*parts: object) -> str:
+        """Join optional metadata parts into one extraction text blob."""
+        text_parts: list[str] = []
+        for part in parts:
+            if part is None:
+                continue
+            if isinstance(part, list):
+                text_parts.extend(str(item) for item in part if item)
+            else:
+                value = str(part).strip()
+                if value:
+                    text_parts.append(value)
+        return "\n".join(text_parts)
+
+    @staticmethod
+    def _populate_missing_remotive_attrs(
+        attrs: dict[str, str],
+        source_text: str,
+    ) -> None:
+        """Fill empty language/tool attributes from metadata, then fallback to text."""
+        if "Programming Language" in attrs and not attrs["Programming Language"]:
+            value = extract_programming_languages(source_text)
+            attrs["Programming Language"] = value if value else "Not specified"
+        if "Tools" in attrs and not attrs["Tools"]:
+            value = extract_tools(source_text)
+            attrs["Tools"] = value if value else "Not specified"
 
     def extract(self, url: str, attributes: list[str]) -> list[dict[str, Any]]:
         """Override to try static scraping first, then fall back to Selenium."""
@@ -90,6 +118,9 @@ class RemotiveExtractor(BaseExtractor):
                     if title and "Job Title" in attrs:
                         attrs["Job Title"] = title
 
+                    fallback_text = self._metadata_text(title, detail_text)
+                    self._populate_missing_remotive_attrs(attrs, fallback_text)
+
                     jobs.append({"job_url": job_url, "attributes": attrs})
 
                 except Exception as exc:
@@ -133,7 +164,19 @@ class RemotiveExtractor(BaseExtractor):
                 if "Job Title" in attrs:
                     attrs["Job Title"] = title or hit.get("title", "")
                 if "Programming Language" in attrs and not attrs["Programming Language"]:
-                    attrs["Programming Language"] = ", ".join(hit.get("skills", []))
+                    attrs["Programming Language"] = extract_programming_languages(" ".join(hit.get("skills", [])))
+                if "Tools" in attrs and not attrs["Tools"]:
+                    attrs["Tools"] = extract_tools(" ".join(hit.get("skills", [])))
+                fallback_text = self._metadata_text(
+                    title,
+                    detail_text,
+                    hit.get("title", ""),
+                    hit.get("occupation", ""),
+                    hit.get("category", ""),
+                    hit.get("company_name", ""),
+                    hit.get("skills", []),
+                )
+                self._populate_missing_remotive_attrs(attrs, fallback_text)
                 if "Salary Range" in attrs and not attrs["Salary Range"]:
                     attrs["Salary Range"] = hit.get("salary", "")
 
@@ -183,6 +226,8 @@ class RemotiveExtractor(BaseExtractor):
                 attrs = extract_attributes(detail_text, attributes)
                 if title and "Job Title" in attrs:
                     attrs["Job Title"] = title
+                fallback_text = self._metadata_text(title, detail_text)
+                self._populate_missing_remotive_attrs(attrs, fallback_text)
                 jobs.append({"job_url": job_url, "attributes": attrs})
                 print(f"    [{idx+1}] {attrs.get('Job Title','?')}")
             except Exception as exc:

@@ -20,6 +20,61 @@
     padding: 1rem 1.5rem; margin-bottom: 2rem; font-size: .95rem;
   }
   .summary-bar span { font-weight: 600; }
+  .followup-summary {
+    margin-bottom: 2rem;
+    background: #ecfdf5;
+    border: 1px solid #86efac;
+    border-radius: .75rem;
+    padding: 1rem 1.25rem;
+  }
+  .followup-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #166534;
+    margin-bottom: .75rem;
+  }
+  .followup-list {
+    display: grid;
+    gap: .5rem;
+  }
+  .followup-item {
+    background: #ffffff;
+    border: 1px solid #bbf7d0;
+    border-radius: .5rem;
+    padding: .65rem .75rem;
+    font-size: .9rem;
+  }
+  .followup-item a { color: #166534; text-decoration: none; }
+  .followup-item a:hover { text-decoration: underline; }
+  .followup-meta { color: var(--muted); font-size: .8rem; margin-top: .15rem; word-break: break-all; }
+  .warning-summary {
+    margin-bottom: 2rem;
+    background: #fff7ed;
+    border: 1px solid #fdba74;
+    border-radius: .75rem;
+    padding: 1rem 1.25rem;
+  }
+  .warning-title {
+    color: #9a3412;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: .5rem;
+  }
+  .warning-list { margin-left: 1rem; color: #7c2d12; font-size: .9rem; }
+  .excluded-badge {
+    display: inline-block; background: #ef4444; color: #fff;
+    font-size: .75rem; font-weight: 600; padding: .15rem .5rem;
+    border-radius: 999px; margin-top: .4rem; margin-left: .35rem;
+  }
+  .exclusion-reason {
+    margin-top: .75rem;
+    padding: .6rem .75rem;
+    border: 1px solid #fecaca;
+    border-radius: .5rem;
+    background: #fef2f2;
+    font-size: .85rem;
+    color: #991b1b;
+  }
   .url-section { margin-bottom: 3rem; }
   .url-header {
     background: #1e293b; color: #f1f5f9;
@@ -83,6 +138,38 @@
   <div>Recommended: <span>{{ recommended }}</span></div>
 </div>
 
+{% if exclusion_warnings %}
+<section class="warning-summary">
+  <div class="warning-title">⚠️ Exclusion Rules Notes</div>
+  <ul class="warning-list">
+    {% for warning in exclusion_warnings %}
+    <li>{{ warning }}</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if recommended_jobs %}
+<section class="followup-summary">
+  <div class="followup-title">✅ Recommended for Follow-Up ({{ recommended_jobs | length }})</div>
+  <div class="followup-list">
+    {% for item in recommended_jobs %}
+    <div class="followup-item">
+      <div>
+        {% if item.job_url %}
+          <a href="{{ item.job_url }}" target="_blank" rel="noopener">{{ item.job_title }}</a>
+        {% else %}
+          {{ item.job_title }}
+        {% endif %}
+        · <strong>{{ item.match_score }}%</strong>
+      </div>
+      <div class="followup-meta">From search URL: {{ item.source_url }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
 {% for result in results %}
 <div class="url-section">
   <div class="url-header">🌐 {{ result.url }}</div>
@@ -117,6 +204,8 @@
           </div>
           {% if job.recommended %}
             <span class="rec-badge">✅ Recommended for follow-up</span>
+          {% elif job.excluded %}
+            <span class="excluded-badge">🚫 Excluded</span>
           {% endif %}
         </div>
         <div class="score-badge" title="Match score">{{ score }}%</div>
@@ -130,6 +219,15 @@
         </div>
         {% endfor %}
       </div>
+
+      {% if job.excluded and job.exclusion_details %}
+      <div class="exclusion-reason">
+        Excluded by:
+        {% for exclusion in job.exclusion_details %}
+          <div>{{ exclusion.rule }} (matched: {{ exclusion.extracted }})</div>
+        {% endfor %}
+      </div>
+      {% endif %}
 
       {% if job.match_details %}
       <table class="match-table">
