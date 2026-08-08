@@ -1,0 +1,21 @@
+Amazon Web Services:AWS
+AWS
+Azure
+CSharp
+CI/CD
+CloudWatch
+DevOps
+EC2
+FastAPI
+GCP
+Google Cloud Platform:GCP
+IAM
+Linux
+MCP
+Model Context Protocol:MCP
+PostgreSQL
+RDS
+S3
+SDLC
+SQL Server
+VPC

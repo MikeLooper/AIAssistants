@@ -134,7 +134,7 @@
       {% if job.match_details %}
       <table class="match-table">
         <thead>
-          <tr><th>Rule</th><th>Result</th><th>Extracted Value</th></tr>
+          <tr><th>Rule</th><th>Result</th><th>Extracted Value</th><th>Reason</th></tr>
         </thead>
         <tbody>
           {% for detail in job.match_details %}
@@ -143,7 +143,8 @@
             <td class="{{ 'match-yes' if detail.matched else 'match-no' }}">
               {{ '✔ Match' if detail.matched else '✘ No match' }}
             </td>
-            <td>{{ detail.extracted }}</td>
+            <td>{{ detail.extracted_value if detail.extracted_value is defined else detail.extracted }}</td>
+            <td>{{ detail.reason if detail.reason is defined else '—' }}</td>
           </tr>
           {% endfor %}
         </tbody>
