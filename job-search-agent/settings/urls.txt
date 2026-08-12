@@ -51,3 +51,12 @@ https://www.dice.com/jobs?adminDistrictCode=CO&countryCode=US&filters.employment
 #
 ## Remotive, .NET
 #https://remotive.com/remote-jobs?query=%22.net%22&location=USA&employment-type=full-time&min_salary=200000
+
+# Workforce Colorado, Solutions Architect:
+https://jobs.connectingcolorado.gov/careerhub/explore/jobs/844768665153968?recommended=0&query=Solutions+Architect&filter_jobType=full+time&filter_jobDuration=permanent
+
+# Workforce Colorado, Software Engineering Manager:
+https://jobs.connectingcolorado.gov/careerhub/explore/jobs/844768665154329?recommended=0&query=Software+Engineering+Manager&filter_jobType=full+time&filter_jobDuration=permanent
+
+# Workforce Colorado, Software Engineer:
+https://jobs.connectingcolorado.gov/careerhub/explore/jobs/844768665153809?recommended=0&query=Software+Engineer&filter_jobType=full+time&filter_jobDuration=permanent
