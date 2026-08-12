@@ -1,8 +1,8 @@
 """
-job_search_agent.py — Main entry point for the Job Search Agent.
+job-search — Main entry point for the Job Search Agent.
 
 Usage:
-    python job_search_agent.py
+    python job-search
 """
 
 import argparse
@@ -27,6 +27,7 @@ DEFAULT_EXCLUSIONS_PATH = SETTINGS_DIR / "exclusions.txt"
 DEFAULT_PROGRAMMING_LANGUAGES_PATH = SETTINGS_DIR / "programminglanguages.txt"
 DEFAULT_TOOLS_PATH = SETTINGS_DIR / "tools.txt"
 DEFAULT_MATCH_PCT = 75
+DEFAULT_MAX_JOBS_PER_URL = 0
 
 
 def load_lines(path: str) -> list[str]:
@@ -103,6 +104,15 @@ def main() -> None:
             f"(default: {DEFAULT_MATCH_PCT})"
         ),
     )
+    parser.add_argument(
+        "--max-jobs-per-url",
+        default=DEFAULT_MAX_JOBS_PER_URL,
+        type=int,
+        help=(
+            "Maximum number of jobs to process per URL (0 means no limit) "
+            f"(default: {DEFAULT_MAX_JOBS_PER_URL})"
+        ),
+    )
     args = parser.parse_args()
 
     urls       = load_lines(args.urls)
@@ -112,7 +122,12 @@ def main() -> None:
     language_aliases = load_alias_lines(args.programminglanguages)
     tool_aliases = load_alias_lines(args.tools)
     match_pct  = args.match_pct
+    max_jobs_per_url = args.max_jobs_per_url
     exclusion_rules, exclusion_warnings = parse_exclusion_rules(exclusion_lines)
+
+    if max_jobs_per_url < 0:
+        print("ERROR: --max-jobs-per-url must be 0 or greater", file=sys.stderr)
+        sys.exit(1)
 
     configure_extraction_aliases(language_aliases, tool_aliases)
 
@@ -134,6 +149,8 @@ def main() -> None:
         extractor = get_extractor(url)
         try:
             jobs = extractor.extract(url, attributes)
+            if max_jobs_per_url > 0:
+                jobs = jobs[:max_jobs_per_url]
         except Exception as exc:  # noqa: BLE001
             print(f"  ERROR extracting jobs from {url}: {exc}", file=sys.stderr)
             all_results.append({"url": url, "jobs": [], "error": str(exc)})
@@ -170,6 +187,7 @@ def main() -> None:
         json.dump({
             "generated": timestamp,
             "match_pct": match_pct,
+            "max_jobs_per_url": max_jobs_per_url,
             "exclusion_warnings": exclusion_warnings,
             "results": all_results,
         }, fh, indent=2)

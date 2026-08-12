@@ -7,7 +7,7 @@ The **Job Search Agent** is a Python-based application that automates job search
 
 ## Core Components
 
-### 1. **Main Entry Point** (`job_search_agent.py`)
+### 1. **Main Entry Point** (`job-search`)
 The orchestrator that ties everything together:
 
 - **Load Configuration Files**
@@ -19,16 +19,17 @@ The orchestrator that ties everything together:
 
 - **Process Flow**
   1. For each URL:
-     - Detect the job board (Dice, LinkedIn, GlassDoor, Greenhouse, Remotive, or generic)
+  - Detect the job board (Connecting Colorado, Dice, LinkedIn, GlassDoor, Greenhouse, Remotive, or generic)
      - Launch site-specific Selenium extractor
      - Extract all jobs and requested attributes
-  2. Score each job against target rules
-  3. Calculate match percentage (number of matched rules / total rules × 100)
-  4. Flag jobs as "RECOMMENDED" if match % ≥ minimum threshold (default: 75%)
-  5. Generate timestamped report directory with:
+    2. Optionally trim each URL result set to `--max-jobs-per-url` jobs (0 means no limit)
+    3. Score each job against target rules
+    4. Calculate match percentage (number of matched rules / total rules × 100)
+    5. Flag jobs as "RECOMMENDED" if match % ≥ minimum threshold (default: 75%)
+    6. Generate timestamped report directory with:
      - `report.html` - Interactive visual report
      - `report.json` - Raw data for programmatic access
-  6. Auto-open HTML report in default browser
+    7. Auto-open HTML report in default browser
 
 - **Command-Line Arguments**
   - `--urls` - Path to URLs file (default: `settings/urls.txt`)
@@ -37,6 +38,7 @@ The orchestrator that ties everything together:
   - `--programminglanguages` - Path to language aliases file (default: `settings/programminglanguages.txt`)
   - `--tools` - Path to tools aliases file (default: `settings/tools.txt`)
   - `--match-pct` - Minimum recommendation threshold 0-100 (default: 75)
+  - `--max-jobs-per-url` - Maximum jobs processed per URL; `0` means no limit (default: 0)
 
 ---
 
@@ -51,6 +53,7 @@ The orchestrator that ties everything together:
 
 | Site | Class | Notes |
 |------|-------|-------|
+| jobs.connectingcolorado.gov | `ConnectingColoradoExtractor` | Clicks each left-side job card and extracts description from right-side detail pane |
 | Dice.com | `DiceExtractor` | Standard Selenium scraping |
 | Glassdoor | `GlassdoorExtractor` | Handles dynamic content |
 | Greenhouse.io | `GreenhouseExtractor` | ATS job board |
@@ -179,13 +182,14 @@ Salary Range Includes 120K
 
 #### Step 5: Run the Agent
 ```bash
-python job_search_agent.py \
+python job-search \
   --urls settings/urls.txt \
   --attributes settings/attributes.txt \
   --targets settings/targets.txt \
   --programminglanguages settings/programminglanguages.txt \
   --tools settings/tools.txt \
-  --match-pct 70
+  --match-pct 70 \
+  --max-jobs-per-url 25
 ```
 
 #### Step 6: Output
@@ -295,7 +299,7 @@ Tools=CI/CD OR Kubernetes OR Linux
 
 ## Key Features
 
-✅ **Multi-Site Support** - Seamlessly extract from Dice, LinkedIn, GlassDoor, Greenhouse, Remotive, or any site  
+✅ **Multi-Site Support** - Seamlessly extract from Connecting Colorado, Dice, LinkedIn, GlassDoor, Greenhouse, Remotive, or any site  
 ✅ **Intelligent Extraction** - Automatically identifies job titles, technologies, and salary ranges  
 ✅ **Flexible Matching** - Supports exact matches, OR logic, and complex salary range validation  
 ✅ **Anti-Detection** - Masks browser automation to bypass bot detection  
@@ -309,7 +313,7 @@ Tools=CI/CD OR Kubernetes OR Linux
 ## File Structure
 ```
 job-search/
-├── job_search_agent.py          # Main entry point
+├── job-search                   # Main entry point
 ├── matcher.py                   # Job scoring logic
 ├── reporter.py                  # Report generation
 ├── settings/

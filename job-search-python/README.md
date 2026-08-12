@@ -18,7 +18,7 @@ pip install -r requirements.txt
 ## Usage
 
 ```bash
-python job_search_agent.py
+python job-search
 ```
 
 The script defaults to:
@@ -30,18 +30,20 @@ The script defaults to:
 - `settings/programminglanguages.txt`
 - `settings/tools.txt`
 - `--match-pct 75`
+- `--max-jobs-per-url 0` (no limit)
 
 All values can still be overridden:
 
 ```bash
-python job_search_agent.py \
+python job-search \
   --urls settings/urls.txt \
   --attributes settings/attributes.txt \
   --targets settings/targets.txt \
   --exclusions settings/exclusions.txt \
   --programminglanguages settings/programminglanguages.txt \
   --tools settings/tools.txt \
-  --match-pct 75
+  --match-pct 75 \
+  --max-jobs-per-url 25
 ```
 
 ### Arguments
@@ -55,6 +57,7 @@ python job_search_agent.py \
 | `--programminglanguages` | Path to programming-language aliases used for discovery/reporting. Defaults to `settings/programminglanguages.txt` |
 | `--tools` | Path to tool aliases used for discovery/reporting. Defaults to `settings/tools.txt` |
 | `--match-pct` | Integer 0–100. Jobs scoring ≥ this value are flagged as **recommended**. Defaults to `75` |
+| `--max-jobs-per-url` | Integer ≥ 0. Limits how many extracted jobs are processed for each URL. `0` means no limit. Defaults to `0` |
 
 ## Input File Formats
 
@@ -164,6 +167,7 @@ After the files are written, the script opens `report.html` in your browser.
 
 | Site | Extraction Method |
 |------|-------------------|
+| Connecting Colorado | Selenium - clicks each job card in the left panel and reads details from the right pane |
 | Dice | Selenium — clicks each job card in the left panel |
 | Glassdoor | Selenium — clicks each job card, handles sign-in wall |
 | Greenhouse | Selenium — standard job board |

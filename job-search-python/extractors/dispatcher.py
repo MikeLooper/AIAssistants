@@ -5,6 +5,7 @@ extractors/dispatcher.py — Maps a URL to the correct site extractor.
 from urllib.parse import urlparse
 
 from extractors.base import BaseExtractor
+from extractors.connectingcolorado import ConnectingColoradoExtractor
 from extractors.dice import DiceExtractor
 from extractors.glassdoor import GlassdoorExtractor
 from extractors.greenhouse import GreenhouseExtractor
@@ -14,6 +15,8 @@ from extractors.generic import GenericExtractor
 
 
 _DOMAIN_MAP: dict[str, type[BaseExtractor]] = {
+    "jobs.connectingcolorado.gov": ConnectingColoradoExtractor,
+    "connectingcolorado.gov":      ConnectingColoradoExtractor,
     "dice.com":        DiceExtractor,
     "glassdoor.com":   GlassdoorExtractor,
     "greenhouse.io":   GreenhouseExtractor,
