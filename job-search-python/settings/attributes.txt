@@ -1,6 +1,0 @@
-# Attribute values — one per line.
-
-Job Title
-Programming Language
-Tools
-Salary Range
