@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-26_2225-pilotutilityapi",
+  "stepId": "15-review-security-input-injection",
+  "status": "completed",
+  "startedAt": "2026-09-26T22:51:00-05:00",
+  "completedAt": "2026-09-26T22:53:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "targetPath=PilotUtilityApi;subjects=all-18;analyzers=none;gitHead=unavailable-user-declined-shell",
+  "skill": "review-security-input-injection",
+  "subject": "Security",
+  "batchIndex": 0,
+  "findings": [],
+  "strengths": [
+    {
+      "id": "SEC-II-STR#1",
+      "subject": "Security",
+      "subSubject": "Input & Injection",
+      "checkId": "SEC-II-03",
+      "title": "Database access goes through Dapper's parameterized CommandDefinition with static, literal-only SQL scripts — no string concatenation of any input",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Repositories/Constants/SqlConstants.cs", "lineStart": 1, "lineEnd": 20, "excerpt": "public const string SqlServerResetTestingScript = @\"...DELETE FROM Categories WHERE categoryName = 'Test Cat'...\"" }]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "SEC-II-01", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "The only request parameter in scope (About's show-details bool) is a simple, model-bound boolean with no injection surface." },
+    { "checkId": "SEC-II-02", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "pass" },
+    { "checkId": "SEC-II-03", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "pass" },
+    { "checkId": "SEC-II-04", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "No shell/OS process execution code exists in the reviewed files." },
+    { "checkId": "SEC-II-05", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "No XML parsing code exists in the reviewed files." },
+    { "checkId": "SEC-II-06", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "No file upload endpoints exist." },
+    { "checkId": "SEC-II-07", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "No file upload endpoints exist." }
+  ],
+  "urlsFetched": [],
+  "notes": "The API's current attack surface for injection is minimal: only two GET endpoints with trivial inputs and one POST endpoint with no request body, and all SQL is static/parameterized. No findings raised, but this should be re-reviewed if endpoints accepting free-form input are added."
+}

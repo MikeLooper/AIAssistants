@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-26_2225-pilotutilityapi",
+  "stepId": "10-review-software-quality",
+  "status": "completed",
+  "startedAt": "2026-09-26T22:36:00-05:00",
+  "completedAt": "2026-09-26T22:40:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "targetPath=PilotUtilityApi;subjects=all-18;analyzers=none;gitHead=unavailable-user-declined-shell",
+  "skill": "review-software-quality",
+  "subject": "Software Quality",
+  "batchIndex": 0,
+  "findings": [
+    {
+      "id": "SQ-01#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-01",
+      "severity": "Warning",
+      "title": "TestingRepository.ResetTestingAsync mixes connection selection, transaction control and error translation in one method",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 55, "lineEnd": 130, "excerpt": "public async Task<RetrieveResponse<int>> ResetTestingAsync(...) { ... connection.Open(); ... transaction.Commit()/Rollback(); ... catch (Exception exInner) ... throw new UserException(...) }" }],
+      "standard": "ISO/IEC 25010 Maintainability",
+      "url": "https://iso25000.com/index.php/en/iso-25000-standards/iso-25010#maintainability",
+      "recommendation": "Extract connection/transaction handling into a small helper (or a unit-of-work abstraction) so ResetTestingAsync only orchestrates the reset operation.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "SQ-06#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-06",
+      "severity": "Error",
+      "title": "Fatal startup exceptions are logged but not surfaced via a non-zero process exit code",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Web/Program.cs", "lineStart": 34, "lineEnd": 41, "excerpt": "catch (Exception ex)\n{\n\tLog.Fatal(ex, \"Server terminated unexpectedly.\");\n}\nfinally\n{\n\tLog.CloseAndFlush();\n}" }],
+      "standard": "ISO/IEC 25010 Reliability",
+      "url": "https://iso25000.com/index.php/en/iso-25000-standards/iso-25010#reliability",
+      "recommendation": "Set Environment.Exit(1) (or rethrow) in the catch block so orchestrators/process supervisors see the process as failed when startup throws.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "AP-05#1",
+      "subject": "Software Quality",
+      "subSubject": "Architecture Patterns",
+      "checkId": "AP-05",
+      "severity": "Information",
+      "title": "No retry/timeout/circuit-breaker pattern wraps the database or OTLP exporter calls",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 55, "lineEnd": 100, "excerpt": "connection.Open(); ... await connection.QueryFirstOrDefaultAsync<int>(command);" }],
+      "standard": "Azure Architecture Patterns",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/",
+      "recommendation": "See the Reliability subject's REL-01/REL-02 findings for the same gap in more detail.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "AP-STR#1",
+      "subject": "Software Quality",
+      "subSubject": "Architecture Patterns",
+      "checkId": "AP-01",
+      "title": "Clean layering: Web controllers call Services, Services call Repositories; no layer is skipped",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 1, "lineEnd": 55, "excerpt": "public TestingController(ITestingService testingService)" }]
+    },
+    {
+      "id": "AP-STR#2",
+      "subject": "Software Quality",
+      "subSubject": "Architecture Patterns",
+      "checkId": "AP-06",
+      "title": "Cross-cutting concerns (logging, OpenTelemetry, OpenAPI, error handling, versioning) are centralized in the Shared project rather than duplicated per module",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 65, "lineEnd": 87, "excerpt": "public static void ApiWebApplication(this WebApplication webApp) { ... webApp.OpenApiWebApplication(); webApp.LoggingWebApplication(); webApp.SwaggerWebApplication(); webApp.UseMiddleware<UnhandledExceptionMiddleware>(); }" }]
+    },
+    {
+      "id": "SQ-STR#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-07",
+      "title": "Consistent, descriptive naming and thorough XML documentation comments throughout the reviewed files",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 1, "lineEnd": 30, "excerpt": "/// <summary>\n/// A controller for system processing.\n/// </summary>" }]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "SQ-01", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "fail", "reason": "ResetTestingAsync mixes several responsibilities in one method.", "findingIds": ["SQ-01#1"] },
+    { "checkId": "SQ-02", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "SQ-03", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "SQ-04", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "SQ-05", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Information", "result": "pass" },
+    { "checkId": "SQ-06", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Error", "result": "fail", "reason": "Fatal startup exceptions in Program.cs don't set a non-zero exit code.", "findingIds": ["SQ-06#1"] },
+    { "checkId": "SQ-07", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Information", "result": "pass" },
+    { "checkId": "SQ-08", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Information", "result": "pass" },
+    { "checkId": "DP-01", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "DP-02", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Information", "result": "pass" },
+    { "checkId": "DP-04", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Information", "result": "pass" },
+    { "checkId": "DP-05", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Information", "result": "pass" },
+    { "checkId": "DP-06", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Warning", "result": "N/A", "reason": "No observer/event subscription patterns are used in the reviewed files." },
+    { "checkId": "AP-01", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "AP-02", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "AP-03", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "AP-04", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Information", "result": "pass" },
+    { "checkId": "AP-05", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Information", "result": "fail", "reason": "No retry/timeout/circuit-breaker around DB or OTLP exporter calls.", "findingIds": ["AP-05#1"] },
+    { "checkId": "AP-06", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass" }
+  ],
+  "urlsFetched": [],
+  "notes": "Reviewed the layered Domain/Repositories/Services/Shared/Web solution. No circular project references or god-classes found; the two flagged issues are startup error handling and one over-long repository method."
+}

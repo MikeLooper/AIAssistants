@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-27_1246-pilotutilityapi",
+  "stepId": "22-review-reliability",
+  "status": "completed",
+  "startedAt": "2026-09-27T14:00:00-05:00",
+  "completedAt": "2026-09-27T14:04:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "654660A96E3CC744F90EF2E66F27D63D237D81D1F87DEF1A0BC2F6F9BA8F3F27",
+  "skill": "review-reliability",
+  "subject": "Operations",
+  "batchIndex": 0,
+  "findings": [
+    {
+      "id": "REL-02#1",
+      "subject": "Operations",
+      "subSubject": "Reliability",
+      "checkId": "REL-02",
+      "severity": "Warning",
+      "title": "No retry-with-backoff policy wraps the database connection/query or the OTLP exporter calls",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 73, "lineEnd": 89, "excerpt": "connection.Open(); ... var transaction = connection.BeginTransaction(); ... result = await connection.QueryFirstOrDefaultAsync<int>(command);" },
+        { "file": "src/PilotUtiltyApi.Shared/OpenTelemetry/Extensions/OpenTelemetryExtensions.cs", "lineStart": 58, "lineEnd": 62, "excerpt": "options.Endpoint = new Uri($\"{otelBaseUrl}/{signalPath}\"); options.Protocol = OtlpExportProtocol.HttpProtobuf;" }
+      ],
+      "standard": "Azure Well-Architected — Reliability",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/",
+      "recommendation": "Wrap the DB connection open/query call in TestingRepository with a Polly retry policy (exponential backoff, small retry count) for transient SqlException/NpgsqlException errors; for the OTLP exporter, confirm/rely on the SDK's own retry behavior rather than assuming it, since none is configured here.",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "REL-04#1",
+      "subject": "Operations",
+      "subSubject": "Reliability",
+      "checkId": "REL-04",
+      "severity": "Warning",
+      "title": "No circuit breaker protects calls to the database or the OpenTelemetry collector",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 73, "lineEnd": 89, "excerpt": "var connection = CreateConnection(activeDataSource.DataSourceType, connectionString); ... connection.Open();" },
+        { "file": "src/PilotUtiltyApi.Shared/OpenTelemetry/Extensions/OpenTelemetryExtensions.cs", "lineStart": 58, "lineEnd": 62, "excerpt": "options.Endpoint = new Uri($\"{otelBaseUrl}/{signalPath}\"); options.Protocol = OtlpExportProtocol.HttpProtobuf;" }
+      ],
+      "standard": "Azure Well-Architected — Reliability",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/",
+      "recommendation": "Add a Polly circuit-breaker policy around the DB client so repeated failures against a degraded database short-circuit quickly instead of each request re-attempting a full open/transaction/query cycle; verify the OTLP exporter's own degraded-collector behavior doesn't block request threads.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "REL-STR#1",
+      "subject": "Operations",
+      "subSubject": "Reliability",
+      "checkId": "REL-01",
+      "title": "Per-data-source connect timeout is explicitly configurable rather than hardcoded",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 141, "lineEnd": 155, "excerpt": "$\"Connect Timeout={dataSource.ConnectTimeout};\" ... $\"Timeout={dataSource.ConnectTimeout};\"" }
+      ]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "REL-01", "subject": "Operations", "subSubject": "Reliability", "severityIfFailed": "Error", "result": "pass", "reason": "A ConnectTimeout is explicitly configured per data source for both SqlServer and PostgreSQL connection strings; the DB command and the OTLP exporter fall back to finite provider/SDK-default timeouts (no indefinite waits observed) even though no timeout is set explicitly on the CommandDefinition or OtlpExporterOptions.", "findingIds": [] },
+    { "checkId": "REL-02", "subject": "Operations", "subSubject": "Reliability", "severityIfFailed": "Warning", "result": "fail", "reason": "No retry policy exists for the DB open/query in TestingRepository or for the OTLP exporter calls in OpenTelemetryExtensions.", "findingIds": ["REL-02#1"] },
+    { "checkId": "REL-03", "subject": "Operations", "subSubject": "Reliability", "severityIfFailed": "Error", "result": "N/A", "reason": "No retry logic exists anywhere in the files reviewed, so there is currently nothing that could unsafely re-run the non-idempotent reset operation.", "findingIds": [] },
+    { "checkId": "REL-04", "subject": "Operations", "subSubject": "Reliability", "severityIfFailed": "Warning", "result": "fail", "reason": "No circuit breaker (Polly or equivalent) wraps calls to the database or the OpenTelemetry collector dependency.", "findingIds": ["REL-04#1"] },
+    { "checkId": "REL-05", "subject": "Operations", "subSubject": "Reliability", "severityIfFailed": "Warning", "result": "N/A", "reason": "No IaC or deployment manifests (Dockerfile, Kubernetes, Bicep/Terraform, etc.) exist anywhere in the target repository to assess replica/instance count.", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "Reviewed the three in-scope files plus TestingRepository's private connection-string/CreateConnection helpers to confirm timeout configuration. No IaC found anywhere in the repo (checked root and .github/workflows), so REL-05 is N/A rather than fail."
+}

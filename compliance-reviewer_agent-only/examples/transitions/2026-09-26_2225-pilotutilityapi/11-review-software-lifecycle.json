@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-26_2225-pilotutilityapi",
+  "stepId": "11-review-software-lifecycle",
+  "status": "completed",
+  "startedAt": "2026-09-26T22:40:00-05:00",
+  "completedAt": "2026-09-26T22:42:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "targetPath=PilotUtilityApi;subjects=all-18;analyzers=none;gitHead=unavailable-user-declined-shell",
+  "skill": "review-software-lifecycle",
+  "subject": "Software Lifecycle",
+  "batchIndex": 0,
+  "findings": [
+    {
+      "id": "SL-01#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Software Lifecycle",
+      "checkId": "SL-01",
+      "severity": "Error",
+      "title": "No CI pipeline builds or tests the solution on push/PR",
+      "evidence": [{ "file": ".github/workflows/", "lineStart": 0, "lineEnd": 0, "excerpt": "(folder exists but contains no workflow files)" }],
+      "standard": "SLSA v1.0 build requirements",
+      "url": "https://slsa.dev/spec/v1.0/requirements",
+      "recommendation": "Add a GitHub Actions workflow that runs `dotnet build` and `dotnet test` on every push and pull request.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-04#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Software Lifecycle",
+      "checkId": "SL-04",
+      "severity": "Warning",
+      "title": "No documented branch protection or required-review policy found in the repo",
+      "evidence": [{ "file": "CONTRIBUTING.md", "lineStart": 15, "lineEnd": 16, "excerpt": "You may merge the Pull Request in once you have the sign-off of two other developers..." }],
+      "standard": "NIST SP 800-218 (SSDF)",
+      "url": "https://www.nist.gov/itl/executive-order-14028-improving-nations-cybersecurity/nist-sp-800-218-secure-software-development",
+      "recommendation": "Document and enforce branch protection rules (required reviews, required status checks) on the default branch in the repository settings, and reference them from CONTRIBUTING.md.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-06#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Software Lifecycle",
+      "checkId": "SL-06",
+      "severity": "Warning",
+      "title": "No automated dependency update tool (e.g. Dependabot/Renovate) configured",
+      "evidence": [{ "file": ".github/", "lineStart": 0, "lineEnd": 0, "excerpt": "no dependabot.yml or renovate.json found" }],
+      "standard": "NIST SP 800-218 (SSDF)",
+      "url": "https://www.nist.gov/itl/executive-order-14028-improving-nations-cybersecurity/nist-sp-800-218-secure-software-development",
+      "recommendation": "Add a `.github/dependabot.yml` (or Renovate config) to schedule automated dependency update PRs for NuGet packages.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-07#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Software Lifecycle",
+      "checkId": "SL-07",
+      "severity": "Information",
+      "title": "No SECURITY.md vulnerability-reporting policy",
+      "evidence": [{ "file": "/", "lineStart": 0, "lineEnd": 0, "excerpt": "repository root has no SECURITY.md" }],
+      "standard": "NIST SP 800-218 (SSDF)",
+      "url": "https://www.nist.gov/itl/executive-order-14028-improving-nations-cybersecurity/nist-sp-800-218-secure-software-development",
+      "recommendation": "Add a SECURITY.md describing how to privately report vulnerabilities.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-08#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Software Lifecycle",
+      "checkId": "SL-08",
+      "severity": "Information",
+      "title": "No CHANGELOG or release notes file",
+      "evidence": [{ "file": "/", "lineStart": 0, "lineEnd": 0, "excerpt": "no CHANGELOG.md found at repo root" }],
+      "standard": "SemVer",
+      "url": "https://semver.org/",
+      "recommendation": "Maintain a CHANGELOG.md (or GitHub Releases notes) alongside version bumps.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "SL-STR#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Software Lifecycle",
+      "checkId": "SL-03",
+      "title": "Version is centrally declared and follows SemVer (1.0.0) via Directory.Build.props",
+      "evidence": [{ "file": "Directory.Build.props", "lineStart": 3, "lineEnd": 3, "excerpt": "<Version>1.0.0</Version>" }]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "SL-01", "subject": "Software Lifecycle", "subSubject": "Software Lifecycle", "severityIfFailed": "Error", "result": "fail", "reason": ".github/workflows is empty; no CI pipeline exists.", "findingIds": ["SL-01#1"] },
+    { "checkId": "SL-02", "subject": "Software Lifecycle", "subSubject": "Software Lifecycle", "severityIfFailed": "Warning", "result": "fail", "reason": "No documented tagging/publish/release process beyond the PR checklist in CONTRIBUTING.md.", "findingIds": [] },
+    { "checkId": "SL-03", "subject": "Software Lifecycle", "subSubject": "Software Lifecycle", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "SL-04", "subject": "Software Lifecycle", "subSubject": "Software Lifecycle", "severityIfFailed": "Warning", "result": "fail", "reason": "Two-reviewer rule is documented but no enforced branch-protection settings are visible in-repo.", "findingIds": ["SL-04#1"] },
+    { "checkId": "SL-05", "subject": "Software Lifecycle", "subSubject": "Software Lifecycle", "severityIfFailed": "Information", "result": "N/A", "reason": "No build/release pipeline exists yet to assess provenance/signing against." },
+    { "checkId": "SL-06", "subject": "Software Lifecycle", "subSubject": "Software Lifecycle", "severityIfFailed": "Warning", "result": "fail", "reason": "No Dependabot/Renovate configuration found.", "findingIds": ["SL-06#1"] },
+    { "checkId": "SL-07", "subject": "Software Lifecycle", "subSubject": "Software Lifecycle", "severityIfFailed": "Information", "result": "fail", "reason": "No SECURITY.md.", "findingIds": ["SL-07#1"] },
+    { "checkId": "SL-08", "subject": "Software Lifecycle", "subSubject": "Software Lifecycle", "severityIfFailed": "Information", "result": "fail", "reason": "No CHANGELOG.md.", "findingIds": ["SL-08#1"] }
+  ],
+  "urlsFetched": [],
+  "notes": "The repo has a CONTRIBUTING.md with a PR process and code of conduct, and centrally-managed versioning, but no automated pipeline, security policy or changelog."
+}

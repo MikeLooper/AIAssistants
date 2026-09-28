@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-27_1246-pilotutilityapi",
+  "stepId": "25-review-monitoring",
+  "status": "completed",
+  "startedAt": "2026-09-27T14:10:15-05:00",
+  "completedAt": "2026-09-27T14:10:30-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "654660A96E3CC744F90EF2E66F27D63D237D81D1F87DEF1A0BC2F6F9BA8F3F27",
+  "skill": "review-monitoring",
+  "subject": "Operations",
+  "batchIndex": 0,
+  "applicable": false,
+  "findings": [],
+  "strengths": [],
+  "checkResults": [
+    { "checkId": "MON-01", "subject": "Operations", "subSubject": "Monitoring", "severityIfFailed": "Warning", "result": "N/A", "reason": "no infrastructure-as-code found" },
+    { "checkId": "MON-02", "subject": "Operations", "subSubject": "Monitoring", "severityIfFailed": "Information", "result": "N/A", "reason": "no infrastructure-as-code found" }
+  ],
+  "urlsFetched": [],
+  "notes": "Skipped per compliance-inventory (iacFound: false). Health checks and SLO/SLI documentation are covered under review-observability (OBS-06/OBS-07) instead."
+}

@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-26_2225-pilotutilityapi",
+  "stepId": "21-review-dependency-management",
+  "status": "completed",
+  "startedAt": "2026-09-26T23:12:00-05:00",
+  "completedAt": "2026-09-26T23:15:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "targetPath=PilotUtilityApi;subjects=all-18;analyzers=none;gitHead=unavailable-user-declined-shell",
+  "skill": "review-dependency-management",
+  "subject": "Implementation",
+  "batchIndex": 0,
+  "findings": [
+    {
+      "id": "DEP-02#1",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "checkId": "DEP-02",
+      "severity": "Warning",
+      "title": "No packages.lock.json committed for any project",
+      "evidence": [{ "file": "Directory.Packages.props", "lineStart": 1, "lineEnd": 5, "excerpt": "<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>" }],
+      "standard": "fallback rubric",
+      "url": "",
+      "recommendation": "Same fix as TF-02: enable RestorePackagesWithLockFile and commit the lock files.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "DEP-05#1",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "checkId": "DEP-05",
+      "severity": "Information",
+      "title": "No SBOM or dependency license inventory is generated",
+      "evidence": [{ "file": "/", "lineStart": 0, "lineEnd": 0, "excerpt": "no sbom.json/CycloneDX/SPDX file found" }],
+      "standard": "fallback rubric",
+      "url": "",
+      "recommendation": "Generate an SBOM (e.g. via `dotnet CycloneDX` or GitHub's dependency graph export) as part of the release process once CI exists.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "DEP-STR#1",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "checkId": "DEP-01",
+      "title": "Every package version is centrally and exactly pinned via Directory.Packages.props (central package management); no floating/wildcard versions",
+      "evidence": [{ "file": "Directory.Packages.props", "lineStart": 6, "lineEnd": 10, "excerpt": "<PackageVersion Include=\"Asp.Versioning.Mvc.ApiExplorer\" Version=\"10.2.1\" />" }]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "DEP-01", "subject": "Implementation", "subSubject": "Dependency Management", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "DEP-02", "subject": "Implementation", "subSubject": "Dependency Management", "severityIfFailed": "Warning", "result": "fail", "reason": "No lock file exists for any project.", "findingIds": ["TF-02#1"] },
+    { "checkId": "DEP-03", "subject": "Implementation", "subSubject": "Dependency Management", "severityIfFailed": "Error", "result": "N/A", "reason": "CLI analyzers (dotnet list package --vulnerable) were not approved for this run, so known-vulnerability status could not be verified." },
+    { "checkId": "DEP-04", "subject": "Implementation", "subSubject": "Dependency Management", "severityIfFailed": "Error", "result": "pass", "reason": "The solution targets net10.0, a current LTS release under active support as of the review date; no package pins an EOL runtime." },
+    { "checkId": "DEP-05", "subject": "Implementation", "subSubject": "Dependency Management", "severityIfFailed": "Information", "result": "fail", "reason": "No SBOM/license-inventory artifact found.", "findingIds": ["DEP-05#1"] },
+    { "checkId": "DEP-06", "subject": "Implementation", "subSubject": "Dependency Management", "severityIfFailed": "Warning", "result": "pass", "reason": "The project is MIT-licensed; all reviewed NuGet dependencies (Microsoft, Serilog, OpenTelemetry, Dapper, NUnit, Moq, Npgsql, Scalar) use permissive (MIT/Apache-2.0/BSD-style) licenses with no known conflict." }
+  ],
+  "urlsFetched": [],
+  "notes": "DEP-02's evidence duplicates TF-02; expect the aggregator to keep TF-02 as primary since Application Design runs earlier in the pipeline. DEP-03 could not be evaluated without approved analyzers — re-run with analyzer approval for a complete vulnerability check."
+}

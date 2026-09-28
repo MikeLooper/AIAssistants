@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-26_2225-pilotutilityapi",
+  "stepId": "18-review-coding-standards",
+  "status": "completed",
+  "startedAt": "2026-09-26T22:59:00-05:00",
+  "completedAt": "2026-09-26T23:04:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "targetPath=PilotUtilityApi;subjects=all-18;analyzers=none;gitHead=unavailable-user-declined-shell",
+  "skill": "review-coding-standards",
+  "subject": "Implementation",
+  "batchIndex": 0,
+  "findings": [
+    {
+      "id": "CS-02#1",
+      "subject": "Implementation",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-02",
+      "severity": "Information",
+      "title": "No .editorconfig or formatter/analyzer config found to enforce the observed formatting conventions",
+      "evidence": [{ "file": "/", "lineStart": 0, "lineEnd": 0, "excerpt": "no .editorconfig at repo root or under src/test" }],
+      "standard": "fallback rubric",
+      "url": "",
+      "recommendation": "Add a .editorconfig (and optionally `dotnet format` in CI) so the currently-consistent tab indentation and brace style stay enforced as the team grows.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "CS-CS-04#1",
+      "subject": "Implementation",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-CS-04",
+      "severity": "Warning",
+      "title": "The IDbConnection created in TestingRepository is closed but never disposed via a using statement",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 78, "lineEnd": 118, "excerpt": "var connection = CreateConnection(activeDataSource.DataSourceType, connectionString);\nif (connection.State != ConnectionState.Open) { connection.Open(); }\n...\nfinally\n{\n\tconnection.Close();\n}" }],
+      "standard": "C# Coding Conventions",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions",
+      "recommendation": "Wrap the connection in a `using`/`await using` declaration instead of manually calling Close() in a finally block, so Dispose() always runs even if Close() itself throws.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "CS-STR#1",
+      "subject": "Implementation",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-04",
+      "title": "Every public type/member across the reviewed files has XML documentation comments, and GenerateDocumentationFile is enabled",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Shared/PilotUtilityApi.Shared.csproj", "lineStart": 5, "lineEnd": 5, "excerpt": "<GenerateDocumentationFile>true</GenerateDocumentationFile>" }]
+    },
+    {
+      "id": "CS-STR#2",
+      "subject": "Implementation",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-CS-05",
+      "title": "Nullable reference types are enabled solution-wide and used correctly (e.g. nullable OpenTelemetryConfiguration)",
+      "evidence": [{ "file": "Directory.Build.props", "lineStart": 4, "lineEnd": 4, "excerpt": "<Nullable>enable</Nullable>" }]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "CS-01", "subject": "Implementation", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "pass" },
+    { "checkId": "CS-02", "subject": "Implementation", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "fail", "reason": "No .editorconfig or enforced formatter config found.", "findingIds": ["CS-02#1"] },
+    { "checkId": "CS-03", "subject": "Implementation", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "pass" },
+    { "checkId": "CS-04", "subject": "Implementation", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "pass" },
+    { "checkId": "CS-05", "subject": "Implementation", "subSubject": "Coding Standards", "severityIfFailed": "Warning", "result": "fail", "reason": "See language-specific results below (CS-CS-04 via the C# file).", "findingIds": ["CS-CS-04#1"] },
+    { "checkId": "CS-CS-01", "subject": "Implementation", "subSubject": "Coding Standards", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "CS-CS-02", "subject": "Implementation", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "pass" },
+    { "checkId": "CS-CS-03", "subject": "Implementation", "subSubject": "Coding Standards", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "CS-CS-04", "subject": "Implementation", "subSubject": "Coding Standards", "severityIfFailed": "Warning", "result": "fail", "reason": "TestingRepository disposes its IDbConnection via a manual Close() call instead of using/await using.", "findingIds": ["CS-CS-04#1"] },
+    { "checkId": "CS-CS-05", "subject": "Implementation", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "pass" }
+  ],
+  "urlsFetched": [],
+  "notes": "Reviewed all source files across the five projects (sampled the largest/most representative ones in each layer). Overall the codebase is consistent and well-documented; the two findings are both small, mechanical fixes."
+}

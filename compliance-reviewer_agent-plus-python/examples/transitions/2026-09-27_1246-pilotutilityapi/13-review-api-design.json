@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-27_1246-pilotutilityapi",
+  "stepId": "13-review-api-design",
+  "status": "completed",
+  "startedAt": "2026-09-27T13:10:00-05:00",
+  "completedAt": "2026-09-27T13:15:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "654660A96E3CC744F90EF2E66F27D63D237D81D1F87DEF1A0BC2F6F9BA8F3F27",
+  "skill": "review-api-design",
+  "subject": "API Design",
+  "batchIndex": 0,
+  "findings": [
+    {
+      "id": "API-03#1",
+      "subject": "API Design",
+      "checkId": "API-03",
+      "severity": "Error",
+      "title": "Generated OpenAPI spec omits the version segment for TestingController's route",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 15, "lineEnd": 19, "excerpt": "[ApiController]\n[ApiVersion(\"1.0\")]\n[Route(\"v{version:apiVersion}/[controller]\")]\n[AllowAnonymous]\npublic class TestingController : ControllerBase" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 45, "lineEnd": 46, "excerpt": "[HttpPost]\n[Route(\"reset\")]" },
+        { "file": "docs/PilotUtilityApi_v1.json", "lineStart": 81, "lineEnd": 83, "excerpt": "\"/testing/reset\": {\n  \"post\": {\n    \"tags\": [\"Testing\"]" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines / OpenAPI Specification",
+      "url": "https://spec.openapis.org/oas/latest.html",
+      "recommendation": "Regenerate the OpenAPI snapshot so paths reflect the actual versioned route (e.g. \"/v1/testing/reset\"), or confirm the SubstituteApiVersionInUrl option is actually honored by the Microsoft.AspNetCore.OpenApi document generator for attribute-routed, Asp.Versioning-based controllers; update docs/PilotUtilityApi_v1.json accordingly.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "API-03#2",
+      "subject": "API Design",
+      "checkId": "API-03",
+      "severity": "Error",
+      "title": "AboutResponse schema omits the ApplicationConfiguration property that the endpoint can return",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Domain/Models/Responses/AboutResponse.cs", "lineStart": 17, "lineEnd": 21, "excerpt": "[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]\npublic IApplicationConfiguration? ApplicationConfiguration { get; set; }" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 81, "lineEnd": 88, "excerpt": "var aboutResponse = new AboutResponse\n{\n  ...\n  ApplicationConfiguration = showDetails ? new ApplicationConfiguration(this.ApplicationConfiguration, true) : null\n};" },
+        { "file": "docs/PilotUtilityApi_v1.json", "lineStart": 151, "lineEnd": 179, "excerpt": "\"AboutResponse\": {\n  \"type\": \"object\",\n  \"properties\": { \"apiVersion\": {...}, \"buildVersion\": {...}, \"deployDate\": {...}, \"name\": {...} }\n}" }
+      ],
+      "standard": "OpenAPI Specification",
+      "url": "https://spec.openapis.org/oas/latest.html",
+      "recommendation": "The ApplicationConfiguration property is typed as the interface IApplicationConfiguration, which the built-in OpenAPI schema generator appears to skip. Expose it via a concrete DTO/class (or an explicit schema transformer) so GET /about?show-details=true responses are fully documented instead of silently diverging from the published schema.",
+      "confidence": "Medium",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "API-07#1",
+      "subject": "API Design",
+      "checkId": "API-07",
+      "title": "Explicit, multi-source API versioning with a sensible default",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 25, "lineEnd": 41, "excerpt": "options.ApiVersionReader = ApiVersionReader.Combine(new HeaderApiVersionReader(\"api-version\"), new QueryStringApiVersionReader(), new UrlSegmentApiVersionReader());\noptions.AssumeDefaultVersionWhenUnspecified = true;\noptions.DefaultApiVersion = new ApiVersion(1, 0);" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines"
+    },
+    {
+      "id": "API-01#1",
+      "subject": "API Design",
+      "checkId": "API-01",
+      "title": "OpenAPI operations are enriched from XML doc comments via a custom transformer",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/OpenApi/Transformers/ManualXmlCommentsOperationTransformer.cs", "lineStart": 44, "lineEnd": 68, "excerpt": "string memberName = GetXmlMemberKey(methodInfo);\nvar memberNode = _xmlDoc.Descendants(\"member\").FirstOrDefault(...);\nif (!string.IsNullOrEmpty(summaryText)) { operation.Summary = summaryText; }" }
+      ]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "API-01", "subject": "API Design", "severityIfFailed": "Warning", "result": "pass", "reason": "docs/PilotUtilityApi_v1.json exists and is generated per API version.", "findingIds": [] },
+    { "checkId": "API-02", "subject": "API Design", "severityIfFailed": "Error", "result": "pass", "reason": "The spec is well-formed JSON, declares \"openapi\": \"3.1.1\", and has valid info/servers/paths/components sections.", "findingIds": [] },
+    { "checkId": "API-03", "subject": "API Design", "severityIfFailed": "Error", "result": "fail", "reason": "TestingController's versioned route is not reflected in the spec's path, and AboutResponse's conditional ApplicationConfiguration property is missing from its schema.", "findingIds": ["API-03#1", "API-03#2"] },
+    { "checkId": "API-04", "subject": "API Design", "severityIfFailed": "Error", "result": "pass", "reason": "Utility endpoints (/healthcheck, /about) are deliberately version-neutral via [ApiVersionNeutral]; the versioned TestingController follows the resource/controller-name convention consistently.", "findingIds": [] },
+    { "checkId": "API-05", "subject": "API Design", "severityIfFailed": "Error", "result": "pass", "reason": "Endpoints return 200/204/400 as appropriate, and [ApiController] client-error handling converts bare BadRequest()/model-binding failures into a consistent ProblemDetails shape, matching the spec.", "findingIds": [] },
+    { "checkId": "API-06", "subject": "API Design", "severityIfFailed": "Warning", "result": "N/A", "reason": "No collection-returning endpoints are present in the files in scope (only /healthcheck, /about, and /testing/reset).", "findingIds": [] },
+    { "checkId": "API-07", "subject": "API Design", "severityIfFailed": "Warning", "result": "pass", "reason": "Explicit versioning is configured via Asp.Versioning with header/query/URL-segment readers and a default version.", "findingIds": [] },
+    { "checkId": "API-08", "subject": "API Design", "severityIfFailed": "Information", "result": "N/A", "reason": "No collection endpoints are present in the files in scope to support field selection/filtering.", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "Scope was limited to SystemController, TestingController, and the Api/OpenApi/Swagger extension folders — the entire controller surface of the app per src/PilotUtiltyApi.Web/Controllers (no other controllers exist). No security-scheme, pagination, or collection-filtering checks apply given the small, non-collection endpoint surface."
+}

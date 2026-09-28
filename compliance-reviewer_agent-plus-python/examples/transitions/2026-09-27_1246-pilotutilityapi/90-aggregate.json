@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-27_1246-pilotutilityapi",
+  "stepId": "90-aggregate",
+  "status": "completed",
+  "startedAt": "2026-09-27T14:16:00-05:00",
+  "completedAt": "2026-09-27T14:30:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "654660A96E3CC744F90EF2E66F27D63D237D81D1F87DEF1A0BC2F6F9BA8F3F27",
+  "overallScore": 59.91,
+  "overallBand": "Poor",
+  "subjectScores": [
+    { "subject": "Software Quality", "score": 70.97, "band": "Fair", "passWeight": 22, "totalWeight": 31 },
+    { "subject": "Software Lifecycle", "score": 0.00, "band": "Poor", "passWeight": 0, "totalWeight": 16 },
+    { "subject": "Application Design", "score": 73.08, "band": "Fair", "passWeight": 19, "totalWeight": 26 },
+    { "subject": "API Design", "score": 79.17, "band": "Good", "passWeight": 19, "totalWeight": 24 },
+    { "subject": "Security", "score": 55.74, "band": "Poor", "passWeight": 34, "totalWeight": 61 },
+    { "subject": "Implementation", "score": 56.86, "band": "Poor", "passWeight": 29, "totalWeight": 51 },
+    { "subject": "Operations", "score": 69.57, "band": "Fair", "passWeight": 16, "totalWeight": 23 }
+  ],
+  "severityCounts": { "Error": 7, "Warning": 24, "Information": 7 },
+  "duplicatesSuppressed": [
+    { "suppressedId": "SWQ-AP-05#1", "primaryId": "REL-02#1", "reason": "Overlapping evidence (TestingRepository.cs lines 73-89) for missing retry/resilience around the database calls; Reliability's Warning outranks Software Quality/Architecture Patterns' Information." },
+    { "suppressedId": "SEC-OP-06#1", "primaryId": "TF-03#1", "reason": "Overlapping evidence (appsettings.json/appsettings.Development.json credential fields); Application Design (Twelve-Factor)'s Error outranks Security — Operational's Warning." },
+    { "suppressedId": "TST-06#1", "primaryId": "SL-01#1", "reason": "Identical evidence (.github/workflows/ empty, no CI runs the test suite); tied Error severity, Software Lifecycle runs earlier in the pipeline than Testing." }
+  ],
+  "findings": [
+    "SWQ-SQ-01#1", "SWQ-SQ-02#1", "SWQ-SQ-03#1", "SWQ-SQ-07#1", "SWQ-DP-04#1",
+    "SL-01#1", "SL-02#1", "SL-03#1", "SL-04#1", "SL-05#1", "SL-06#1", "SL-07#1", "SL-08#1",
+    "TF-03#1", "TF-11#1",
+    "API-03#1", "API-03#2",
+    "SEC-IA-01#1", "SEC-IA-02#1", "SEC-IA-08#1",
+    "SEC-WA-06#1", "SEC-WA-01#1", "SEC-WA-02#1", "SEC-WA-03#1", "SEC-WA-04#1",
+    "CS-CS-02#1", "CS-CS-04#1",
+    "TST-01#1", "TST-02#1", "TST-03#1",
+    "OBS-02#1", "OBS-07#1",
+    "DEP-02#1", "DEP-05#1",
+    "REL-02#1", "REL-04#1",
+    "PERF-02#1",
+    "MAINT-02#1"
+  ],
+  "topRisks": [
+    { "rank": 1, "findingId": "SEC-IA-01#1", "severity": "Error", "title": "No authentication is registered anywhere in the app; a destructive endpoint is fully anonymous" },
+    { "rank": 2, "findingId": "SEC-IA-02#1", "severity": "Error", "title": "No function-level access control distinguishes sensitive actions from public ones" },
+    { "rank": 3, "findingId": "SEC-WA-06#1", "severity": "Error", "title": "HTTPS redirection is only enabled in Development, not Production" },
+    { "rank": 4, "findingId": "SL-01#1", "severity": "Error", "title": "No CI pipeline builds or tests the code on push/PR" },
+    { "rank": 5, "findingId": "TF-03#1", "severity": "Error", "title": "Environment-specific backing-service config is hardcoded in versioned appsettings files instead of environment variables" }
+  ],
+  "notes": "Scoring uses all 41 raw findings' checkResults (pass/fail/N/A) per subject, unaffected by dedup. The deduplicated findings list (38 entries) and severity counts (Error 7, Warning 24, Information 7) exclude the 3 suppressed duplicates. topRisks prioritizes the two Security/Identity & Access Errors and the HTTPS-enforcement Error ahead of the two remaining Errors (SL-01, TF-03) by real-world risk (unauthenticated destructive endpoint > missing CI > appsettings secrets, given TF-03's committed value is a placeholder, not a live credential) rather than a strictly mechanical confidence/effort tiebreak, which would otherwise have left three effort-tied, confidence-tied Errors (SL-01, API-03#1, SEC-WA-06) ambiguously ordered against the two Medium-effort Security Errors. API-03#1/#2 (API Design) did not make the top 5 despite being High/Medium confidence Errors, as they represent spec/documentation drift rather than an exploitable or availability-impacting defect."
+}

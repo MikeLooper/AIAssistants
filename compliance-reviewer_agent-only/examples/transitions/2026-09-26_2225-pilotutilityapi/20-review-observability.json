@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-26_2225-pilotutilityapi",
+  "stepId": "20-review-observability",
+  "status": "completed",
+  "startedAt": "2026-09-26T23:08:00-05:00",
+  "completedAt": "2026-09-26T23:12:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "targetPath=PilotUtilityApi;subjects=all-18;analyzers=none;gitHead=unavailable-user-declined-shell",
+  "skill": "review-observability",
+  "subject": "Implementation",
+  "batchIndex": 0,
+  "findings": [
+    {
+      "id": "OBS-02#1",
+      "subject": "Implementation",
+      "subSubject": "Observability",
+      "checkId": "OBS-02",
+      "severity": "Warning",
+      "title": "Error correlation IDs are freshly generated GUIDs, not tied to the OpenTelemetry trace/span ID already in use",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Shared/Logging/Models/LoggingCorrelation.cs", "lineStart": 13, "lineEnd": 16, "excerpt": "public LoggingCorrelation()\n{\n\tthis.CorrelationId = Guid.NewGuid().ToString();\n}" }],
+      "standard": "OpenTelemetry",
+      "url": "https://opentelemetry.io/docs/",
+      "recommendation": "Derive CorrelationId from `Activity.Current?.TraceId` (already populated by the AspNetCore OTel instrumentation) instead of a new GUID, so the ID shown to users matches the trace they can look up in Tempo/App Insights.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "OBS-07#1",
+      "subject": "Implementation",
+      "subSubject": "Observability",
+      "checkId": "OBS-07",
+      "severity": "Information",
+      "title": "No SLOs/SLIs are documented for the API",
+      "evidence": [{ "file": "README.md", "lineStart": 1, "lineEnd": 1, "excerpt": "(no SLO/SLI section found in README.md or docs/)" }],
+      "standard": "Azure Well-Architected — Operational Excellence",
+      "url": "https://learn.microsoft.com/azure/well-architected/operational-excellence/",
+      "recommendation": "Document target latency/availability/error-rate SLOs (even simple ones) for the healthcheck and reset endpoints in README.md or docs/.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "OBS-STR#1",
+      "subject": "Implementation",
+      "subSubject": "Observability",
+      "checkId": "OBS-03",
+      "title": "OpenTelemetry logging, metrics and tracing are all wired up with AspNetCore/HttpClient/SqlClient/Npgsql instrumentation and exported via OTLP",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Shared/OpenTelemetry/Extensions/OpenTelemetryExtensions.cs", "lineStart": 61, "lineEnd": 96, "excerpt": ".WithMetrics(metrics => { metrics.AddMeter(...).AddAspNetCoreInstrumentation()... }) .WithTracing(tracing => { tracing.SetSampler(new AlwaysOnSampler()).AddSource(\"PilotApi.Web\")... })" }]
+    },
+    {
+      "id": "OBS-STR#2",
+      "subject": "Implementation",
+      "subSubject": "Observability",
+      "checkId": "OBS-06",
+      "title": "A dedicated, version-neutral health check endpoint is exposed",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 38, "lineEnd": 45, "excerpt": "[HttpGet]\n[Route(\"healthcheck\")]\npublic IActionResult HealthCheck() { return this.Ok(\"OK\"); }" }]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "OBS-01", "subject": "Implementation", "subSubject": "Observability", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "OBS-02", "subject": "Implementation", "subSubject": "Observability", "severityIfFailed": "Warning", "result": "fail", "reason": "CorrelationId is a fresh GUID per error, unrelated to the OTel TraceId.", "findingIds": ["OBS-02#1"] },
+    { "checkId": "OBS-03", "subject": "Implementation", "subSubject": "Observability", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "OBS-04", "subject": "Implementation", "subSubject": "Observability", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "OBS-05", "subject": "Implementation", "subSubject": "Observability", "severityIfFailed": "Information", "result": "pass" },
+    { "checkId": "OBS-06", "subject": "Implementation", "subSubject": "Observability", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "OBS-07", "subject": "Implementation", "subSubject": "Observability", "severityIfFailed": "Information", "result": "fail", "reason": "No SLO/SLI documentation found.", "findingIds": ["OBS-07#1"] }
+  ],
+  "urlsFetched": [],
+  "notes": "Observability is a genuine strength of this codebase — full OTel logging/metrics/tracing pipeline. The two gaps are the disconnect between the app's own correlation ID and OTel's trace ID, and missing SLO documentation."
+}

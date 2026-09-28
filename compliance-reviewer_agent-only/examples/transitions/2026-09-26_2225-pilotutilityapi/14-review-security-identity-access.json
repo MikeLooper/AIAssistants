@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-26_2225-pilotutilityapi",
+  "stepId": "14-review-security-identity-access",
+  "status": "completed",
+  "startedAt": "2026-09-26T22:48:00-05:00",
+  "completedAt": "2026-09-26T22:51:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "targetPath=PilotUtilityApi;subjects=all-18;analyzers=none;gitHead=unavailable-user-declined-shell",
+  "skill": "review-security-identity-access",
+  "subject": "Security",
+  "batchIndex": 0,
+  "findings": [
+    {
+      "id": "SEC-IA-01#1",
+      "subject": "Security",
+      "subSubject": "Identity & Access",
+      "checkId": "SEC-IA-01",
+      "severity": "Error",
+      "title": "No authentication scheme is registered anywhere in the application; every endpoint is explicitly anonymous",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 19, "lineEnd": 19, "excerpt": "[AllowAnonymous]" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 18, "lineEnd": 18, "excerpt": "[AllowAnonymous]" }
+      ],
+      "standard": "OWASP Authentication Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html",
+      "recommendation": "Register an authentication scheme (e.g. JWT bearer or API key) via builder.Services.AddAuthentication(...), and remove [AllowAnonymous] from state-changing endpoints such as /v1/testing/reset.",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "SEC-IA-02#1",
+      "subject": "Security",
+      "subSubject": "Identity & Access",
+      "checkId": "SEC-IA-02",
+      "severity": "Error",
+      "title": "The destructive testing-data-reset endpoint has no authorization check",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 16, "lineEnd": 36, "excerpt": "[ApiVersion(\"1.0\")]\n[Route(\"v{version:apiVersion}/[controller]\")]\n[AllowAnonymous]\npublic class TestingController : ControllerBase" }],
+      "standard": "OWASP Authorization Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html",
+      "recommendation": "Require an authenticated caller with an explicit role/scope (e.g. an 'admin' or 'test-automation' policy) for POST /v1/testing/reset, since it deletes production-shaped data.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [],
+  "checkResults": [
+    { "checkId": "SEC-IA-01", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "fail", "reason": "No AddAuthentication/authentication middleware is configured anywhere; both controllers are [AllowAnonymous].", "findingIds": ["SEC-IA-01#1"] },
+    { "checkId": "SEC-IA-02", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "fail", "reason": "No authorization policy guards the data-mutating reset endpoint.", "findingIds": ["SEC-IA-02#1"] },
+    { "checkId": "SEC-IA-03", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No JWTs are issued or consumed by this application." },
+    { "checkId": "SEC-IA-04", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No OAuth2 flow is implemented." },
+    { "checkId": "SEC-IA-05", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No session cookies or server-side sessions are used; the API is stateless with no auth mechanism at all." },
+    { "checkId": "SEC-IA-06", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "The application does not store end-user passwords; only DB connection credentials appear in config (covered under Security — Operational)." },
+    { "checkId": "SEC-IA-07", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No custom cryptography/hashing code was found." },
+    { "checkId": "SEC-IA-08", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Warning", "result": "fail", "reason": "With no authentication at all, access relies entirely on network-level trust rather than explicit per-request verification.", "findingIds": ["SEC-IA-01#1"] }
+  ],
+  "urlsFetched": [],
+  "notes": "This is a small proof-of-concept API; both endpoints are intentionally anonymous today. Flagged because a destructive data-reset endpoint with no auth is a real risk if ever exposed outside a fully trusted network."
+}

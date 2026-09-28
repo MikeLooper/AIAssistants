@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-26_2225-pilotutilityapi",
+  "stepId": "12-review-twelve-factor",
+  "status": "completed",
+  "startedAt": "2026-09-26T22:42:00-05:00",
+  "completedAt": "2026-09-26T22:45:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "targetPath=PilotUtilityApi;subjects=all-18;analyzers=none;gitHead=unavailable-user-declined-shell",
+  "skill": "review-twelve-factor",
+  "subject": "Application Design",
+  "batchIndex": 0,
+  "findings": [
+    {
+      "id": "TF-02#1",
+      "subject": "Application Design",
+      "subSubject": "Twelve-Factor",
+      "checkId": "TF-02",
+      "severity": "Error",
+      "title": "No committed lock file for NuGet dependencies",
+      "evidence": [{ "file": "Directory.Packages.props", "lineStart": 1, "lineEnd": 5, "excerpt": "<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>" }],
+      "standard": "Twelve-Factor App II. Dependencies",
+      "url": "https://12factor.net/dependencies",
+      "recommendation": "Enable `<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>` and commit the generated `packages.lock.json` files so restores are fully reproducible.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "TF-03#1",
+      "subject": "Application Design",
+      "subSubject": "Twelve-Factor",
+      "checkId": "TF-03",
+      "severity": "Warning",
+      "title": "Data source credentials live in tracked appsettings JSON files rather than environment/secret-store config",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 3, "lineEnd": 20, "excerpt": "\"Password\": \"<DevUser password>\"" }],
+      "standard": "Twelve-Factor App III. Config",
+      "url": "https://12factor.net/config",
+      "recommendation": "Keep only non-sensitive defaults in appsettings*.json; source Host/Port/UserName/Password from environment variables or a secret manager per environment (a UserSecretsId is already configured for local dev — extend the same approach to other environments).",
+      "confidence": "Medium",
+      "effort": "Medium"
+    },
+    {
+      "id": "TF-10#1",
+      "subject": "Application Design",
+      "subSubject": "Twelve-Factor",
+      "checkId": "TF-10",
+      "severity": "Warning",
+      "title": "HTTPS redirection is enabled only in Development, so dev and prod handle transport security differently",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 73, "lineEnd": 76, "excerpt": "if (webApp.Environment.IsDevelopment())\n{\n\twebApp.UseHttpsRedirection();\n}" }],
+      "standard": "Twelve-Factor App X. Dev/prod parity",
+      "url": "https://12factor.net/dev-prod-parity",
+      "recommendation": "Enable UseHttpsRedirection (and HSTS) unconditionally, or at least in every non-local environment, so behavior doesn't diverge between dev and prod. See also SEC-WA-06.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "TF-11#1",
+      "subject": "Application Design",
+      "subSubject": "Twelve-Factor",
+      "checkId": "TF-11",
+      "severity": "Warning",
+      "title": "Serilog writes application-managed rolling log files to a local logs/ folder in addition to stdout",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 28, "lineEnd": 37, "excerpt": "\"Name\": \"File\",\n\"Args\": { \"path\": \"logs/log-.json\", \"rollingInterval\": \"Day\", \"rollOnFileSizeLimit\": true, ... \"retainedFileCountLimit\": 14 }" }],
+      "standard": "Twelve-Factor App XI. Logs",
+      "url": "https://12factor.net/logs",
+      "recommendation": "Treat logs purely as an event stream to stdout/stderr and let the execution environment (container platform, OTel collector) handle routing, aggregation and retention, rather than having the app manage file rotation/retention itself.",
+      "confidence": "Medium",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "TF-STR#1",
+      "subject": "Application Design",
+      "subSubject": "Twelve-Factor",
+      "checkId": "TF-04",
+      "title": "Backing services (SQL Server / PostgreSQL) are attached purely via configuration, with a single 'Active' flag switching providers without code changes",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 3, "lineEnd": 20, "excerpt": "\"DataSources\": [ { \"Active\": true, \"DataSourceType\": \"SqlServer\", ... }, { \"Active\": false, \"DataSourceType\": \"PostgreSQL\", ... } ]" }]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "TF-01", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "TF-02", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Error", "result": "fail", "reason": "No packages.lock.json / nuget.config found anywhere in the repo.", "findingIds": ["TF-02#1"] },
+    { "checkId": "TF-03", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Warning", "result": "fail", "reason": "Connection credentials are structured as JSON config fields committed to the repo, not read from environment variables. Downgraded to Warning: the committed value is a placeholder, not a live credential.", "findingIds": ["TF-03#1"] },
+    { "checkId": "TF-04", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "TF-05", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "TF-06", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "TF-07", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Information", "result": "pass" },
+    { "checkId": "TF-08", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Information", "result": "pass" },
+    { "checkId": "TF-09", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "TF-10", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Warning", "result": "fail", "reason": "HTTPS redirection differs between Development and other environments.", "findingIds": ["TF-10#1"] },
+    { "checkId": "TF-11", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Warning", "result": "fail", "reason": "Serilog file sink manages its own rolling/retention instead of relying purely on stdout.", "findingIds": ["TF-11#1"] },
+    { "checkId": "TF-12", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Information", "result": "pass" }
+  ],
+  "urlsFetched": [],
+  "notes": "TF-03 evidence overlaps SEC-OP-05/06 and TF-10 evidence overlaps SEC-WA-06; expect the aggregator to keep the Security findings as primary."
+}
