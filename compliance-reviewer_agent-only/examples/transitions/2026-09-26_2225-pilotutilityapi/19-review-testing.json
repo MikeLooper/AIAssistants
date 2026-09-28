@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-26_2225-pilotutilityapi",
+  "stepId": "19-review-testing",
+  "status": "completed",
+  "startedAt": "2026-09-26T23:04:00-05:00",
+  "completedAt": "2026-09-26T23:08:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "targetPath=PilotUtilityApi;subjects=all-18;analyzers=none;gitHead=unavailable-user-declined-shell",
+  "skill": "review-testing",
+  "subject": "Implementation",
+  "batchIndex": 0,
+  "findings": [
+    {
+      "id": "TST-01#1",
+      "subject": "Implementation",
+      "subSubject": "Testing",
+      "checkId": "TST-01",
+      "severity": "Warning",
+      "title": "No integration test exercises the actual SQL execution success path against SQL Server or PostgreSQL",
+      "evidence": [{ "file": "test/PilotUtiltyApi.Repositories.Tests/Repositories/TestingRepositoryTests.cs", "lineStart": 1, "lineEnd": 100, "excerpt": "TestingRepository_ResetTestingAsync_WithNoActiveDataSource_ReturnsError_Test / ...WithEmptyDataSources... / ...WithUnsupportedDataSourceType..." }],
+      "standard": "Practical Test Pyramid",
+      "url": "https://martinfowler.com/articles/practical-test-pyramid.html",
+      "recommendation": "Add an integration test (e.g. with Testcontainers for SQL Server/PostgreSQL) that runs ResetTestingAsync end-to-end and asserts on the deleted-row count, since the current unit tests only cover configuration-validation and unsupported-type error branches.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    },
+    {
+      "id": "TST-06#1",
+      "subject": "Implementation",
+      "subSubject": "Testing",
+      "checkId": "TST-06",
+      "severity": "Error",
+      "title": "The test suite has no CI pipeline to run it automatically",
+      "evidence": [{ "file": ".github/workflows/", "lineStart": 0, "lineEnd": 0, "excerpt": "(folder exists but contains no workflow files)" }],
+      "standard": "Practical Test Pyramid",
+      "url": "https://martinfowler.com/articles/practical-test-pyramid.html",
+      "recommendation": "Same fix as SL-01: add a CI workflow that runs `dotnet test` on every push/PR.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "TST-STR#1",
+      "subject": "Implementation",
+      "subSubject": "Testing",
+      "checkId": "TST-04",
+      "title": "Tests mock only the true external boundaries (ILoggerFactory, IApplicationConfiguration) and assert concrete return values/messages rather than 'did not throw'",
+      "evidence": [{ "file": "test/PilotUtiltyApi.Repositories.Tests/Repositories/TestingRepositoryTests.cs", "lineStart": 49, "lineEnd": 63, "excerpt": "Assert.That(result.ErrorMessage, Does.Contain(\"No active data source configured\"));" }]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "TST-01", "subject": "Implementation", "subSubject": "Testing", "severityIfFailed": "Warning", "result": "fail", "reason": "Every test project is unit-only; the happy-path DB write is untested at any level.", "findingIds": ["TST-01#1"] },
+    { "checkId": "TST-02", "subject": "Implementation", "subSubject": "Testing", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "TST-03", "subject": "Implementation", "subSubject": "Testing", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "TST-04", "subject": "Implementation", "subSubject": "Testing", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "TST-05", "subject": "Implementation", "subSubject": "Testing", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "TST-06", "subject": "Implementation", "subSubject": "Testing", "severityIfFailed": "Error", "result": "fail", "reason": "No CI workflow exists to run the test suite automatically (same root cause as SL-01).", "findingIds": ["SL-01#1"] }
+  ],
+  "urlsFetched": [],
+  "notes": "TST-06's evidence is identical to SL-01's; expect the aggregator to keep SL-01 as the primary finding since Software Lifecycle runs earlier in the pipeline."
+}

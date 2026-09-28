@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-26_2225-pilotutilityapi",
+  "stepId": "27-review-maintainability",
+  "status": "completed",
+  "startedAt": "2026-09-26T23:22:30-05:00",
+  "completedAt": "2026-09-26T23:26:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "targetPath=PilotUtilityApi;subjects=all-18;analyzers=none;gitHead=unavailable-user-declined-shell",
+  "skill": "review-maintainability",
+  "subject": "Operations",
+  "batchIndex": 0,
+  "findings": [],
+  "strengths": [
+    {
+      "id": "MAINT-STR#1",
+      "subject": "Operations",
+      "subSubject": "Maintainability",
+      "checkId": "MAINT-01",
+      "title": "README.md documents prerequisites, build, run, configuration and project structure in detail, with a table of contents",
+      "evidence": [{ "file": "README.md", "lineStart": 79, "lineEnd": 106, "excerpt": "### Prerequisites\n- [.NET 10 SDK]... ### Building the Application ... ### Running the Application" }]
+    },
+    {
+      "id": "MAINT-STR#2",
+      "subject": "Operations",
+      "subSubject": "Maintainability",
+      "checkId": "MAINT-02",
+      "title": "Folder boundaries map 1:1 to the Domain/Repositories/Services/Shared/Web architecture, both in code and in README's documented project structure",
+      "evidence": [{ "file": "README.md", "lineStart": 41, "lineEnd": 75, "excerpt": "├── src/\n│   ├── PilotUtilityApi.Domain/ ... │   ├── PilotUtilityApi.Repositories/ ... │   ├── PilotUtilityApi.Services/ ... │   └── PilotUtilityApi.Web/" }]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "MAINT-01", "subject": "Operations", "subSubject": "Maintainability", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "MAINT-02", "subject": "Operations", "subSubject": "Maintainability", "severityIfFailed": "Information", "result": "pass" },
+    { "checkId": "MAINT-03", "subject": "Operations", "subSubject": "Maintainability", "severityIfFailed": "Warning", "result": "pass", "reason": "Prerequisites and every configuration field are documented in a table in README.md, even though there is no .env.example (config is JSON-file based, see TF-03)." },
+    { "checkId": "MAINT-04", "subject": "Operations", "subSubject": "Maintainability", "severityIfFailed": "Information", "result": "N/A", "reason": "No TODO/FIXME/HACK markers were found in the reviewed files." },
+    { "checkId": "MAINT-05", "subject": "Operations", "subSubject": "Maintainability", "severityIfFailed": "Information", "result": "pass", "reason": "No deprecated or dead code paths were found." }
+  ],
+  "urlsFetched": [],
+  "notes": "Maintainability is a clear strength: thorough README, consistent architecture-to-folder mapping, and no accumulated debt markers."
+}

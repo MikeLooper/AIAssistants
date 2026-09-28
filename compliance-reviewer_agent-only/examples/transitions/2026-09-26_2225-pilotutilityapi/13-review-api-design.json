@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-26_2225-pilotutilityapi",
+  "stepId": "13-review-api-design",
+  "status": "completed",
+  "startedAt": "2026-09-26T22:45:00-05:00",
+  "completedAt": "2026-09-26T22:48:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "targetPath=PilotUtilityApi;subjects=all-18;analyzers=none;gitHead=unavailable-user-declined-shell",
+  "skill": "review-api-design",
+  "subject": "API Design",
+  "batchIndex": 0,
+  "findings": [
+    {
+      "id": "API-03#1",
+      "subject": "API Design",
+      "subSubject": "API Design",
+      "checkId": "API-03",
+      "severity": "Error",
+      "title": "OpenAPI spec's /testing/reset path omits the version segment the controller actually requires",
+      "evidence": [
+        { "file": "docs/PilotUtilityApi_v1.json", "lineStart": 78, "lineEnd": 79, "excerpt": "\"/testing/reset\": { \"post\": { ... } }" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 16, "lineEnd": 17, "excerpt": "[ApiVersion(\"1.0\")]\n[Route(\"v{version:apiVersion}/[controller]\")]" }
+      ],
+      "standard": "OpenAPI Specification",
+      "url": "https://spec.openapis.org/oas/latest.html",
+      "recommendation": "Regenerate docs/PilotUtilityApi_v1.json from the running app (or add it to CI) so the documented path includes the required `v{version}` segment, e.g. `/v1/testing/reset`.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "API-03#2",
+      "subject": "API Design",
+      "subSubject": "API Design",
+      "checkId": "API-03",
+      "severity": "Warning",
+      "title": "Spec documents a ProblemDetails body for the 400 response, but the controller returns an empty BadRequest with only a custom header",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 38, "lineEnd": 42, "excerpt": "Response.Headers.Append(\"Warning\", response.ErrorMessage ?? \"An error occurred\");\nreturn BadRequest();" }],
+      "standard": "OpenAPI Specification",
+      "url": "https://spec.openapis.org/oas/latest.html",
+      "recommendation": "Return `BadRequest(new ProblemDetails { Detail = response.ErrorMessage })` so the actual response body matches the documented `ProblemDetails` schema, or update the spec to match the header-only contract.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "API-STR#1",
+      "subject": "API Design",
+      "subSubject": "API Design",
+      "checkId": "API-01",
+      "title": "An OpenAPI 3.1 spec is generated and checked in, backed by Scalar/Swashbuckle UI wiring in code",
+      "evidence": [{ "file": "docs/PilotUtilityApi_v1.json", "lineStart": 1, "lineEnd": 8, "excerpt": "\"openapi\": \"3.1.1\", \"info\": { \"title\": \"PilotUtilityApi.Web | v1\", \"version\": \"1.0.0\" }" }]
+    },
+    {
+      "id": "API-STR#2",
+      "subject": "API Design",
+      "subSubject": "API Design",
+      "checkId": "API-07",
+      "title": "The API is explicitly versioned via Asp.Versioning, with version-neutral system endpoints kept separate",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 27, "lineEnd": 38, "excerpt": "services.AddApiVersioning(options => { ... options.DefaultApiVersion = new ApiVersion(1, 0); ... })" }]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "API-01", "subject": "API Design", "subSubject": "API Design", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "API-02", "subject": "API Design", "subSubject": "API Design", "severityIfFailed": "Error", "result": "pass", "reason": "Visual inspection shows well-formed OpenAPI 3.1 JSON; not run through a formal validator." },
+    { "checkId": "API-03", "subject": "API Design", "subSubject": "API Design", "severityIfFailed": "Error", "result": "fail", "reason": "The documented /testing/reset path and 400 response body diverge from the actual versioned route and response.", "findingIds": ["API-03#1", "API-03#2"] },
+    { "checkId": "API-04", "subject": "API Design", "subSubject": "API Design", "severityIfFailed": "Error", "result": "pass", "reason": "Endpoints are small in number; the one action-style endpoint (testing/reset) is a reasonable exception for a utility/admin operation, not a resource collection." },
+    { "checkId": "API-05", "subject": "API Design", "subSubject": "API Design", "severityIfFailed": "Error", "result": "pass" },
+    { "checkId": "API-06", "subject": "API Design", "subSubject": "API Design", "severityIfFailed": "Warning", "result": "N/A", "reason": "No collection-returning endpoints exist yet." },
+    { "checkId": "API-07", "subject": "API Design", "subSubject": "API Design", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "API-08", "subject": "API Design", "subSubject": "API Design", "severityIfFailed": "Information", "result": "N/A", "reason": "No collection-returning endpoints exist yet." }
+  ],
+  "urlsFetched": [],
+  "notes": "API Design is applicable: an OpenAPI spec exists and two controllers implement it. The spec is a stale/manually-exported snapshot that has drifted from the actual versioned routes and error contract."
+}

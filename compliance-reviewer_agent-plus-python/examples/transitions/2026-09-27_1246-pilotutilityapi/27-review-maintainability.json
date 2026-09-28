@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-27_1246-pilotutilityapi",
+  "stepId": "27-review-maintainability",
+  "status": "completed",
+  "startedAt": "2026-09-27T14:11:00-05:00",
+  "completedAt": "2026-09-27T14:15:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "654660A96E3CC744F90EF2E66F27D63D237D81D1F87DEF1A0BC2F6F9BA8F3F27",
+  "skill": "review-maintainability",
+  "subject": "Operations",
+  "batchIndex": 0,
+  "findings": [
+    {
+      "id": "MAINT-02#1",
+      "subject": "Operations",
+      "subSubject": "Maintainability",
+      "checkId": "MAINT-02",
+      "severity": "Warning",
+      "title": "Folder/project names diverge from namespaces and from the README's documented structure",
+      "evidence": [
+        { "file": "README.md", "lineStart": 47, "lineEnd": 54, "excerpt": "PilotUtilityApi/\n├── src/\n│   ├── PilotUtilityApi.Domain/           # DTOs and domain models\n..." },
+        { "file": "src/PilotUtiltyApi.Web/Program.cs", "lineStart": 1, "lineEnd": 3, "excerpt": "using PilotUtilityApi.Shared.Api.Extensions;\nusing PilotUtilityApi.Web.Extensions;" }
+      ],
+      "standard": "fallback rubric",
+      "recommendation": "The actual src/ and test/ folders are named PilotUtiltyApi.* (missing the second \"i\" in \"Utility\"), while the .csproj files, namespaces and the README's Project Structure diagram all use the correct \"PilotUtilityApi.*\" spelling. Rename the folders (and update the .sln/project references) to match the namespace spelling consistently, so folder names, project file names, namespaces and documentation all agree.",
+      "confidence": "High",
+      "effort": "Medium"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "MAINT-01#1",
+      "subject": "Operations",
+      "subSubject": "Maintainability",
+      "checkId": "MAINT-01",
+      "title": "README provides thorough setup, configuration, run and test instructions",
+      "evidence": [
+        { "file": "README.md", "lineStart": 1, "lineEnd": 17, "excerpt": "## Table of Contents\n- [Description](#description)\n- [Features](#features)\n- [Project Structure](#project-structure)\n- [Getting Started](#getting-started)\n..." },
+        { "file": "README.md", "lineStart": 235, "lineEnd": 261, "excerpt": "## Testing\n\nThe project includes comprehensive unit tests using NUnit.\n\n### Running All Tests\n\n```bash\ndotnet test\n```" }
+      ]
+    },
+    {
+      "id": "MAINT-02#2",
+      "subject": "Operations",
+      "subSubject": "Maintainability",
+      "checkId": "MAINT-02",
+      "title": "Clear Clean Architecture layering with consistent, single-direction dependencies",
+      "evidence": [
+        { "file": "README.md", "lineStart": 265, "lineEnd": 290, "excerpt": "The application follows **Clean Architecture** principles with clear separation of concerns:\n\n### Layers\n\n1. **Domain Layer** (`PilotUtilityApi.Domain`)\n   - Contains DTOs and domain models\n   - No dependencies on other layers" }
+      ]
+    },
+    {
+      "id": "MAINT-04#1",
+      "subject": "Operations",
+      "subSubject": "Maintainability",
+      "checkId": "MAINT-04",
+      "title": "No TODO/FIXME/HACK markers accumulating in src",
+      "evidence": [
+        { "file": "src/", "lineStart": 1, "lineEnd": 1, "excerpt": "grep for TODO|FIXME|HACK|XXX across src/** returned no matches" }
+      ]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "MAINT-01", "subject": "Operations", "subSubject": "Maintainability", "severityIfFailed": "Warning", "result": "pass", "reason": "README.md includes Table of Contents, Prerequisites, Building/Running, Configuration (including a Local Development user-secrets example), API Endpoints, Testing, and Architecture sections.", "findingIds": [] },
+    { "checkId": "MAINT-02", "subject": "Operations", "subSubject": "Maintainability", "severityIfFailed": "Information", "result": "fail", "reason": "Layering itself (Domain/Repositories/Services/Web/Shared) is clean and consistent, but the on-disk folder names (PilotUtiltyApi.*) do not match the .csproj file names, C# namespaces, or the README's own Project Structure diagram (PilotUtilityApi.*), which is confusing for new contributors.", "findingIds": ["MAINT-02#1"] },
+    { "checkId": "MAINT-03", "subject": "Operations", "subSubject": "Maintainability", "severityIfFailed": "Warning", "result": "pass", "reason": "Prerequisites (.NET 10 SDK, SQL Server or PostgreSQL) are documented, and README's Local Development section documents the User Secrets JSON shape needed to run locally; no unexplained environment variables were found in Program.cs or configuration classes.", "findingIds": [] },
+    { "checkId": "MAINT-04", "subject": "Operations", "subSubject": "Maintainability", "severityIfFailed": "Information", "result": "pass", "reason": "No TODO/FIXME/HACK/XXX markers found under src/**.", "findingIds": [] },
+    { "checkId": "MAINT-05", "subject": "Operations", "subSubject": "Maintainability", "severityIfFailed": "Information", "result": "pass", "reason": "No [Obsolete] attributes or 'deprecated' markers found under src/**; no dead/duplicated legacy code paths observed in the layer folders reviewed.", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "CLAUDE.md is an AI-agent routing note (skill index), not user-facing project documentation, so it wasn't scored against MAINT-01/03; it was read only to confirm it doesn't duplicate README content. docs/ contains only AI-generation prompt history, not user-facing docs, consistent with README already covering setup/run/test."
+}

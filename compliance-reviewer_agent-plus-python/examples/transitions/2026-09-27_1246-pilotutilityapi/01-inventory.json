@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-27_1246-pilotutilityapi",
+  "stepId": "01-inventory",
+  "status": "completed",
+  "startedAt": "2026-09-27T12:47:00-05:00",
+  "completedAt": "2026-09-27T12:52:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "654660A96E3CC744F90EF2E66F27D63D237D81D1F87DEF1A0BC2F6F9BA8F3F27",
+  "languages": ["csharp"],
+  "frameworks": ["ASP.NET Core", ".NET 10", "Serilog", "OpenTelemetry", "Dapper", "NUnit", "Asp.Versioning", "Scalar.AspNetCore"],
+  "apiSpecsFound": true,
+  "iacFound": false,
+  "notes": "No Dockerfile, docker-compose, Bicep/Terraform/k8s/helm manifests found anywhere in the target. .github/workflows/ exists but is empty (no CI/CD pipeline files). API spec found as a generated snapshot at docs/PilotUtilityApi_v1.json plus in-code OpenAPI/Swagger/Scalar wiring; controllers use ASP.NET Core attribute routing with Asp.Versioning. Repo layout unchanged since prior run 2026-09-26_2225-pilotutilityapi.",
+  "subjects": {
+    "review-software-quality": {
+      "files": [
+        "src/PilotUtiltyApi.Web/Program.cs",
+        "src/PilotUtiltyApi.Web/Controllers/SystemController.cs",
+        "src/PilotUtiltyApi.Web/Controllers/TestingController.cs",
+        "src/PilotUtiltyApi.Web/Extensions/ApplicationInjectionExtensions.cs",
+        "src/PilotUtiltyApi.Shared/Api/Extensions/*.cs",
+        "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs",
+        "src/PilotUtiltyApi.Shared/Api/Transformers/*.cs",
+        "src/PilotUtiltyApi.Shared/OpenTelemetry/Extensions/*.cs",
+        "src/PilotUtiltyApi.Shared/Configuration/ApplicationConfiguration.cs",
+        "src/PilotUtiltyApi.Shared/Configuration/IApplicationConfiguration.cs",
+        "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+        "src/PilotUtiltyApi.Repositories/Constants/*.cs",
+        "src/PilotUtiltyApi.Services/Services/TestingService.cs",
+        "src/PilotUtiltyApi.Services/Extensions/*.cs",
+        "src/PilotUtiltyApi.Domain/Models/*.cs",
+        "src/PilotUtiltyApi.Domain/Constants/*.cs"
+      ],
+      "batches": [["src/PilotUtiltyApi.Web/*", "src/PilotUtiltyApi.Shared/*", "src/PilotUtiltyApi.Repositories/*", "src/PilotUtiltyApi.Services/*", "src/PilotUtiltyApi.Domain/*"]],
+      "applicable": true
+    },
+    "review-software-lifecycle": {
+      "files": [".github/workflows/ (empty)", ".github/copilot-instructions.md", ".github/instructions/*.md", "README.md", "CONTRIBUTING.md", "Directory.Build.props"],
+      "batches": [["README.md", "CONTRIBUTING.md", ".github/workflows/", ".github/instructions/*"]],
+      "applicable": true
+    },
+    "review-twelve-factor": {
+      "files": [
+        "src/PilotUtiltyApi.Web/appsettings.json",
+        "src/PilotUtiltyApi.Web/appsettings.Development.json",
+        "src/PilotUtiltyApi.Web/Program.cs",
+        "src/PilotUtiltyApi.Web/PilotUtilityApi.Web.csproj",
+        "src/PilotUtiltyApi.Services/Extensions/*.cs",
+        "src/PilotUtiltyApi.Shared/Configuration/*.cs",
+        "Directory.Packages.props"
+      ],
+      "batches": [["appsettings*.json", "Program.cs", "*.csproj", "Directory.Packages.props", "Configuration/*"]],
+      "applicable": true
+    },
+    "review-api-design": {
+      "files": [
+        "docs/PilotUtilityApi_v1.json",
+        "src/PilotUtiltyApi.Web/Controllers/SystemController.cs",
+        "src/PilotUtiltyApi.Web/Controllers/TestingController.cs",
+        "src/PilotUtiltyApi.Shared/Api/Extensions/*.cs",
+        "src/PilotUtiltyApi.Shared/Api/Transformers/*.cs",
+        "src/PilotUtiltyApi.Shared/OpenApi/*",
+        "src/PilotUtiltyApi.Shared/Swagger/*"
+      ],
+      "batches": [["docs/PilotUtilityApi_v1.json", "Controllers/*", "Api/Extensions/*", "Api/Transformers/*", "OpenApi/*", "Swagger/*"]],
+      "applicable": true
+    },
+    "review-security-identity-access": {
+      "files": [
+        "src/PilotUtiltyApi.Web/Controllers/SystemController.cs",
+        "src/PilotUtiltyApi.Web/Controllers/TestingController.cs",
+        "src/PilotUtiltyApi.Shared/Api/Extensions/*.cs",
+        "src/PilotUtiltyApi.Web/Program.cs"
+      ],
+      "batches": [["Controllers/*", "Api/Extensions/*", "Program.cs"]],
+      "applicable": true
+    },
+    "review-security-input-injection": {
+      "files": [
+        "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+        "src/PilotUtiltyApi.Repositories/Constants/*.cs",
+        "src/PilotUtiltyApi.Web/Controllers/TestingController.cs",
+        "src/PilotUtiltyApi.Web/Controllers/SystemController.cs"
+      ],
+      "batches": [["Repositories/*", "Constants/*", "Controllers/*"]],
+      "applicable": true
+    },
+    "review-security-web-api": {
+      "files": [
+        "src/PilotUtiltyApi.Shared/Api/Extensions/*.cs",
+        "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs",
+        "src/PilotUtiltyApi.Web/Program.cs"
+      ],
+      "batches": [["Api/Extensions/*", "Api/Middleware/*", "Program.cs"]],
+      "applicable": true
+    },
+    "review-security-operational": {
+      "files": [
+        "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs",
+        "src/PilotUtiltyApi.Shared/Logging/Extensions/*.cs",
+        "src/PilotUtiltyApi.Shared/Logging/LoggingUtilities.cs",
+        "src/PilotUtiltyApi.Web/appsettings.json",
+        "src/PilotUtiltyApi.Web/appsettings.Development.json",
+        "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs"
+      ],
+      "batches": [["Api/Middleware/*", "Logging/*", "appsettings*.json", "Repositories/*"]],
+      "applicable": true
+    },
+    "review-coding-standards": {
+      "files": [
+        "src/PilotUtiltyApi.Web/**/*.cs",
+        "src/PilotUtiltyApi.Domain/**/*.cs",
+        "src/PilotUtiltyApi.Repositories/**/*.cs",
+        "src/PilotUtiltyApi.Services/**/*.cs",
+        "src/PilotUtiltyApi.Shared/**/*.cs"
+      ],
+      "batches": [["all *.cs source files, sampled"]],
+      "applicable": true
+    },
+    "review-testing": {
+      "files": [
+        "test/PilotUtiltyApi.Domain.Tests/",
+        "test/PilotUtiltyApi.Repositories.Tests/",
+        "test/PilotUtiltyApi.Services.Tests/",
+        "test/PilotUtiltyApi.Shared.Tests/",
+        "test/PilotUtiltyApi.Web.Tests/",
+        "test/PilotUtiltyApi.TestingShared/",
+        ".github/instructions/unit-tests.instructions.md",
+        "Directory.Packages.props",
+        ".github/workflows/ (empty)"
+      ],
+      "batches": [["test/**"]],
+      "applicable": true
+    },
+    "review-observability": {
+      "files": [
+        "src/PilotUtiltyApi.Shared/OpenTelemetry/Extensions/*.cs",
+        "src/PilotUtiltyApi.Shared/Logging/Extensions/*.cs",
+        "src/PilotUtiltyApi.Shared/Logging/LoggingUtilities.cs",
+        "src/PilotUtiltyApi.Web/Controllers/SystemController.cs",
+        "src/PilotUtiltyApi.Web/appsettings.json"
+      ],
+      "batches": [["OpenTelemetry/*", "Logging/*", "Controllers/SystemController.cs", "appsettings.json"]],
+      "applicable": true
+    },
+    "review-dependency-management": {
+      "files": [
+        "Directory.Packages.props",
+        "src/PilotUtiltyApi.Web/PilotUtilityApi.Web.csproj",
+        "src/PilotUtiltyApi.Shared/PilotUtilityApi.Shared.csproj",
+        "src/PilotUtiltyApi.Repositories/PilotUtilityApi.Repositories.csproj",
+        "src/PilotUtiltyApi.Services/PilotUtilityApi.Services.csproj",
+        "src/PilotUtiltyApi.Domain/PilotUtilityApi.Domain.csproj",
+        "LICENSE"
+      ],
+      "batches": [["Directory.Packages.props", "**/*.csproj", "LICENSE"]],
+      "applicable": true
+    },
+    "review-reliability": {
+      "files": [
+        "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+        "src/PilotUtiltyApi.Shared/OpenTelemetry/Extensions/*.cs",
+        "src/PilotUtiltyApi.Web/Program.cs"
+      ],
+      "batches": [["Repositories/*", "OpenTelemetry/*", "Program.cs"]],
+      "applicable": true
+    },
+    "review-performance": {
+      "files": [
+        "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+        "src/PilotUtiltyApi.Services/Services/TestingService.cs",
+        "src/PilotUtiltyApi.Web/Controllers/TestingController.cs",
+        "src/PilotUtiltyApi.Shared/OpenTelemetry/Extensions/*.cs"
+      ],
+      "batches": [["Repositories/*", "Services/*", "Controllers/*", "OpenTelemetry/*"]],
+      "applicable": true
+    },
+    "review-disaster-recovery": { "files": [], "batches": [], "applicable": false },
+    "review-monitoring": { "files": [], "batches": [], "applicable": false },
+    "review-cost-sustainability": { "files": [], "batches": [], "applicable": false },
+    "review-maintainability": {
+      "files": [
+        "README.md",
+        "CONTRIBUTING.md",
+        "CLAUDE.md",
+        "docs/",
+        "src/**",
+        "test/**"
+      ],
+      "batches": [["README.md", "CONTRIBUTING.md", "CLAUDE.md", "folder structure"]],
+      "applicable": true
+    }
+  },
+  "skippedSubjects": {
+    "review-disaster-recovery": "no infrastructure-as-code found",
+    "review-cost-sustainability": "no infrastructure-as-code found",
+    "review-monitoring": "no infrastructure-as-code found"
+  }
+}

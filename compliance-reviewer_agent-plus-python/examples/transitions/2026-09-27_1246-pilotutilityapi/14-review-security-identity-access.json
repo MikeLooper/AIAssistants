@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-27_1246-pilotutilityapi",
+  "stepId": "14-review-security-identity-access",
+  "status": "completed",
+  "startedAt": "2026-09-27T13:16:00-05:00",
+  "completedAt": "2026-09-27T13:20:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "654660A96E3CC744F90EF2E66F27D63D237D81D1F87DEF1A0BC2F6F9BA8F3F27",
+  "skill": "review-security-identity-access",
+  "subject": "Security",
+  "batchIndex": 0,
+  "findings": [
+    {
+      "id": "SEC-IA-01#1",
+      "subject": "Security",
+      "subSubject": "Identity & Access",
+      "checkId": "SEC-IA-01",
+      "severity": "Error",
+      "title": "No authentication is registered anywhere in the app; a destructive endpoint is fully anonymous",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 105, "lineEnd": 128, "excerpt": "public static void ApiWebApplicationBuilder(this WebApplicationBuilder builder)\n... builder.Services.AddVersioning(); ... AddEndpointsApiExplorer(); ... AddControllers(...)  // no AddAuthentication()/AddAuthorization()" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 15, "lineEnd": 19, "excerpt": "[ApiController]\n[ApiVersion(\"1.0\")]\n[Route(\"v{version:apiVersion}/[controller]\")]\n[AllowAnonymous]\npublic class TestingController : ControllerBase" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 46, "lineEnd": 51, "excerpt": "[HttpPost]\n[Route(\"reset\")]\n...\npublic async Task<IActionResult> ResetTesting(CancellationToken cancellationToken)" }
+      ],
+      "standard": "OWASP Authentication Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html",
+      "recommendation": "Register an authentication scheme (e.g. JWT bearer or the org's identity provider) via services.AddAuthentication(...), call app.UseAuthentication()/UseAuthorization() in the request pipeline, and remove [AllowAnonymous] from TestingController (or restrict it to an authenticated/internal-only policy) so the state-changing /reset action cannot be invoked by an unauthenticated caller.",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "SEC-IA-02#1",
+      "subject": "Security",
+      "subSubject": "Identity & Access",
+      "checkId": "SEC-IA-02",
+      "severity": "Error",
+      "title": "No function-level access control distinguishes sensitive actions from public ones",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 65, "lineEnd": 87, "excerpt": "public static void ApiWebApplication(this WebApplication webApp)\n{ ... webApp.OpenApiWebApplication(); webApp.LoggingWebApplication(); webApp.SwaggerWebApplication(); webApp.UseMiddleware<UnhandledExceptionMiddleware>(); webApp.MapControllers(); }" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 16, "lineEnd": 19, "excerpt": "[ApiController]\n[ApiVersionNeutral]\n[AllowAnonymous]\npublic class SystemController : ControllerBase" }
+      ],
+      "standard": "OWASP Authorization Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html",
+      "recommendation": "Add services.AddAuthorization() and app.UseAuthorization() to the pipeline, define policies/roles, and apply [Authorize] with the appropriate policy to state-changing actions (e.g. TestingController.ResetTesting) so every sensitive action is checked server-side rather than uniformly allowing anonymous access across both controllers.",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "SEC-IA-08#1",
+      "subject": "Security",
+      "subSubject": "Identity & Access",
+      "checkId": "SEC-IA-08",
+      "severity": "Warning",
+      "title": "Zero Trust violation: every reviewed endpoint implicitly trusts any network caller",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 65, "lineEnd": 87, "excerpt": "public static void ApiWebApplication(this WebApplication webApp) { ... no UseAuthentication()/UseAuthorization() call ... }" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 60, "lineEnd": 64, "excerpt": "[HttpGet]\n[Route(\"about\")]\n...\npublic IActionResult About(\n\t[FromQuery(Name = \"show-details\"), BindRequired] bool showDetails = false)" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 87, "lineEnd": 87, "excerpt": "ApplicationConfiguration = showDetails ? new ApplicationConfiguration(this.ApplicationConfiguration, true) : null" }
+      ],
+      "standard": "OWASP Zero Trust Architecture Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+      "recommendation": "Apply explicit verification per-request instead of implicit network trust: require an authenticated/authorized caller identity for every endpoint, and gate the showDetails=true branch of /about (which discloses full application configuration) behind an authenticated, least-privilege policy rather than exposing it to any anonymous caller.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    }
+  ],
+  "strengths": [],
+  "checkResults": [
+    { "checkId": "SEC-IA-01", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "fail", "reason": "No AddAuthentication/UseAuthentication is registered anywhere in Program.cs or ApiExtensions.cs, and the state-changing TestingController.ResetTesting endpoint carries [AllowAnonymous].", "findingIds": ["SEC-IA-01#1"] },
+    { "checkId": "SEC-IA-02", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "fail", "reason": "No AddAuthorization/UseAuthorization or [Authorize] policy exists; SystemController and TestingController both carry blanket [AllowAnonymous] with no function-level distinction between low- and high-sensitivity actions.", "findingIds": ["SEC-IA-02#1"] },
+    { "checkId": "SEC-IA-03", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No JWT issuance or validation code exists in the files in scope; the reviewed controllers and extensions use no bearer-token authentication.", "findingIds": [] },
+    { "checkId": "SEC-IA-04", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No OAuth2 client or server flow code (authorization code, redirect URI, state parameter) is present in the files in scope.", "findingIds": [] },
+    { "checkId": "SEC-IA-05", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No session or cookie-based authentication is used; the API is stateless and every reviewed endpoint is [AllowAnonymous] with no session state.", "findingIds": [] },
+    { "checkId": "SEC-IA-06", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No password or credential storage code exists in the files in scope (TestingController only resets test data rows, not credentials).", "findingIds": [] },
+    { "checkId": "SEC-IA-07", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No custom cryptography or credential hashing code exists in the files in scope.", "findingIds": [] },
+    { "checkId": "SEC-IA-08", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Warning", "result": "fail", "reason": "No pipeline-level authentication/authorization exists, and the /about endpoint can disclose full application configuration to any anonymous caller via showDetails=true.", "findingIds": ["SEC-IA-08#1"] }
+  ],
+  "urlsFetched": [],
+  "notes": "Scope was the two listed controllers, ApiExtensions.cs and Program.cs. To confirm whether authentication/authorization is configured at all, also read the closely-related src/PilotUtiltyApi.Web/Extensions/ApplicationInjectionExtensions.cs and src/PilotUtiltyApi.Services/Extensions/ServicesInjectionExtensions.cs (both call chains invoked from Program.cs); neither registers AddAuthentication/AddAuthorization. No JWT, OAuth2, session/cookie, or password-storage code was found in scope, so SEC-IA-03/04/05/06/07 are N/A. If authentication is intentionally delegated to an external gateway/reverse proxy not present in this repo, that mitigates SEC-IA-01/02/08 but was not evidenced in the files reviewed."
+}

@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-27_1246-pilotutilityapi",
+  "stepId": "21-review-dependency-management",
+  "status": "completed",
+  "startedAt": "2026-09-27T13:55:00-05:00",
+  "completedAt": "2026-09-27T13:59:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "654660A96E3CC744F90EF2E66F27D63D237D81D1F87DEF1A0BC2F6F9BA8F3F27",
+  "skill": "review-dependency-management",
+  "subject": "Implementation",
+  "batchIndex": 0,
+  "findings": [
+    {
+      "id": "DEP-02#1",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "checkId": "DEP-02",
+      "severity": "Warning",
+      "title": "No NuGet lock file is generated or committed for any project",
+      "evidence": [
+        { "file": "Directory.Build.props", "lineStart": 1, "lineEnd": 8, "excerpt": "<TargetFramework>net10.0</TargetFramework>\n<Nullable>enable</Nullable>" },
+        { "file": "Directory.Packages.props", "lineStart": 1, "lineEnd": 4, "excerpt": "<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>" }
+      ],
+      "standard": "fallback rubric",
+      "recommendation": "Set <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile> in Directory.Build.props (or per-project) and commit the generated packages.lock.json files so restores are reproducible and tamper-evident, even though Directory.Packages.props already pins exact versions.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "DEP-05#1",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "checkId": "DEP-05",
+      "severity": "Information",
+      "title": "No SBOM or license inventory is present in the repository",
+      "evidence": [
+        { "file": "Directory.Packages.props", "lineStart": 1, "lineEnd": 35, "excerpt": "<PackageVersion Include=\"Dapper\" Version=\"2.1.79\" />\n... (35 PackageVersion entries, no accompanying SBOM/license manifest)" }
+      ],
+      "standard": "fallback rubric",
+      "recommendation": "Generate a CycloneDX or SPDX SBOM as part of CI (e.g. dotnet CycloneDX tool or dotnet list package --format json piped through a license-report tool) and publish it as a build artifact or commit it alongside the manifests.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "DEP-STR#1",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "checkId": "DEP-01",
+      "title": "Central Package Management is used with every dependency pinned to an exact version, and no csproj overrides with floating/wildcard versions",
+      "evidence": [
+        { "file": "Directory.Packages.props", "lineStart": 1, "lineEnd": 35, "excerpt": "<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>\n<PackageVersion Include=\"Npgsql\" Version=\"10.0.3\" />" },
+        { "file": "src/PilotUtiltyApi.Repositories/PilotUtilityApi.Repositories.csproj", "lineStart": 9, "lineEnd": 12, "excerpt": "<PackageReference Include=\"Dapper\" />\n<PackageReference Include=\"Microsoft.Data.SqlClient\" />\n<PackageReference Include=\"Npgsql\" />" }
+      ]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "DEP-01", "subject": "Implementation", "subSubject": "Dependency Management", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "DEP-02", "subject": "Implementation", "subSubject": "Dependency Management", "severityIfFailed": "Warning", "result": "fail", "reason": "No packages.lock.json files exist and no project sets RestorePackagesWithLockFile.", "findingIds": ["DEP-02#1"] },
+    { "checkId": "DEP-03", "subject": "Implementation", "subSubject": "Dependency Management", "severityIfFailed": "Error", "result": "N/A", "reason": "No analyzer approval was given for this run (analyzerApproval: \"none\"), so no vulnerability scan (e.g. dotnet list package --vulnerable) was run and no 02-analyzers.json exists to source vulnerability data from; cannot be assessed from manifest inspection alone.", "findingIds": [] },
+    { "checkId": "DEP-04", "subject": "Implementation", "subSubject": "Dependency Management", "severityIfFailed": "Error", "result": "pass", "reason": "All projects target net10.0, a currently supported .NET release (per Directory.Build.props); no dependency versions in Directory.Packages.props reference an out-of-support major runtime.", "findingIds": [] },
+    { "checkId": "DEP-05", "subject": "Implementation", "subSubject": "Dependency Management", "severityIfFailed": "Information", "result": "fail", "reason": "No sbom.json, *.cdx.json, *.spdx.json or other license inventory file was found anywhere in the repository.", "findingIds": ["DEP-05#1"] },
+    { "checkId": "DEP-06", "subject": "Implementation", "subSubject": "Dependency Management", "severityIfFailed": "Warning", "result": "N/A", "reason": "No license inventory or SBOM exists to cross-reference (see DEP-05), and manifests (csproj/Directory.Packages.props) do not declare dependency license metadata; confirming compatibility would require fetching third-party package-registry pages not on the approved-sources allowlist.", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "Per instructions, no dependency-vulnerability scanning tools were run (analyzerApproval: \"none\"); DEP-03 and DEP-06 are marked N/A rather than guessed."
+}

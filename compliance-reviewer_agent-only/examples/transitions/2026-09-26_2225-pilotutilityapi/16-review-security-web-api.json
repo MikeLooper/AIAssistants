@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-26_2225-pilotutilityapi",
+  "stepId": "16-review-security-web-api",
+  "status": "completed",
+  "startedAt": "2026-09-26T22:53:00-05:00",
+  "completedAt": "2026-09-26T22:56:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "targetPath=PilotUtilityApi;subjects=all-18;analyzers=none;gitHead=unavailable-user-declined-shell",
+  "skill": "review-security-web-api",
+  "subject": "Security",
+  "batchIndex": 0,
+  "findings": [
+    {
+      "id": "SEC-WA-06#1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-06",
+      "severity": "Error",
+      "title": "HTTPS redirection is only enabled in Development; HTTP requests in other environments are never redirected or rejected",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 73, "lineEnd": 76, "excerpt": "if (webApp.Environment.IsDevelopment())\n{\n\twebApp.UseHttpsRedirection();\n}" }],
+      "standard": "OWASP REST Security Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+      "recommendation": "Call webApp.UseHttpsRedirection() unconditionally (or gate it on `!IsDevelopment()` if HTTPS is terminated by a reverse proxy only outside dev) and add webApp.UseHsts() for non-development environments.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-WA-01#1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-01",
+      "severity": "Warning",
+      "title": "No security response headers (CSP, X-Content-Type-Options, X-Frame-Options, HSTS) are set anywhere in the pipeline",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 65, "lineEnd": 87, "excerpt": "public static void ApiWebApplication(this WebApplication webApp) { ... webApp.UseMiddleware<UnhandledExceptionMiddleware>(); webApp.MapControllers(); }" }],
+      "standard": "OWASP HTTP Headers Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html",
+      "recommendation": "Add a small middleware (or `UseSecurityHeaders`-style extension) that sets Content-Security-Policy, X-Content-Type-Options: nosniff, X-Frame-Options: DENY (or frame-ancestors 'none') and Strict-Transport-Security on every response.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "SEC-WA-STR#1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-07",
+      "title": "Error responses return a sanitized ProblemDetails message; no stack traces or internal details are leaked to the client",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs", "lineStart": 41, "lineEnd": 80, "excerpt": "var loggingCorrelation = LoggingUtilities.GetLoggingCorrelation(); this.logger.LogError(exception, \"{UserMessage}\", loggingCorrelation.UserMessage); ... Detail = loggingCorrelation.UserMessage" }]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "SEC-WA-01", "subject": "Security", "subSubject": "Web & API", "severityIfFailed": "Warning", "result": "fail", "reason": "No CSP header is set anywhere in the pipeline.", "findingIds": ["SEC-WA-01#1"] },
+    { "checkId": "SEC-WA-02", "subject": "Security", "subSubject": "Web & API", "severityIfFailed": "Warning", "result": "fail", "reason": "No UseHsts() call and HTTPS redirection is dev-only.", "findingIds": ["SEC-WA-01#1"] },
+    { "checkId": "SEC-WA-03", "subject": "Security", "subSubject": "Web & API", "severityIfFailed": "Warning", "result": "fail", "reason": "No X-Content-Type-Options header is set.", "findingIds": ["SEC-WA-01#1"] },
+    { "checkId": "SEC-WA-04", "subject": "Security", "subSubject": "Web & API", "severityIfFailed": "Warning", "result": "fail", "reason": "No X-Frame-Options/frame-ancestors protection is set.", "findingIds": ["SEC-WA-01#1"] },
+    { "checkId": "SEC-WA-05", "subject": "Security", "subSubject": "Web & API", "severityIfFailed": "Error", "result": "N/A", "reason": "No CORS middleware is registered at all, so there is no wildcard-plus-credentials misconfiguration to find." },
+    { "checkId": "SEC-WA-06", "subject": "Security", "subSubject": "Web & API", "severityIfFailed": "Error", "result": "fail", "reason": "HTTPS is enforced only in Development.", "findingIds": ["SEC-WA-06#1"] },
+    { "checkId": "SEC-WA-07", "subject": "Security", "subSubject": "Web & API", "severityIfFailed": "Warning", "result": "pass" }
+  ],
+  "urlsFetched": [],
+  "notes": "SEC-WA-06 evidence overlaps TF-10's finding; keep this Security finding as primary per the higher severity/earlier-pipeline rule."
+}

@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-26_2225-pilotutilityapi",
+  "stepId": "23-review-performance",
+  "status": "completed",
+  "startedAt": "2026-09-26T23:18:00-05:00",
+  "completedAt": "2026-09-26T23:21:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "targetPath=PilotUtilityApi;subjects=all-18;analyzers=none;gitHead=unavailable-user-declined-shell",
+  "skill": "review-performance",
+  "subject": "Operations",
+  "batchIndex": 0,
+  "findings": [
+    {
+      "id": "PERF-05#1",
+      "subject": "Operations",
+      "subSubject": "Performance",
+      "checkId": "PERF-05",
+      "severity": "Information",
+      "title": "Tracing uses AlwaysOnSampler, exporting 100% of traces regardless of environment",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Shared/OpenTelemetry/Extensions/OpenTelemetryExtensions.cs", "lineStart": 87, "lineEnd": 87, "excerpt": ".SetSampler(new AlwaysOnSampler())" }],
+      "standard": "Azure Well-Architected — Performance Efficiency",
+      "url": "https://learn.microsoft.com/azure/well-architected/performance-efficiency/",
+      "recommendation": "Consider a ratio-based sampler (e.g. TraceIdRatioBasedSampler) for production traffic once volume grows, to reduce exporter/collector overhead while keeping full sampling in dev.",
+      "confidence": "Low",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "PERF-STR#1",
+      "subject": "Operations",
+      "subSubject": "Performance",
+      "checkId": "PERF-02",
+      "title": "All I/O-bound request-handling code (controllers, services, repository) is fully async with CancellationToken propagation",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 32, "lineEnd": 34, "excerpt": "public async Task<IActionResult> ResetTesting(CancellationToken cancellationToken)\n{\n\tvar response = await testingService.ResetTestingAsync(cancellationToken);" }]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "PERF-01", "subject": "Operations", "subSubject": "Performance", "severityIfFailed": "Warning", "result": "N/A", "reason": "No expensive/repeated read operations were found in the reviewed endpoints that would benefit from caching." },
+    { "checkId": "PERF-02", "subject": "Operations", "subSubject": "Performance", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "PERF-03", "subject": "Operations", "subSubject": "Performance", "severityIfFailed": "Warning", "result": "pass", "reason": "ADO.NET connections (SqlConnection/NpgsqlConnection) use the drivers' built-in connection pooling by default; no Pooling=false is set." },
+    { "checkId": "PERF-04", "subject": "Operations", "subSubject": "Performance", "severityIfFailed": "Warning", "result": "N/A", "reason": "No loop-based or per-item data access code exists in the reviewed files." },
+    { "checkId": "PERF-05", "subject": "Operations", "subSubject": "Performance", "severityIfFailed": "Information", "result": "fail", "reason": "100% trace sampling is configured with no environment-based override.", "findingIds": ["PERF-05#1"] }
+  ],
+  "urlsFetched": [],
+  "notes": "No significant performance issues; the one Information-level note about trace sampling is a minor, low-confidence forward-looking observation given current traffic is presumably low (proof-of-concept API)."
+}

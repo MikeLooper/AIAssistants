@@ -1,0 +1,184 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-27_1246-pilotutilityapi",
+  "stepId": "10-review-software-quality",
+  "status": "completed",
+  "startedAt": "2026-09-27T12:53:00-05:00",
+  "completedAt": "2026-09-27T13:00:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "654660A96E3CC744F90EF2E66F27D63D237D81D1F87DEF1A0BC2F6F9BA8F3F27",
+  "skill": "review-software-quality",
+  "subject": "Software Quality",
+  "batchIndex": 0,
+  "findings": [
+    {
+      "id": "SWQ-SQ-01#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-01",
+      "severity": "Warning",
+      "title": "ResetTestingAsync mixes multiple responsibilities in one method (maintainability)",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 57, "lineEnd": 133, "excerpt": "public async Task<RetrieveResponse<int>> ResetTestingAsync(...) { ... try { ... connection.Open(); ... transaction.BeginTransaction(); ... try { ... transaction.Commit()/Rollback(); } catch (Exception exInner) { ... } finally { connection.Close(); } ... } catch (UserException) { throw; } catch (Exception ex) { ... } }" }
+      ],
+      "standard": "ISO/IEC 25010 Maintainability",
+      "url": "https://iso25000.com/index.php/en/iso-25000-standards/iso-25010#maintainability",
+      "recommendation": "Extract connection/transaction lifecycle management (open, begin/commit/rollback, close) into a small private helper or a using-based unit-of-work so ResetTestingAsync only orchestrates the high-level steps; this also lets the resource-management code be reused/tested independently.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    },
+    {
+      "id": "SWQ-SQ-02#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-02",
+      "severity": "Warning",
+      "title": "Nested try/catch/finally with multiple branch points increases cyclomatic complexity",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 61, "lineEnd": 132, "excerpt": "try { ... if (activeDataSource == null) ... if (connection.State != ConnectionState.Open) ... try { ... if (result == 0) { transaction.Commit(); } else { transaction.Rollback(); } } catch (Exception exInner) { ... } finally { connection.Close(); } } catch (UserException) { throw; } catch (Exception ex) { ... }" }
+      ],
+      "standard": "ISO/IEC 25010 Maintainability",
+      "url": "https://iso25000.com/index.php/en/iso-25000-standards/iso-25010#maintainability",
+      "recommendation": "Flatten the nested try/catch (e.g. by wrapping connection/transaction/command in `using`/`await using` declarations) and let a single outer catch translate any exception to UserException; this reduces the number of independent paths a reader must trace and removes the manual connection.Close() in a finally block.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    },
+    {
+      "id": "SWQ-SQ-03#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-03",
+      "severity": "Warning",
+      "title": "Data-source-type switch/case structure is duplicated across three private methods",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 144, "lineEnd": 160, "excerpt": "return dataSource.DataSourceType.ToLowerInvariant() switch { \"sqlserver\" => ..., \"postgresql\" => ..., _ => throw new ConfigurationException(...) };" },
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 165, "lineEnd": 177, "excerpt": "return dataSourceType.ToLowerInvariant() switch { \"sqlserver\" => new SqlConnection(connectionString), \"postgresql\" => new NpgsqlConnection(connectionString), _ => throw new ConfigurationException(...) };" },
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 200, "lineEnd": 206, "excerpt": "return dataSourceType.ToLowerInvariant() switch { \"sqlserver\" => SqlConstants.SqlServerResetTestingScript, \"postgresql\" => SqlConstants.PostgreSqlResetTestingScript, _ => throw new ConfigurationException(...) };" }
+      ],
+      "standard": "ISO/IEC 25010 Maintainability",
+      "url": "https://iso25000.com/index.php/en/iso-25000-standards/iso-25010#maintainability",
+      "recommendation": "Consolidate the repeated \"sqlserver\"/\"postgresql\" switch into a single per-provider abstraction (e.g. a small IDataSourceProvider implemented once per database type, exposing connection-string building, connection creation and the reset script) so adding a third database only touches one place instead of three near-identical switch statements.",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "SWQ-SQ-07#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-07",
+      "severity": "Information",
+      "title": "Namespace/folder naming is inconsistent for the Domain response model",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Domain/Models/Responses/AboutResponse.cs", "lineStart": 1, "lineEnd": 4, "excerpt": "namespace PilotUtilityApi.Domain.Models.Dto\n{\n\tpublic class AboutResponse" }
+      ],
+      "standard": "ISO/IEC 25010 Maintainability",
+      "url": "https://iso25000.com/index.php/en/iso-25000-standards/iso-25010#maintainability",
+      "recommendation": "Rename the namespace to PilotUtilityApi.Domain.Models.Responses to match the physical folder (Models/Responses), or move the file into a Dto folder; also note every src project folder is named PilotUtiltyApi.* (missing an 'i') while the namespaces are correctly PilotUtilityApi.* — align folder names with the namespace spelling to avoid confusion.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SWQ-DP-04#1",
+      "subject": "Software Quality",
+      "subSubject": "Design Patterns",
+      "checkId": "DP-04",
+      "severity": "Warning",
+      "title": "Temporary service provider built before the container is finalized (DI anti-pattern)",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 122, "lineEnd": 126, "excerpt": "var serviceProvider = builder.Services.BuildServiceProvider();\nbuilder.OpenTelemetryWebApplicationBuilder(serviceProvider);\nbuilder.OpenApiWebApplicationBuilder(serviceProvider);\nbuilder.LoggingWebApplicationBuilder();" }
+      ],
+      "standard": "Fallback rubric (no single wording-based source for DP-* checks)",
+      "url": "",
+      "recommendation": "Avoid calling builder.Services.BuildServiceProvider() before WebApplicationBuilder.Build(): it creates an extra, throwaway DI container whose singletons (e.g. IApplicationConfiguration or anything registered before this point) are separate instances from the ones the running app will later resolve — the same anti-pattern flagged by the ASP0000 analyzer. Read IApplicationConfiguration directly from builder.Configuration/the already-bound settings object, or defer OpenTelemetry/OpenApi configuration to IPostConfigureOptions/IConfigureOptions so no extra container is built.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SWQ-AP-05#1",
+      "subject": "Software Quality",
+      "subSubject": "Architecture Patterns",
+      "checkId": "AP-05",
+      "severity": "Information",
+      "title": "No retry/resilience pattern around external database calls",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 73, "lineEnd": 89, "excerpt": "var connection = CreateConnection(activeDataSource.DataSourceType, connectionString);\nif (connection.State != ConnectionState.Open) { connection.Open(); }\nvar transaction = connection.BeginTransaction();\n... result = await connection.QueryFirstOrDefaultAsync<int>(command);" }
+      ],
+      "standard": "Azure Architecture Center — Cloud Design Patterns",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/",
+      "recommendation": "Wrap the connection open/transaction/command sequence with a transient-fault retry policy (e.g. Polly, or the SqlClient/Npgsql built-in retry executors) so brief network blips against SQL Server/PostgreSQL don't surface as user-facing 500s. This may overlap with review-reliability's findings for the same file; aggregation will de-duplicate.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "SWQ-SQ-06#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-06",
+      "title": "Errors are consistently logged with a correlation id and never silently swallowed",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 123, "lineEnd": 132, "excerpt": "catch (Exception ex) { this.Logger.LogError(ex, \"Error occurred in {ClassName}.{MethodName}. CorrelationId: {CorrelationId}\", ...); throw new UserException(loggingCorrelation.UserMessage); }" },
+        { "file": "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs", "lineStart": 43, "lineEnd": 90, "excerpt": "catch (UserException uExc) { ... } catch (Exception exception) { ... this.logger.LogError(exception, \"{UserMessage}\", loggingCorrelation.UserMessage); ... }" }
+      ],
+      "standard": "ISO/IEC 25010 Reliability",
+      "url": "https://iso25000.com/index.php/en/iso-25000-standards/iso-25010#reliability"
+    },
+    {
+      "id": "SWQ-DP-01#1",
+      "subject": "Software Quality",
+      "subSubject": "Design Patterns",
+      "checkId": "DP-01",
+      "title": "Application configuration singleton is immutable, read-only startup data — not shared mutable per-request state",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Services/Extensions/ServicesInjectionExtensions.cs", "lineStart": 1, "lineEnd": 40, "excerpt": "var applicationSettings = new ApplicationConfiguration();\nbuilder.Configuration.GetSection(\"Application\").Bind(applicationSettings);\napplicationSettings.Validate();\nbuilder.Services.AddSingleton<IApplicationConfiguration>(applicationSettings);" }
+      ]
+    },
+    {
+      "id": "SWQ-AP-01#1",
+      "subject": "Software Quality",
+      "subSubject": "Architecture Patterns",
+      "checkId": "AP-01",
+      "title": "Clean, one-directional layering: Web -> Services/Domain/Shared, Services -> Repositories/Domain/Shared, Repositories -> Domain/Shared, with no project referencing back up the stack",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/PilotUtilityApi.Web.csproj", "lineStart": 12, "lineEnd": 14, "excerpt": "<ProjectReference Include=\"..\\PilotUtiltyApi.Domain\\PilotUtilityApi.Domain.csproj\" />\n<ProjectReference Include=\"..\\PilotUtiltyApi.Services\\PilotUtilityApi.Services.csproj\" />\n<ProjectReference Include=\"..\\PilotUtiltyApi.Shared\\PilotUtilityApi.Shared.csproj\" />" }
+      ],
+      "standard": "Azure Architecture Center — Cloud Design Patterns",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/"
+    },
+    {
+      "id": "SWQ-AP-06#1",
+      "subject": "Software Quality",
+      "subSubject": "Architecture Patterns",
+      "checkId": "AP-06",
+      "title": "Cross-cutting concerns (versioning, logging, OpenTelemetry, unhandled-exception handling) are centralized in shared extension methods/middleware rather than duplicated per controller",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 68, "lineEnd": 84, "excerpt": "webApp.OpenApiWebApplication();\nwebApp.LoggingWebApplication();\nwebApp.SwaggerWebApplication();\nwebApp.UseMiddleware<UnhandledExceptionMiddleware>();\nwebApp.MapControllers();" }
+      ]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "SQ-01", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "fail", "reason": "TestingRepository.ResetTestingAsync combines data-source lookup, connection lifecycle, transaction management and SQL execution in one method.", "findingIds": ["SWQ-SQ-01#1"] },
+    { "checkId": "SQ-02", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "fail", "reason": "Nested try/catch/finally in ResetTestingAsync raises branch count beyond a comfortable single-purpose method.", "findingIds": ["SWQ-SQ-02#1"] },
+    { "checkId": "SQ-03", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "fail", "reason": "The sqlserver/postgresql switch structure is repeated near-identically in three private methods of TestingRepository.", "findingIds": ["SWQ-SQ-03#1"] },
+    { "checkId": "SQ-04", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "pass", "reason": "Controllers, services, repositories and extension classes reviewed each have a single, clearly named responsibility; no god-classes found in scope.", "findingIds": [] },
+    { "checkId": "SQ-05", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Information", "result": "pass", "reason": "Parameter lists across reviewed methods are short (0-3 parameters); related configuration is already grouped into DataSourceConfiguration/ApplicationConfiguration objects.", "findingIds": [] },
+    { "checkId": "SQ-06", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Error", "result": "pass", "reason": "Exceptions are caught, logged with a correlation id, and re-thrown as a UserException or converted to a ProblemDetails response; nothing is silently swallowed.", "findingIds": ["SWQ-SQ-06#1"] },
+    { "checkId": "SQ-07", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Information", "result": "fail", "reason": "AboutResponse's namespace (Dto) doesn't match its folder (Responses), and project folders are misspelled PilotUtiltyApi vs the correct PilotUtilityApi namespaces.", "findingIds": ["SWQ-SQ-07#1"] },
+    { "checkId": "SQ-08", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Information", "result": "pass", "reason": "No commented-out code blocks or obviously dead code found in the reviewed files.", "findingIds": [] },
+    { "checkId": "DP-01", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Warning", "result": "pass", "reason": "The only singleton in scope (IApplicationConfiguration) holds immutable startup configuration, not per-request mutable state.", "findingIds": ["SWQ-DP-01#1"] },
+    { "checkId": "DP-02", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Information", "result": "pass", "reason": "Classes reviewed use composition and interfaces (ITestingService, ITestingRepository, IApplicationConfiguration) rather than deep inheritance chains.", "findingIds": [] },
+    { "checkId": "DP-04", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Information", "result": "fail", "reason": "ApiExtensions.ApiWebApplicationBuilder builds a second, throwaway IServiceProvider purely to resolve one config value before the real container is built — a known DI anti-pattern (ASP0000) rather than a pattern matching a real problem.", "findingIds": ["SWQ-DP-04#1"] },
+    { "checkId": "DP-05", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Information", "result": "pass", "reason": "Simple internal factory methods (CreateConnection, GetResetScript) are already used to construct provider-specific objects, even though their bodies duplicate the same switch (see SQ-03).", "findingIds": [] },
+    { "checkId": "DP-06", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Warning", "result": "N/A", "reason": "No observer/event subscription pattern is present in any file in scope.", "findingIds": [] },
+    { "checkId": "AP-01", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass", "reason": "Web project references only Domain, Services and Shared — never Repositories — and controllers call into ITestingService rather than touching the database directly.", "findingIds": ["SWQ-AP-01#1"] },
+    { "checkId": "AP-02", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass", "reason": "TestingController and SystemController only bind input, call a service/config abstraction, and shape the HTTP response; no business logic is embedded in the controllers.", "findingIds": [] },
+    { "checkId": "AP-03", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass", "reason": "Project reference graph (Web -> Domain/Services/Shared; Services -> Domain/Repositories/Shared; Repositories -> Domain/Shared; Domain -> Shared) is acyclic.", "findingIds": [] },
+    { "checkId": "AP-04", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Information", "result": "pass", "reason": "Each project groups a single concern (Domain models, data access, business services, cross-cutting Shared utilities, Web presentation), giving high cohesion per module.", "findingIds": [] },
+    { "checkId": "AP-05", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Information", "result": "fail", "reason": "No retry/circuit-breaker policy wraps the SQL Server/PostgreSQL calls in TestingRepository despite depending on an external database.", "findingIds": ["SWQ-AP-05#1"] },
+    { "checkId": "AP-06", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass", "reason": "Versioning, OpenAPI, Swagger, logging, OpenTelemetry and unhandled-exception handling are each set up once in shared extension methods/middleware and reused across the app.", "findingIds": ["SWQ-AP-06#1"] }
+  ],
+  "urlsFetched": [],
+  "notes": "Reviewed all files listed in scope plus the .sln and each src/*/*.csproj to derive the project reference graph for layering/coupling checks. No languages/ override file exists for csharp under review-software-quality, so only the shared checklist applied."
+}

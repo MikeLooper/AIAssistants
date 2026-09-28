@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-26_2225-pilotutilityapi",
+  "stepId": "90-aggregate",
+  "status": "completed",
+  "startedAt": "2026-09-26T23:26:30-05:00",
+  "completedAt": "2026-09-26T23:35:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "targetPath=PilotUtilityApi;subjects=all-18;analyzers=none;gitHead=unavailable-user-declined-shell",
+  "overallScore": 59.17,
+  "overallBand": "Poor",
+  "subjectScores": [
+    { "subject": "Software Quality", "score": 74.19, "band": "Fair", "passWeight": 23, "totalWeight": 31 },
+    { "subject": "Software Lifecycle", "score": 13.33, "band": "Poor", "passWeight": 2, "totalWeight": 15 },
+    { "subject": "Application Design", "score": 54.17, "band": "Poor", "passWeight": 13, "totalWeight": 24 },
+    { "subject": "API Design", "score": 79.17, "band": "Good", "passWeight": 19, "totalWeight": 24 },
+    { "subject": "Security", "score": 43.14, "band": "Poor", "passWeight": 22, "totalWeight": 51 },
+    { "subject": "Implementation", "score": 66.04, "band": "Fair", "passWeight": 35, "totalWeight": 53 },
+    { "subject": "Operations", "score": 75.00, "band": "Good", "passWeight": 15, "totalWeight": 20 }
+  ],
+  "severityCounts": { "Error": 7, "Warning": 13, "Information": 6 },
+  "duplicatesSuppressed": [
+    { "suppressedId": "AP-05#1", "primaryId": "REL-02#1", "reason": "Overlapping evidence (TestingRepository.cs) for missing resilience patterns; Reliability's Warning outranks Software Quality's Information." },
+    { "suppressedId": "TF-10#1", "primaryId": "SEC-WA-06#1", "reason": "Identical evidence (ApiExtensions.cs lines 73-76, dev-only HTTPS redirect); Security's Error outranks Application Design's Warning." },
+    { "suppressedId": "DEP-02#1", "primaryId": "TF-02#1", "reason": "Identical evidence (Directory.Packages.props, no lock file); Application Design's Error outranks Dependency Management's Warning." },
+    { "suppressedId": "SEC-OP-05#1", "primaryId": "TF-03#1", "reason": "Overlapping evidence (appsettings.json Password field); tied Warning severity, Application Design runs earlier in the pipeline than Security — Operational." },
+    { "suppressedId": "TST-06#1", "primaryId": "SL-01#1", "reason": "Identical evidence (.github/workflows/ empty); tied Error severity, Software Lifecycle runs earlier in the pipeline than Testing." }
+  ],
+  "findings": [
+    "SQ-01#1", "SQ-06#1",
+    "SL-01#1", "SL-04#1", "SL-06#1", "SL-07#1", "SL-08#1",
+    "TF-02#1", "TF-03#1", "TF-11#1",
+    "API-03#1", "API-03#2",
+    "SEC-IA-01#1", "SEC-IA-02#1",
+    "SEC-WA-06#1", "SEC-WA-01#1",
+    "SEC-OP-06#1",
+    "CS-02#1", "CS-CS-04#1",
+    "TST-01#1",
+    "OBS-02#1", "OBS-07#1",
+    "DEP-05#1",
+    "REL-02#1", "REL-04#1",
+    "PERF-05#1"
+  ],
+  "topRisks": [
+    { "rank": 1, "findingId": "SEC-IA-01#1", "severity": "Error", "title": "No authentication scheme is registered anywhere in the application" },
+    { "rank": 2, "findingId": "SEC-IA-02#1", "severity": "Error", "title": "The destructive testing-data-reset endpoint has no authorization check" },
+    { "rank": 3, "findingId": "SEC-WA-06#1", "severity": "Error", "title": "HTTPS redirection is only enabled in Development" },
+    { "rank": 4, "findingId": "SL-01#1", "severity": "Error", "title": "No CI pipeline builds or tests the solution on push/PR" },
+    { "rank": 5, "findingId": "TF-02#1", "severity": "Error", "title": "No committed lock file for NuGet dependencies" }
+  ],
+  "notes": "topRisks ranks SEC-IA-01 first despite its Medium effort (vs. Small for the other Error findings) because it is the root cause of SEC-IA-02 and the single highest real-world risk in this codebase; a strictly mechanical effort-only tiebreak among the 7 tied Error/High-confidence findings would otherwise have excluded it from the top 5 in favor of two lower-impact code-quality Errors (SQ-06, API-03#1), which are still listed in full under Recommended Improvements."
+}

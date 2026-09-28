@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-09-26_2225-pilotutilityapi",
+  "stepId": "17-review-security-operational",
+  "status": "completed",
+  "startedAt": "2026-09-26T22:56:00-05:00",
+  "completedAt": "2026-09-26T22:59:00-05:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "targetPath=PilotUtilityApi;subjects=all-18;analyzers=none;gitHead=unavailable-user-declined-shell",
+  "skill": "review-security-operational",
+  "subject": "Security",
+  "batchIndex": 0,
+  "findings": [
+    {
+      "id": "SEC-OP-05#1",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-05",
+      "severity": "Warning",
+      "title": "Database credential fields are structured directly into tracked appsettings JSON files",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 6, "lineEnd": 8, "excerpt": "\"Password\": \"<DevUser password>\"" },
+        { "file": "src/PilotUtiltyApi.Web/appsettings.Development.json", "lineStart": 6, "lineEnd": 6, "excerpt": "\"Password\": \"<DevUser password>\"" }
+      ],
+      "standard": "OWASP Secrets Management Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html",
+      "recommendation": "The current value is only a placeholder, not a live credential, but the config shape invites a real password to be pasted into a tracked file. Remove the Password field from appsettings*.json entirely and source it only from user-secrets (already configured via UserSecretsId) locally and a vault/environment variable in deployed environments.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-OP-06#1",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-06",
+      "severity": "Warning",
+      "title": "No vault/secret-manager integration is wired up for non-local environments",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Web/PilotUtilityApi.Web.csproj", "lineStart": 6, "lineEnd": 6, "excerpt": "<UserSecretsId>9b8addf2-6945-4c57-a386-37e2503a0fff</UserSecretsId>" }],
+      "standard": "OWASP Secrets Management Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html",
+      "recommendation": "user-secrets covers local development; add an Azure Key Vault (or equivalent) configuration provider for staging/production so real credentials never live in appsettings*.json.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "SEC-OP-STR#1",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-02",
+      "title": "Errors are logged with class/method context and a correlation ID before being translated to a safe user-facing message",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 105, "lineEnd": 112, "excerpt": "this.Logger.LogError(exInner, \"Error occurred in {ClassName}.{MethodName}. CorrelationId: {CorrelationId}\", nameof(TestingRepository), nameof(ResetTestingAsync), loggingCorrelation.CorrelationId);" }]
+    },
+    {
+      "id": "SEC-OP-STR#2",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-01",
+      "title": "A dedicated UserException type enforces that only pre-sanitized, user-safe messages ever reach the HTTP response",
+      "evidence": [{ "file": "src/PilotUtiltyApi.Shared/Exceptions/UserException.cs", "lineStart": 6, "lineEnd": 9, "excerpt": "/// The message should be user-friendly and not contain any sensitive information - including stacktraces, class names, or other internal information." }]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "SEC-OP-01", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "SEC-OP-02", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "SEC-OP-03", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Error", "result": "pass", "reason": "No evidence of passwords/tokens/PII being written to log messages; only structured metadata (class, method, correlation id) is logged." },
+    { "checkId": "SEC-OP-04", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "N/A", "reason": "No user-controlled input is currently written into log messages in the reviewed files." },
+    { "checkId": "SEC-OP-05", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "fail", "reason": "A Password config field is committed in appsettings*.json, currently a placeholder but structurally ready to hold a real secret. Downgraded to Warning since no live credential is present.", "findingIds": ["SEC-OP-05#1"] },
+    { "checkId": "SEC-OP-06", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "fail", "reason": "No vault/secret-manager provider is configured beyond local user-secrets. Downgraded to Warning consistent with SEC-OP-05.", "findingIds": ["SEC-OP-06#1"] },
+    { "checkId": "SEC-OP-07", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Information", "result": "pass", "reason": "This review prioritized auth (Identity & Access), data access (Input & Injection) and error/secrets handling (this subject) first." }
+  ],
+  "urlsFetched": [],
+  "notes": "Downgraded SEC-OP-05/06 from the checklist's default Error to Warning because the committed value is an obvious placeholder, not a live credential — see recommendation for why the pattern itself still needs to change before real deployment."
+}
