@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1926-pilotutilityapi",
+  "stepId": "16-review-security-web-api",
+  "status": "completed",
+  "startedAt": "2026-10-09T01:26:05Z",
+  "completedAt": "2026-10-09T01:48:00Z",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "929741f5c04d8218a6852d5d6eb33cbeb2f1d20b",
+  "inputsHash": "sha256:0562d896a8fce07e",
+  "batchId": "batch-7",
+  "skill": "review-security-web-api",
+  "subject": "Security",
+  "findings": [
+    {
+      "id": "SEC-WA-01#1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-01",
+      "severity": "Warning",
+      "title": "No Content-Security-Policy header is set; the pipeline also serves Swagger UI and Scalar HTML pages",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 78, "lineEnd": 86, "excerpt": "webApp.OpenApiWebApplication(); webApp.LoggingWebApplication(); webApp.SwaggerWebApplication(); ... webApp.MapControllers();" }
+      ],
+      "standard": "OWASP Content Security Policy Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html",
+      "recommendation": "Add security-header middleware (for example NetEscapades.AspNetCore.SecurityHeaders or a small custom middleware) that sets `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'` on API responses. Use a looser policy only for the Swagger/Scalar UI routes.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-WA-02#1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-02",
+      "severity": "Warning",
+      "title": "Strict-Transport-Security is never set (no UseHsts in the pipeline)",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 73, "lineEnd": 76, "excerpt": "if (webApp.Environment.IsDevelopment()) { webApp.UseHttpsRedirection(); }" }
+      ],
+      "standard": "OWASP HTTP Headers Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#strict-transport-security-hsts",
+      "recommendation": "Call `webApp.UseHsts()` when the environment is not Development, before the other middleware.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-WA-03#1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-03",
+      "severity": "Warning",
+      "title": "X-Content-Type-Options: nosniff is not set",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 65, "lineEnd": 87, "excerpt": "public static void ApiWebApplication(this WebApplication webApp) ... no security-header middleware registered" }
+      ],
+      "standard": "OWASP HTTP Headers Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-content-type-options",
+      "recommendation": "Add `X-Content-Type-Options: nosniff` to every response from the same security-header middleware.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-WA-04#1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-04",
+      "severity": "Warning",
+      "title": "No clickjacking protection (no X-Frame-Options or CSP frame-ancestors)",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Swagger/Extensions/SwaggerExtensions.cs", "lineStart": 38, "lineEnd": 41, "excerpt": "webApp.UseSwaggerUI(options => { options.SwaggerEndpoint(\"/openapi/v1.json\", \"v1\"); });" },
+        { "file": "src/PilotUtiltyApi.Shared/OpenApi/Extensions/OpenApiExtensions.cs", "lineStart": 143, "lineEnd": 143, "excerpt": "webApp.MapScalarApiReference(options =>" }
+      ],
+      "standard": "OWASP HTTP Headers Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-frame-options",
+      "recommendation": "Send `X-Frame-Options: DENY` and/or the CSP directive `frame-ancestors 'none'` on all responses, including the Swagger and Scalar UI pages.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-WA-06#1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-06",
+      "severity": "Error",
+      "title": "HTTPS redirection is enabled only in Development (the condition is inverted), and the launch profile listens on HTTP only",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 73, "lineEnd": 76, "excerpt": "if (webApp.Environment.IsDevelopment()) { webApp.UseHttpsRedirection(); }" },
+        { "file": "src/PilotUtiltyApi.Web/Properties/launchSettings.json", "lineStart": 12, "lineEnd": 12, "excerpt": "\"applicationUrl\": \"http://localhost:58401\"" }
+      ],
+      "standard": "OWASP REST Security Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html#https",
+      "recommendation": "Call `UseHttpsRedirection()` (with `UseHsts()`) in every environment except Development, or reject HTTP at the edge. Also add an HTTPS URL to the launch profile.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "STR-SEC-WA-07#1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-07",
+      "title": "Global exception middleware returns a ProblemDetails body with only a generic user message; stack traces are logged on the server and never returned",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs", "lineStart": 81, "lineEnd": 87, "excerpt": "var problemDetails = new ProblemDetails { Status = 500, Title = \"Internal Server Error\", Detail = loggingCorrelation.UserMessage, ..." }
+      ],
+      "standard": "OWASP REST Security Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html#error-handling"
+    },
+    {
+      "id": "STR-SEC-WA-05#1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-05",
+      "title": "No permissive CORS policy is registered, so browsers keep the default same-origin restriction",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 113, "lineEnd": 121, "excerpt": "builder.Services.AddVersioning(); ... builder.Services.AddControllers(...) (no AddCors/UseCors)" }
+      ],
+      "standard": "OWASP REST Security Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html#cors"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "SEC-WA-01", "subject": "Security", "subSubject": "Web & API", "severityIfFailed": "Warning", "result": "fail", "reason": "No Content-Security-Policy header is configured anywhere in the pipeline.", "findingIds": ["SEC-WA-01#1"] },
+    { "checkId": "SEC-WA-02", "subject": "Security", "subSubject": "Web & API", "severityIfFailed": "Warning", "result": "fail", "reason": "UseHsts is never called.", "findingIds": ["SEC-WA-02#1"] },
+    { "checkId": "SEC-WA-03", "subject": "Security", "subSubject": "Web & API", "severityIfFailed": "Warning", "result": "fail", "reason": "No X-Content-Type-Options header is set.", "findingIds": ["SEC-WA-03#1"] },
+    { "checkId": "SEC-WA-04", "subject": "Security", "subSubject": "Web & API", "severityIfFailed": "Warning", "result": "fail", "reason": "Neither X-Frame-Options nor CSP frame-ancestors is set.", "findingIds": ["SEC-WA-04#1"] },
+    { "checkId": "SEC-WA-05", "subject": "Security", "subSubject": "Web & API", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-WA-06", "subject": "Security", "subSubject": "Web & API", "severityIfFailed": "Error", "result": "fail", "reason": "HTTPS redirection runs only in Development and the launch profile is HTTP-only.", "findingIds": ["SEC-WA-06#1"] },
+    { "checkId": "SEC-WA-07", "subject": "Security", "subSubject": "Web & API", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "SEC-WA-07 passed after checking TestingRepository.cs: exceptions become UserException(UserMessage), so neither the TestingController Warning header nor the ProblemDetails body carries raw exception text. An anonymous /about?show-details=true endpoint returns configuration; that is out of scope here and belongs to identity-access/operational review. OpenAPI/Scalar/Swagger UI are exposed in all environments (code comment admits this)."
+}

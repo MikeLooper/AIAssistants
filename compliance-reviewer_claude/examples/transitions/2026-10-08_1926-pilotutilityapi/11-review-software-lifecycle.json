@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1926-pilotutilityapi",
+  "stepId": "11-review-software-lifecycle",
+  "status": "completed",
+  "startedAt": "2026-10-09T01:26:05Z",
+  "completedAt": "2026-10-09T01:48:00Z",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "929741f5c04d8218a6852d5d6eb33cbeb2f1d20b",
+  "inputsHash": "sha256:0562d896a8fce07e",
+  "batchId": "batch-10",
+  "skill": "review-software-lifecycle",
+  "subject": "Software Lifecycle",
+  "findings": [
+    {
+      "id": "SL-01#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "CI/CD",
+      "checkId": "SL-01",
+      "severity": "Error",
+      "title": "No CI pipeline builds and tests every push/PR; build and test are manual only",
+      "evidence": [
+        { "file": "README.md", "lineStart": 105, "lineEnd": 108, "excerpt": "3. Build the solution:\n   ```bash\n   dotnet build" },
+        { "file": "README.md", "lineStart": 278, "lineEnd": 282, "excerpt": "### Running All Tests\n\n```bash\ndotnet test" }
+      ],
+      "standard": "SLSA v1.0 Requirements (scripted build on a hosted build platform)",
+      "url": "https://slsa.dev/spec/v1.0/requirements",
+      "recommendation": "Add a CI workflow (e.g. .github/workflows/ci.yml) that runs dotnet restore, build and test on every push and pull request, and make it a required status check on main.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-02#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Release Process",
+      "checkId": "SL-02",
+      "severity": "Warning",
+      "title": "No documented release process (tagging, changelog, publish step)",
+      "evidence": [
+        { "file": "CONTRIBUTING.md", "lineStart": 15, "lineEnd": 16, "excerpt": "4. Increase the version numbers in any examples files and the README.md to the new version that this Pull Request would represent." },
+        { "file": "CONTRIBUTING.md", "lineStart": 10, "lineEnd": 11, "excerpt": "1. Ensure any install or build dependencies are removed before the end of the layer when doing a build." }
+      ],
+      "standard": "Semantic Versioning 2.0.0",
+      "url": "https://semver.org/",
+      "recommendation": "Document a release procedure (version bump in Directory.Build.props, Git tag vX.Y.Z, changelog entry, build/publish step) and replace the boilerplate container-layer step in CONTRIBUTING.md, which does not apply to this repo.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-03#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Versioning",
+      "checkId": "SL-03",
+      "severity": "Warning",
+      "title": "Inconsistent version sources: assembly version 1.0.0 vs documented API version 0.1.1",
+      "evidence": [
+        { "file": "Directory.Build.props", "lineStart": 3, "lineEnd": 3, "excerpt": "<Version>1.0.0</Version>" },
+        { "file": "README.md", "lineStart": 183, "lineEnd": 183, "excerpt": "\"Version\": \"0.1.1\"" }
+      ],
+      "standard": "Semantic Versioning 2.0.0",
+      "url": "https://semver.org/#semantic-versioning-specification-semver",
+      "recommendation": "Keep a single source of truth for the version (Directory.Build.props) and derive the OpenAPI/documented version from it so bumps are consistent and meaningful.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-04#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Branching Model",
+      "checkId": "SL-04",
+      "severity": "Warning",
+      "title": "Branching model not documented; review rule exists only as text with no visible enforcement",
+      "evidence": [
+        { "file": "CONTRIBUTING.md", "lineStart": 17, "lineEnd": 18, "excerpt": "5. You may merge the Pull Request in once you have the sign-off of two other developers" }
+      ],
+      "standard": "NIST SP 800-218 SSDF",
+      "url": "https://www.nist.gov/itl/executive-order-14028-improving-nations-cybersecurity/nist-sp-800-218-secure-software-development",
+      "recommendation": "Document the branching model (e.g. trunk-based with short-lived feature branches into protected main) and enforce it with branch protection/rulesets requiring reviews and passing CI.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-05#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Supply Chain",
+      "checkId": "SL-05",
+      "severity": "Information",
+      "title": "No build provenance, signing or reproducible-build settings",
+      "evidence": [
+        { "file": "Directory.Build.props", "lineStart": 2, "lineEnd": 9, "excerpt": "<PropertyGroup>\n    <Version>1.0.0</Version>" }
+      ],
+      "standard": "SLSA v1.0 Requirements (provenance)",
+      "url": "https://slsa.dev/spec/v1.0/requirements",
+      "recommendation": "Once CI exists, generate build provenance attestations (e.g. actions/attest-build-provenance) and enable deterministic builds (ContinuousIntegrationBuild, RestorePackagesWithLockFile).",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "SL-06#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Supply Chain",
+      "checkId": "SL-06",
+      "severity": "Warning",
+      "title": "No automated or scheduled dependency updates (no Dependabot/Renovate config)",
+      "evidence": [
+        { "file": ".github/copilot-instructions.md", "lineStart": 1, "lineEnd": 4, "excerpt": "# Copilot Instructions: Repository-Wide Guidance" }
+      ],
+      "standard": "NIST SP 800-218 SSDF",
+      "url": "https://www.nist.gov/itl/executive-order-14028-improving-nations-cybersecurity/nist-sp-800-218-secure-software-development",
+      "recommendation": "Add .github/dependabot.yml with the nuget ecosystem (and github-actions once CI exists) on a weekly schedule.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-07#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Vulnerability Disclosure",
+      "checkId": "SL-07",
+      "severity": "Information",
+      "title": "No SECURITY.md or vulnerability-reporting process",
+      "evidence": [
+        { "file": "CONTRIBUTING.md", "lineStart": 73, "lineEnd": 74, "excerpt": "reported by contacting the project team at MikelLooper@gmail.com." }
+      ],
+      "standard": "NIST SP 800-218 SSDF (RV.1)",
+      "url": "https://www.nist.gov/itl/executive-order-14028-improving-nations-cybersecurity/nist-sp-800-218-secure-software-development",
+      "recommendation": "Add a SECURITY.md describing supported versions and a private reporting channel (e.g. GitHub private vulnerability reporting); the only contact today is for Code of Conduct issues.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-08#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Documentation",
+      "checkId": "SL-08",
+      "severity": "Information",
+      "title": "No changelog or release notes",
+      "evidence": [
+        { "file": "CONTRIBUTING.md", "lineStart": 12, "lineEnd": 13, "excerpt": "2. Update the README.md with details of changes to the interface" }
+      ],
+      "standard": "Semantic Versioning 2.0.0",
+      "url": "https://semver.org/",
+      "recommendation": "Add a CHANGELOG.md (Keep a Changelog format) and require an entry per PR in CONTRIBUTING.md.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "STR-SL-1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Branching Model",
+      "checkId": "SL-04",
+      "title": "Contributing guide requires sign-off from two other developers before merge",
+      "evidence": [
+        { "file": "CONTRIBUTING.md", "lineStart": 17, "lineEnd": 18, "excerpt": "5. You may merge the Pull Request in once you have the sign-off of two other developers" }
+      ]
+    },
+    {
+      "id": "STR-SL-2",
+      "subject": "Software Lifecycle",
+      "subSubject": "Versioning",
+      "checkId": "SL-03",
+      "title": "SemVer adopted explicitly and assembly version centralised in Directory.Build.props",
+      "evidence": [
+        { "file": "CONTRIBUTING.md", "lineStart": 16, "lineEnd": 16, "excerpt": "The versioning scheme we use is [SemVer](http://semver.org/)." },
+        { "file": "Directory.Build.props", "lineStart": 3, "lineEnd": 3, "excerpt": "<Version>1.0.0</Version>" }
+      ],
+      "standard": "Semantic Versioning 2.0.0",
+      "url": "https://semver.org/"
+    },
+    {
+      "id": "STR-SL-3",
+      "subject": "Software Lifecycle",
+      "subSubject": "Documentation",
+      "title": "README documents prerequisites, build, run and test steps clearly",
+      "evidence": [
+        { "file": "README.md", "lineStart": 79, "lineEnd": 118, "excerpt": "## Getting Started ... dotnet restore ... dotnet build" }
+      ]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "SL-01", "subject": "Software Lifecycle", "subSubject": "CI/CD", "severityIfFailed": "Error", "result": "fail", "reason": "No CI configuration (.github/workflows, azure-pipelines.yml, Jenkinsfile) exists.", "findingIds": ["SL-01#1"] },
+    { "checkId": "SL-02", "subject": "Software Lifecycle", "subSubject": "Release Process", "severityIfFailed": "Warning", "result": "fail", "reason": "Only a manual README version bump is described; no tagging, changelog or publish step.", "findingIds": ["SL-02#1"] },
+    { "checkId": "SL-03", "subject": "Software Lifecycle", "subSubject": "Versioning", "severityIfFailed": "Warning", "result": "fail", "reason": "SemVer format is used but assembly (1.0.0) and documented API (0.1.1) versions disagree.", "findingIds": ["SL-03#1"] },
+    { "checkId": "SL-04", "subject": "Software Lifecycle", "subSubject": "Branching Model", "severityIfFailed": "Warning", "result": "fail", "reason": "No branching model documented and no enforcement visible; only a two-reviewer rule in text.", "findingIds": ["SL-04#1"] },
+    { "checkId": "SL-05", "subject": "Software Lifecycle", "subSubject": "Supply Chain", "severityIfFailed": "Information", "result": "fail", "reason": "No provenance, signing or deterministic-build configuration.", "findingIds": ["SL-05#1"] },
+    { "checkId": "SL-06", "subject": "Software Lifecycle", "subSubject": "Supply Chain", "severityIfFailed": "Warning", "result": "fail", "reason": "No Dependabot or Renovate configuration exists.", "findingIds": ["SL-06#1"] },
+    { "checkId": "SL-07", "subject": "Software Lifecycle", "subSubject": "Vulnerability Disclosure", "severityIfFailed": "Information", "result": "fail", "reason": "No SECURITY.md or equivalent vulnerability-reporting process.", "findingIds": ["SL-07#1"] },
+    { "checkId": "SL-08", "subject": "Software Lifecycle", "subSubject": "Documentation", "severityIfFailed": "Information", "result": "fail", "reason": "No CHANGELOG or release notes exist.", "findingIds": ["SL-08#1"] }
+  ],
+  "urlsFetched": [],
+  "notes": "Absence of CI, CHANGELOG and SECURITY.md taken from inventory note; dependabot/renovate absence confirmed by file glob. Branch protection settings are not visible from the repo. README paths use 'PilotUtilityApi.*' while actual folders are 'PilotUtiltyApi.*', so docs are partly out of date. No languages/csharp.md exists for this skill."
+}

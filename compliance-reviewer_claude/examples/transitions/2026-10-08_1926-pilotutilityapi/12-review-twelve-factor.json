@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1926-pilotutilityapi",
+  "stepId": "12-review-twelve-factor",
+  "status": "completed",
+  "startedAt": "2026-10-09T01:26:05Z",
+  "completedAt": "2026-10-09T01:40:00Z",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "929741f5c04d8218a6852d5d6eb33cbeb2f1d20b",
+  "inputsHash": "sha256:0562d896a8fce07e",
+  "batchId": "batch-5",
+  "skill": "review-twelve-factor",
+  "subject": "Application Design",
+  "findings": [
+    {
+      "id": "TF-02#1",
+      "subject": "Application Design",
+      "subSubject": "Twelve-Factor",
+      "checkId": "TF-02",
+      "severity": "Error",
+      "title": "NuGet dependencies are declared centrally but not locked (no packages.lock.json)",
+      "evidence": [
+        { "file": "Directory.Packages.props", "lineStart": 2, "lineEnd": 4, "excerpt": "<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>" }
+      ],
+      "standard": "The Twelve-Factor App - II. Dependencies",
+      "url": "https://12factor.net/dependencies",
+      "recommendation": "Set <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile> in Directory.Build.props, commit the generated packages.lock.json files, and restore with --locked-mode in builds.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "TF-03#1",
+      "subject": "Application Design",
+      "subSubject": "Twelve-Factor",
+      "checkId": "TF-03",
+      "severity": "Error",
+      "title": "Deploy-specific config and credential fields live in committed, environment-named appsettings files",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 10, "lineEnd": 13, "excerpt": "\"Host\": \"localhost\", \"Password\": \"<DevUser password>\", \"Port\": 1433, \"UserName\": \"DevUser\"" },
+        { "file": "src/PilotUtiltyApi.Web/appsettings.Development.json", "lineStart": 9, "lineEnd": 12, "excerpt": "\"Host\": \"localhost\", \"Password\": \"<DevUser password>\", \"Port\": 1433, \"UserName\": \"DevUser\"" },
+        { "file": "src/PilotUtiltyApi.Web/PilotUtilityApi.Web.csproj", "lineStart": 18, "lineEnd": 20, "excerpt": "<Content Update=\"appsettings.json\"><CopyToOutputDirectory>Always</CopyToOutputDirectory>" }
+      ],
+      "standard": "The Twelve-Factor App - III. Config",
+      "url": "https://12factor.net/config",
+      "recommendation": "Remove hosts, user names and password fields from committed appsettings files and supply them per deploy via environment variables (e.g. Application__DataSources__0__Password) or a secret store; keep only non-deploy-specific defaults in appsettings.json.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    },
+    {
+      "id": "TF-11#1",
+      "subject": "Application Design",
+      "subSubject": "Twelve-Factor",
+      "checkId": "TF-11",
+      "severity": "Warning",
+      "title": "App writes and manages its own rolling log files instead of only streaming to stdout",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 58, "lineEnd": 65, "excerpt": "\"Name\": \"File\", \"Args\": { \"path\": \"logs/log-.json\", \"rollingInterval\": \"Day\", ... \"retainedFileCountLimit\": 14" }
+      ],
+      "standard": "The Twelve-Factor App - XI. Logs",
+      "url": "https://12factor.net/logs",
+      "recommendation": "Drop the Serilog File sink (or enable it only in a local-dev override) and rely on the Console/OTLP streams, leaving routing and retention to the execution environment; also remove the committed files under src/PilotUtiltyApi.Web/logs/ from the repository.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "TF-04#S1",
+      "subject": "Application Design",
+      "subSubject": "Twelve-Factor",
+      "checkId": "TF-04",
+      "title": "Database and OTEL collector are attached resources selected purely by configuration",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 3, "lineEnd": 9, "excerpt": "\"DataSources\": [ { \"Active\": true, ... \"DataSourceType\": \"SqlServer\"" },
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 41, "lineEnd": 44, "excerpt": "\"OpenTelemetry\": { \"Server\": \"otel-collector\", \"Port\": 4318 }" }
+      ],
+      "standard": "The Twelve-Factor App - IV. Backing services",
+      "url": "https://12factor.net/backing-services"
+    },
+    {
+      "id": "TF-09#S1",
+      "subject": "Application Design",
+      "subSubject": "Twelve-Factor",
+      "checkId": "TF-09",
+      "title": "Generic host handles SIGTERM and logs are flushed on shutdown",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Program.cs", "lineStart": 32, "lineEnd": 41, "excerpt": "webApp.Run(); ... finally { Log.CloseAndFlush(); }" }
+      ],
+      "standard": "The Twelve-Factor App - IX. Disposability",
+      "url": "https://12factor.net/disposability"
+    },
+    {
+      "id": "TF-07#S1",
+      "subject": "Application Design",
+      "subSubject": "Twelve-Factor",
+      "checkId": "TF-07",
+      "title": "Self-contained Kestrel host exports HTTP via port binding",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Program.cs", "lineStart": 16, "lineEnd": 32, "excerpt": "var webAppBuilder = WebApplication.CreateBuilder(args); ... webApp.Run();" }
+      ],
+      "standard": "The Twelve-Factor App - VII. Port binding",
+      "url": "https://12factor.net/port-binding"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "TF-01", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-02", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Error", "result": "fail", "reason": "Central package versions are declared but no NuGet lock files exist or are enabled.", "findingIds": ["TF-02#1"] },
+    { "checkId": "TF-03", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Error", "result": "fail", "reason": "Hosts and credential fields are kept in committed, environment-named appsettings files rather than supplied via environment variables.", "findingIds": ["TF-03#1"] },
+    { "checkId": "TF-04", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-05", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Warning", "result": "N/A", "reason": "No CI/CD, Dockerfile or release tooling exists in scope to evaluate build/release/run separation.", "findingIds": [] },
+    { "checkId": "TF-06", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-07", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-08", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-09", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-10", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-11", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Warning", "result": "fail", "reason": "Serilog File sink with app-managed rolling and retention is configured alongside Console.", "findingIds": ["TF-11#1"] },
+    { "checkId": "TF-12", "subject": "Application Design", "subSubject": "Twelve-Factor", "severityIfFailed": "Information", "result": "N/A", "reason": "No admin, migration or one-off process tooling found in scope.", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "TF-03 overlaps review-security-operational secrets findings on appsettings.json; raised here only for the env-vs-file angle. logs/ is in .gitignore but log files were committed earlier. Program.cs swallows fatal startup exceptions without a non-zero exit code (reliability concern, not scored here)."
+}

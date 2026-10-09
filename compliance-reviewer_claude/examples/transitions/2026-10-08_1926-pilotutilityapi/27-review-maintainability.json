@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1926-pilotutilityapi",
+  "stepId": "27-review-maintainability",
+  "status": "completed",
+  "startedAt": "2026-10-09T01:26:05Z",
+  "completedAt": "2026-10-09T02:05:00Z",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "929741f5c04d8218a6852d5d6eb33cbeb2f1d20b",
+  "inputsHash": "sha256:0562d896a8fce07e",
+  "batchId": "batch-9",
+  "skill": "review-maintainability",
+  "subject": "Operations",
+  "findings": [
+    {
+      "id": "MAINT-01#1",
+      "subject": "Operations",
+      "subSubject": "Maintainability",
+      "checkId": "MAINT-01",
+      "severity": "Warning",
+      "title": "README run instructions point to non-existent folder paths and inconsistent URLs/ports",
+      "evidence": [
+        { "file": "README.md", "lineStart": 112, "lineEnd": 117, "excerpt": "Configure your database connection in `src/PilotUtilityApi.Web/appsettings.json` ... cd src/PilotUtilityApi.Web" },
+        { "file": "README.md", "lineStart": 120, "lineEnd": 122, "excerpt": "Swagger UI: https://localhost:58701/swagger ... Health Check: https://localhost:58401/healthcheck" },
+        { "file": "src/PilotUtiltyApi.Web/Properties/launchSettings.json", "lineStart": 12, "lineEnd": 12, "excerpt": "\"applicationUrl\": \"http://localhost:58401\"" }
+      ],
+      "standard": "Maintainability fallback rubric (onboarding documentation accuracy)",
+      "url": "",
+      "recommendation": "Correct README paths to the actual src/PilotUtiltyApi.Web folder (or rename folders), and align the Swagger/health-check/curl URLs (58701, 58401, 7000, https) with launchSettings.json (http://localhost:58401).",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "MAINT-02#1",
+      "subject": "Operations",
+      "subSubject": "Maintainability",
+      "checkId": "MAINT-02",
+      "severity": "Information",
+      "title": "Project folder names misspelled (PilotUtiltyApi.*) and inconsistent with csproj names, namespaces and README structure",
+      "evidence": [
+        { "file": "PilotUtilityApi.sln", "lineStart": 19, "lineEnd": 27, "excerpt": "\"PilotUtilityApi.Shared\", \"src\\PilotUtiltyApi.Shared\\PilotUtilityApi.Shared.csproj\"" },
+        { "file": "README.md", "lineStart": 49, "lineEnd": 64, "excerpt": "│   ├── PilotUtilityApi.Domain/           # DTOs and domain models" },
+        { "file": "README.md", "lineStart": 288, "lineEnd": 297, "excerpt": "dotnet test test/PilotUtiltyApi.Shared.Tests" }
+      ],
+      "standard": "Maintainability fallback rubric (consistent module/folder boundaries)",
+      "url": "",
+      "recommendation": "Rename the src/ and test/ folders to PilotUtilityApi.* to match project names and namespaces (dotnet_style_namespace_match_folder is enabled), then update the .sln paths and README.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "MAINT-03#1",
+      "subject": "Operations",
+      "subSubject": "Maintainability",
+      "checkId": "MAINT-03",
+      "severity": "Warning",
+      "title": "Database provisioning and secret/environment configuration steps are not documented",
+      "evidence": [
+        { "file": "README.md", "lineStart": 84, "lineEnd": 86, "excerpt": "One of the following databases: SQL Server ... PostgreSQL (version 12+)" },
+        { "file": "README.md", "lineStart": 189, "lineEnd": 192, "excerpt": "For local development and testing, the following User Secret can be used:" }
+      ],
+      "standard": "Maintainability fallback rubric (onboarding prerequisites and environment documentation)",
+      "url": "",
+      "recommendation": "Document how to create the NorthWind/northwind database and the test tables/schema, give the `dotnet user-secrets set` commands, and show environment-variable overrides (e.g. Application__DataSources__0__Password) instead of editing appsettings.json.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "MAINT-05#1",
+      "subject": "Operations",
+      "subSubject": "Maintainability",
+      "checkId": "MAINT-05",
+      "severity": "Information",
+      "title": "Stale references: solution lists a missing .runsettings file and CONTRIBUTING links a non-existent README section",
+      "evidence": [
+        { "file": "PilotUtilityApi.sln", "lineStart": 9, "lineEnd": 9, "excerpt": ".runsettings = .runsettings" },
+        { "file": "CONTRIBUTING.md", "lineStart": 14, "lineEnd": 14, "excerpt": "review the customization notes in [README.md](README.md#copilot-customization)" }
+      ],
+      "standard": "Maintainability fallback rubric (remove stale artifacts)",
+      "url": "",
+      "recommendation": "Add the .runsettings file or remove it from Solution Items, and either add a 'Copilot Customization' README section or point CONTRIBUTING at .github/copilot-instructions.md.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "STR-MAINT-01",
+      "subject": "Operations",
+      "subSubject": "Maintainability",
+      "checkId": "MAINT-02",
+      "title": "README documents layered architecture with explicit inter-layer dependency rules",
+      "evidence": [
+        { "file": "README.md", "lineStart": 311, "lineEnd": 343, "excerpt": "The application follows **Clean Architecture** principles ... Depends on: Domain, Repository, Shared" }
+      ]
+    },
+    {
+      "id": "STR-MAINT-02",
+      "subject": "Operations",
+      "subSubject": "Maintainability",
+      "title": "Comprehensive .editorconfig and written architecture guardrails enforce consistent style and layering",
+      "evidence": [
+        { "file": ".editorconfig", "lineStart": 1, "lineEnd": 2, "excerpt": "root = true" },
+        { "file": ".github/instructions/architecture.instructions.md", "lineStart": 41, "lineEnd": 44, "excerpt": "No dead code, placeholders, or TODO stubs in core paths." }
+      ]
+    },
+    {
+      "id": "STR-MAINT-03",
+      "subject": "Operations",
+      "subSubject": "Maintainability",
+      "checkId": "MAINT-04",
+      "title": "Thin composition root with no TODO/FIXME/HACK markers in reviewed code",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Program.cs", "lineStart": 18, "lineEnd": 29, "excerpt": "webAppBuilder.ApplicationRegistration(); webAppBuilder.ApiWebApplicationBuilder(); ... webApp.ApiWebApplication();" }
+      ]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "MAINT-01", "subject": "Operations", "subSubject": "Maintainability", "severityIfFailed": "Warning", "result": "fail", "reason": "README covers setup/run/test but run steps use non-existent folder paths and inconsistent URLs/ports.", "findingIds": ["MAINT-01#1"] },
+    { "checkId": "MAINT-02", "subject": "Operations", "subSubject": "Maintainability", "severityIfFailed": "Information", "result": "fail", "reason": "Layering is clear, but folder names (PilotUtiltyApi.*) diverge from project names, namespaces and README.", "findingIds": ["MAINT-02#1"] },
+    { "checkId": "MAINT-03", "subject": "Operations", "subSubject": "Maintainability", "severityIfFailed": "Warning", "result": "fail", "reason": "Tooling prerequisites are listed, but database provisioning, user-secrets setup and env-var overrides are undocumented.", "findingIds": ["MAINT-03#1"] },
+    { "checkId": "MAINT-04", "subject": "Operations", "subSubject": "Maintainability", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "MAINT-05", "subject": "Operations", "subSubject": "Maintainability", "severityIfFailed": "Information", "result": "fail", "reason": "Stale references remain: missing .runsettings in the solution and a dead README anchor in CONTRIBUTING.", "findingIds": ["MAINT-05#1"] }
+  ],
+  "urlsFetched": [],
+  "notes": "No authoritative source URL for this subject (fallback rubric). launchSettings.json and file existence of .runsettings/LICENSE were checked only to confirm findings. MAINT-04 evaluated against subject files only (Program.cs, TestingService.cs); no repo-wide marker scan. Folder misspelling may overlap with review-software-quality architecture findings."
+}

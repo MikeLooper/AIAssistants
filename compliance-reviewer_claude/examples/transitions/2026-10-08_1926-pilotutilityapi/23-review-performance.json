@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1926-pilotutilityapi",
+  "stepId": "23-review-performance",
+  "status": "completed",
+  "startedAt": "2026-10-09T01:26:05Z",
+  "completedAt": "2026-10-09T01:43:00Z",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "929741f5c04d8218a6852d5d6eb33cbeb2f1d20b",
+  "inputsHash": "sha256:0562d896a8fce07e",
+  "batchId": "batch-1",
+  "skill": "review-performance",
+  "subject": "Operations",
+  "findings": [
+    {
+      "id": "PERF-02#1",
+      "subject": "Operations",
+      "subSubject": "Performance",
+      "checkId": "PERF-02",
+      "severity": "Warning",
+      "title": "Synchronous connection.Open() and BeginTransaction() inside an async request path",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 74, "lineEnd": 79, "excerpt": "connection.Open(); ... var transaction = connection.BeginTransaction();" }
+      ],
+      "standard": "Azure Well-Architected Framework - Performance Efficiency",
+      "url": "https://learn.microsoft.com/azure/well-architected/performance-efficiency/",
+      "recommendation": "Use DbConnection.OpenAsync(cancellationToken) and BeginTransactionAsync(cancellationToken) (typing the connection as DbConnection) so request threads are not blocked on network I/O.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "S-PERF-02",
+      "subject": "Operations",
+      "subSubject": "Performance",
+      "checkId": "PERF-02",
+      "title": "Async end-to-end controller/service/query path with CancellationToken propagated",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 51, "lineEnd": 53, "excerpt": "public async Task<IActionResult> ResetTesting(CancellationToken cancellationToken) { var response = await testingService.ResetTestingAsync(cancellationToken);" }
+      ]
+    },
+    {
+      "id": "S-PERF-04",
+      "subject": "Operations",
+      "subSubject": "Performance",
+      "checkId": "PERF-04",
+      "title": "Reset runs as a single batched script in one round trip",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 81, "lineEnd": 89, "excerpt": "var command = new CommandDefinition(sqlScript, transaction: transaction, cancellationToken: cancellationToken);" }
+      ]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "PERF-01", "subject": "Operations", "subSubject": "Performance", "severityIfFailed": "Warning", "result": "N/A", "reason": "No expensive or repeated reads in the reviewed files; the only DB operation is a destructive reset that must not be cached.", "findingIds": [] },
+    { "checkId": "PERF-02", "subject": "Operations", "subSubject": "Performance", "severityIfFailed": "Warning", "result": "fail", "reason": "Connection open and transaction begin are synchronous in the async path.", "findingIds": ["PERF-02#1"] },
+    { "checkId": "PERF-03", "subject": "Operations", "subSubject": "Performance", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "PERF-04", "subject": "Operations", "subSubject": "Performance", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "PERF-05", "subject": "Operations", "subSubject": "Performance", "severityIfFailed": "Information", "result": "pass", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "PERF-03 passes on provider-default ADO.NET pooling (SqlClient/Npgsql) with a stable connection string and Close() in finally; note the connection can leak from the pool if BeginTransaction throws before the inner try (see software-quality CS-05#1)."
+}

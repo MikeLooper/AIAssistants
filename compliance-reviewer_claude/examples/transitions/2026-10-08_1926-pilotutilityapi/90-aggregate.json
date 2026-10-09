@@ -1,0 +1,1837 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1926-pilotutilityapi",
+  "stepId": "90-aggregate",
+  "status": "completed",
+  "startedAt": "2026-10-08T19:31:26-06:00",
+  "completedAt": "2026-10-08T19:31:26-06:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "929741f5c04d8218a6852d5d6eb33cbeb2f1d20b",
+  "inputsHash": "sha256:0562d896a8fce07e",
+  "overallScore": 54.13,
+  "overallBand": "Poor",
+  "subjectScores": [
+    {
+      "subject": "Software Quality",
+      "score": 64.86,
+      "band": "Fair",
+      "passWeight": 24,
+      "totalWeight": 37,
+      "findings": {
+        "Error": 1,
+        "Warning": 4,
+        "Information": 3
+      }
+    },
+    {
+      "subject": "Software Lifecycle",
+      "score": 0.0,
+      "band": "Poor",
+      "passWeight": 0,
+      "totalWeight": 16,
+      "findings": {
+        "Error": 1,
+        "Warning": 4,
+        "Information": 3
+      }
+    },
+    {
+      "subject": "Application Design",
+      "score": 50.0,
+      "band": "Poor",
+      "passWeight": 12,
+      "totalWeight": 24,
+      "findings": {
+        "Error": 2,
+        "Warning": 1,
+        "Information": 0
+      }
+    },
+    {
+      "subject": "API Design",
+      "score": 37.5,
+      "band": "Poor",
+      "passWeight": 9,
+      "totalWeight": 24,
+      "findings": {
+        "Error": 3,
+        "Warning": 0,
+        "Information": 0
+      }
+    },
+    {
+      "subject": "Security",
+      "score": 59.46,
+      "band": "Poor",
+      "passWeight": 44,
+      "totalWeight": 74,
+      "findings": {
+        "Error": 3,
+        "Warning": 3,
+        "Information": 0
+      }
+    },
+    {
+      "subject": "Implementation",
+      "score": 62.96,
+      "band": "Fair",
+      "passWeight": 17,
+      "totalWeight": 27,
+      "findings": {
+        "Error": 1,
+        "Warning": 2,
+        "Information": 2
+      }
+    },
+    {
+      "subject": "Observability",
+      "score": 75.0,
+      "band": "Good",
+      "passWeight": 9,
+      "totalWeight": 12,
+      "findings": {
+        "Error": 0,
+        "Warning": 0,
+        "Information": 0
+      }
+    },
+    {
+      "subject": "Operations",
+      "score": 57.14,
+      "band": "Poor",
+      "passWeight": 16,
+      "totalWeight": 28,
+      "findings": {
+        "Error": 0,
+        "Warning": 3,
+        "Information": 2
+      }
+    }
+  ],
+  "severityCounts": {
+    "Error": 11,
+    "Warning": 17,
+    "Information": 10
+  },
+  "topRisks": [
+    {
+      "rank": 1,
+      "findingId": "SQ-06#1",
+      "severity": "Error",
+      "title": "Functional suitability: reset commits only when 0 rows deleted and rolls back otherwise, yet reports success"
+    },
+    {
+      "rank": 2,
+      "findingId": "SL-01#1",
+      "severity": "Error",
+      "title": "No CI pipeline builds and tests every push/PR; build and test are manual only"
+    },
+    {
+      "rank": 3,
+      "findingId": "TF-02#1",
+      "severity": "Error",
+      "title": "NuGet dependencies are declared centrally but not locked (no packages.lock.json)"
+    },
+    {
+      "rank": 4,
+      "findingId": "API-03#1",
+      "severity": "Error",
+      "title": "Committed OpenAPI spec does not match implemented routes and DTOs"
+    },
+    {
+      "rank": 5,
+      "findingId": "API-05#1",
+      "severity": "Error",
+      "title": "Server-side failures returned as 400 with error text in deprecated Warning header instead of a structured error body"
+    }
+  ],
+  "findings": [
+    {
+      "id": "SQ-03#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-03",
+      "severity": "Warning",
+      "title": "Maintainability: provider switch on DataSourceType repeated three times and error-logging block duplicated",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+          "lineStart": 146,
+          "lineEnd": 148,
+          "excerpt": "return dataSource.DataSourceType.ToLowerInvariant() switch { \"sqlserver\" => ..."
+        },
+        {
+          "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+          "lineStart": 181,
+          "lineEnd": 184,
+          "excerpt": "return dataSourceType.ToLowerInvariant() switch { \"sqlserver\" => new SqlConnection(connectionString), ..."
+        },
+        {
+          "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+          "lineStart": 104,
+          "lineEnd": 131,
+          "excerpt": "this.Logger.LogError(exInner, \"Error occurred in {ClassName}.{MethodName}...\" (repeated at 125-131)"
+        }
+      ],
+      "standard": "ISO/IEC 25010 - Maintainability",
+      "url": "https://iso25000.com/index.php/en/iso-25000-standards/iso-25010#maintainability",
+      "recommendation": "Introduce a per-provider strategy (e.g. IDbProvider with BuildConnectionString/CreateConnection/ResetScript) resolved once, and collapse the two identical LogError/throw blocks into a single outer catch.",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "SQ-06#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-06",
+      "severity": "Error",
+      "title": "Functional suitability: reset commits only when 0 rows deleted and rolls back otherwise, yet reports success",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+          "lineStart": 89,
+          "lineEnd": 98,
+          "excerpt": "if (result == 0) { transaction.Commit(); } else { transaction.Rollback(); }"
+        }
+      ],
+      "standard": "ISO/IEC 25010 - Functional suitability / Reliability",
+      "url": "https://iso25000.com/index.php/en/iso-25000-standards/iso-25010#reliability",
+      "recommendation": "Commit the transaction on successful execution regardless of the deleted-row count (roll back only on exception), and add a test asserting deletes persist.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SQ-06#2",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-06",
+      "severity": "Warning",
+      "title": "Reliability: fatal startup exception is logged but the process exits with code 0",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/Program.cs",
+          "lineStart": 34,
+          "lineEnd": 37,
+          "excerpt": "catch (Exception ex) { Log.Fatal(ex, \"Server terminated unexpectedly.\"); }"
+        }
+      ],
+      "standard": "ISO/IEC 25010 - Reliability",
+      "url": "https://iso25000.com/index.php/en/iso-25000-standards/iso-25010#reliability",
+      "recommendation": "Return a non-zero exit code (e.g. Environment.ExitCode = 1 or rethrow) after logging so hosts/orchestrators detect the failed start.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SQ-08#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-08",
+      "severity": "Information",
+      "title": "Unused Logger property created in TestingService",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Services/Services/TestingService.cs",
+          "lineStart": 30,
+          "lineEnd": 37,
+          "excerpt": "this.Logger = loggerFactory.CreateLogger(GetType()); ... protected ILogger Logger { get; }"
+        }
+      ],
+      "standard": "ISO/IEC 25010 - Maintainability",
+      "url": "https://iso25000.com/index.php/en/iso-25000-standards/iso-25010#maintainability",
+      "recommendation": "Remove the unused logger dependency or use it to log service-level outcomes.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "CS-01#1",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-01",
+      "severity": "Information",
+      "title": "Project folders misspelled 'PilotUtiltyApi' while namespaces/projects use 'PilotUtilityApi'",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Services/Services/TestingService.cs",
+          "lineStart": 8,
+          "lineEnd": 8,
+          "excerpt": "namespace PilotUtilityApi.Services.Services"
+        },
+        {
+          "file": "src/PilotUtiltyApi.Shared/Configuration/ApplicationConfiguration.cs",
+          "lineStart": 16,
+          "lineEnd": 16,
+          "excerpt": "/// Instatiate a <see cref=\"ApplicationConfiguration\"/> object."
+        }
+      ],
+      "standard": "C# coding conventions",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions",
+      "recommendation": "Rename the src/test folders to PilotUtilityApi.* to match namespaces and project names, and fix the 'Instatiate' typos.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "CS-03#1",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-03",
+      "severity": "Information",
+      "title": "Several XML doc comments are inaccurate (copy-paste returns text, wrong usage examples)",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs",
+          "lineStart": 40,
+          "lineEnd": 42,
+          "excerpt": "/// A read only list of all DTO objects from the category table, or null if no objects exist."
+        },
+        {
+          "file": "src/PilotUtiltyApi.Services/Extensions/ServicesInjectionExtensions.cs",
+          "lineStart": 27,
+          "lineEnd": 27,
+          "excerpt": "/// webAppBuilder.Services.ServicesConfiguration();"
+        },
+        {
+          "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs",
+          "lineStart": 59,
+          "lineEnd": 59,
+          "excerpt": "/// var webApp = webAppBuilder.ApiWebApplication();"
+        }
+      ],
+      "standard": "C# coding conventions",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions",
+      "recommendation": "Correct the HealthCheck <returns> text and the <example> snippets so they match the real extension targets (WebApplicationBuilder/WebApplication).",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "CS-05#1",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-05",
+      "severity": "Warning",
+      "title": "IDisposable connection and transaction are not wrapped in using (CS-CS-04)",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+          "lineStart": 73,
+          "lineEnd": 79,
+          "excerpt": "var connection = CreateConnection(...); ... var transaction = connection.BeginTransaction();"
+        }
+      ],
+      "standard": "C# coding conventions",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions",
+      "recommendation": "Use 'await using' declarations for the DbConnection and DbTransaction (and OpenAsync/BeginTransactionAsync) so they are disposed even if an exception occurs before the inner try.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "CS-05#2",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-05",
+      "severity": "Warning",
+      "title": "BuildServiceProvider called during service registration (ASP0000), creating a second container",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs",
+          "lineStart": 124,
+          "lineEnd": 126,
+          "excerpt": "var serviceProvider = builder.Services.BuildServiceProvider();"
+        }
+      ],
+      "standard": "C# coding conventions / ASP.NET Core analyzers",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions",
+      "recommendation": "Read IApplicationConfiguration from builder.Configuration (or use IOptions/IConfigureOptions) instead of building an intermediate service provider.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-01#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "CI/CD",
+      "checkId": "SL-01",
+      "severity": "Error",
+      "title": "No CI pipeline builds and tests every push/PR; build and test are manual only",
+      "evidence": [
+        {
+          "file": "README.md",
+          "lineStart": 105,
+          "lineEnd": 108,
+          "excerpt": "3. Build the solution:\n   ```bash\n   dotnet build"
+        },
+        {
+          "file": "README.md",
+          "lineStart": 278,
+          "lineEnd": 282,
+          "excerpt": "### Running All Tests\n\n```bash\ndotnet test"
+        }
+      ],
+      "standard": "SLSA v1.0 Requirements (scripted build on a hosted build platform)",
+      "url": "https://slsa.dev/spec/v1.0/requirements",
+      "recommendation": "Add a CI workflow (e.g. .github/workflows/ci.yml) that runs dotnet restore, build and test on every push and pull request, and make it a required status check on main.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-02#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Release Process",
+      "checkId": "SL-02",
+      "severity": "Warning",
+      "title": "No documented release process (tagging, changelog, publish step)",
+      "evidence": [
+        {
+          "file": "CONTRIBUTING.md",
+          "lineStart": 15,
+          "lineEnd": 16,
+          "excerpt": "4. Increase the version numbers in any examples files and the README.md to the new version that this Pull Request would represent."
+        },
+        {
+          "file": "CONTRIBUTING.md",
+          "lineStart": 10,
+          "lineEnd": 11,
+          "excerpt": "1. Ensure any install or build dependencies are removed before the end of the layer when doing a build."
+        }
+      ],
+      "standard": "Semantic Versioning 2.0.0",
+      "url": "https://semver.org/",
+      "recommendation": "Document a release procedure (version bump in Directory.Build.props, Git tag vX.Y.Z, changelog entry, build/publish step) and replace the boilerplate container-layer step in CONTRIBUTING.md, which does not apply to this repo.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-03#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Versioning",
+      "checkId": "SL-03",
+      "severity": "Warning",
+      "title": "Inconsistent version sources: assembly version 1.0.0 vs documented API version 0.1.1",
+      "evidence": [
+        {
+          "file": "Directory.Build.props",
+          "lineStart": 3,
+          "lineEnd": 3,
+          "excerpt": "<Version>1.0.0</Version>"
+        },
+        {
+          "file": "README.md",
+          "lineStart": 183,
+          "lineEnd": 183,
+          "excerpt": "\"Version\": \"0.1.1\""
+        }
+      ],
+      "standard": "Semantic Versioning 2.0.0",
+      "url": "https://semver.org/#semantic-versioning-specification-semver",
+      "recommendation": "Keep a single source of truth for the version (Directory.Build.props) and derive the OpenAPI/documented version from it so bumps are consistent and meaningful.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-04#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Branching Model",
+      "checkId": "SL-04",
+      "severity": "Warning",
+      "title": "Branching model not documented; review rule exists only as text with no visible enforcement",
+      "evidence": [
+        {
+          "file": "CONTRIBUTING.md",
+          "lineStart": 17,
+          "lineEnd": 18,
+          "excerpt": "5. You may merge the Pull Request in once you have the sign-off of two other developers"
+        }
+      ],
+      "standard": "NIST SP 800-218 SSDF",
+      "url": "https://www.nist.gov/itl/executive-order-14028-improving-nations-cybersecurity/nist-sp-800-218-secure-software-development",
+      "recommendation": "Document the branching model (e.g. trunk-based with short-lived feature branches into protected main) and enforce it with branch protection/rulesets requiring reviews and passing CI.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-05#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Supply Chain",
+      "checkId": "SL-05",
+      "severity": "Information",
+      "title": "No build provenance, signing or reproducible-build settings",
+      "evidence": [
+        {
+          "file": "Directory.Build.props",
+          "lineStart": 2,
+          "lineEnd": 9,
+          "excerpt": "<PropertyGroup>\n    <Version>1.0.0</Version>"
+        }
+      ],
+      "standard": "SLSA v1.0 Requirements (provenance)",
+      "url": "https://slsa.dev/spec/v1.0/requirements",
+      "recommendation": "Once CI exists, generate build provenance attestations (e.g. actions/attest-build-provenance) and enable deterministic builds (ContinuousIntegrationBuild, RestorePackagesWithLockFile).",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "SL-06#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Supply Chain",
+      "checkId": "SL-06",
+      "severity": "Warning",
+      "title": "No automated or scheduled dependency updates (no Dependabot/Renovate config)",
+      "evidence": [
+        {
+          "file": ".github/copilot-instructions.md",
+          "lineStart": 1,
+          "lineEnd": 4,
+          "excerpt": "# Copilot Instructions: Repository-Wide Guidance"
+        }
+      ],
+      "standard": "NIST SP 800-218 SSDF",
+      "url": "https://www.nist.gov/itl/executive-order-14028-improving-nations-cybersecurity/nist-sp-800-218-secure-software-development",
+      "recommendation": "Add .github/dependabot.yml with the nuget ecosystem (and github-actions once CI exists) on a weekly schedule.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-07#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Vulnerability Disclosure",
+      "checkId": "SL-07",
+      "severity": "Information",
+      "title": "No SECURITY.md or vulnerability-reporting process",
+      "evidence": [
+        {
+          "file": "CONTRIBUTING.md",
+          "lineStart": 73,
+          "lineEnd": 74,
+          "excerpt": "reported by contacting the project team at MikelLooper@gmail.com."
+        }
+      ],
+      "standard": "NIST SP 800-218 SSDF (RV.1)",
+      "url": "https://www.nist.gov/itl/executive-order-14028-improving-nations-cybersecurity/nist-sp-800-218-secure-software-development",
+      "recommendation": "Add a SECURITY.md describing supported versions and a private reporting channel (e.g. GitHub private vulnerability reporting); the only contact today is for Code of Conduct issues.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-08#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Documentation",
+      "checkId": "SL-08",
+      "severity": "Information",
+      "title": "No changelog or release notes",
+      "evidence": [
+        {
+          "file": "CONTRIBUTING.md",
+          "lineStart": 12,
+          "lineEnd": 13,
+          "excerpt": "2. Update the README.md with details of changes to the interface"
+        }
+      ],
+      "standard": "Semantic Versioning 2.0.0",
+      "url": "https://semver.org/",
+      "recommendation": "Add a CHANGELOG.md (Keep a Changelog format) and require an entry per PR in CONTRIBUTING.md.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "TF-02#1",
+      "subject": "Application Design",
+      "subSubject": "Twelve-Factor",
+      "checkId": "TF-02",
+      "severity": "Error",
+      "title": "NuGet dependencies are declared centrally but not locked (no packages.lock.json)",
+      "evidence": [
+        {
+          "file": "Directory.Packages.props",
+          "lineStart": 2,
+          "lineEnd": 4,
+          "excerpt": "<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>"
+        }
+      ],
+      "standard": "The Twelve-Factor App - II. Dependencies",
+      "url": "https://12factor.net/dependencies",
+      "recommendation": "Set <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile> in Directory.Build.props, commit the generated packages.lock.json files, and restore with --locked-mode in builds.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "TF-03#1",
+      "subject": "Application Design",
+      "subSubject": "Twelve-Factor",
+      "checkId": "TF-03",
+      "severity": "Error",
+      "title": "Deploy-specific config and credential fields live in committed, environment-named appsettings files",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/appsettings.json",
+          "lineStart": 10,
+          "lineEnd": 13,
+          "excerpt": "\"Host\": \"localhost\", \"Password\": \"<DevUser password>\", \"Port\": 1433, \"UserName\": \"DevUser\""
+        },
+        {
+          "file": "src/PilotUtiltyApi.Web/appsettings.Development.json",
+          "lineStart": 9,
+          "lineEnd": 12,
+          "excerpt": "\"Host\": \"localhost\", \"Password\": \"<DevUser password>\", \"Port\": 1433, \"UserName\": \"DevUser\""
+        },
+        {
+          "file": "src/PilotUtiltyApi.Web/PilotUtilityApi.Web.csproj",
+          "lineStart": 18,
+          "lineEnd": 20,
+          "excerpt": "<Content Update=\"appsettings.json\"><CopyToOutputDirectory>Always</CopyToOutputDirectory>"
+        }
+      ],
+      "standard": "The Twelve-Factor App - III. Config",
+      "url": "https://12factor.net/config",
+      "recommendation": "Remove hosts, user names and password fields from committed appsettings files and supply them per deploy via environment variables (e.g. Application__DataSources__0__Password) or a secret store; keep only non-deploy-specific defaults in appsettings.json.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    },
+    {
+      "id": "TF-11#1",
+      "subject": "Application Design",
+      "subSubject": "Twelve-Factor",
+      "checkId": "TF-11",
+      "severity": "Warning",
+      "title": "App writes and manages its own rolling log files instead of only streaming to stdout",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/appsettings.json",
+          "lineStart": 58,
+          "lineEnd": 65,
+          "excerpt": "\"Name\": \"File\", \"Args\": { \"path\": \"logs/log-.json\", \"rollingInterval\": \"Day\", ... \"retainedFileCountLimit\": 14"
+        }
+      ],
+      "standard": "The Twelve-Factor App - XI. Logs",
+      "url": "https://12factor.net/logs",
+      "recommendation": "Drop the Serilog File sink (or enable it only in a local-dev override) and rely on the Console/OTLP streams, leaving routing and retention to the execution environment; also remove the committed files under src/PilotUtiltyApi.Web/logs/ from the repository.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "API-03#1",
+      "subject": "API Design",
+      "subSubject": "OpenAPI Specification",
+      "checkId": "API-03",
+      "severity": "Error",
+      "title": "Committed OpenAPI spec does not match implemented routes and DTOs",
+      "evidence": [
+        {
+          "file": "docs/PilotUtilityApi_v1.json",
+          "lineStart": 81,
+          "lineEnd": 82,
+          "excerpt": "\"/testing/reset\": { \"post\": {"
+        },
+        {
+          "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs",
+          "lineStart": 16,
+          "lineEnd": 17,
+          "excerpt": "[ApiVersion(\"1.0\")] [Route(\"v{version:apiVersion}/[controller]\")]"
+        },
+        {
+          "file": "src/PilotUtiltyApi.Domain/Models/Responses/AboutResponse.cs",
+          "lineStart": 20,
+          "lineEnd": 21,
+          "excerpt": "[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public IApplicationConfiguration? ApplicationConfiguration"
+        }
+      ],
+      "standard": "OpenAPI Specification 3.1",
+      "url": "https://spec.openapis.org/oas/latest.html#paths-object",
+      "recommendation": "Regenerate docs/PilotUtilityApi_v1.json from the running app (or at build time) so the path is /v1/testing/reset, the show-details parameter reflects [BindRequired], and AboutResponse includes the optional applicationConfiguration property; add a CI diff check to keep it in sync.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "API-04#1",
+      "subject": "API Design",
+      "subSubject": "Azure API Guidelines",
+      "checkId": "API-04",
+      "severity": "Error",
+      "title": "Inconsistent URL structure: URL-segment versioning mixed with unversioned routes and a verb-style action path",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs",
+          "lineStart": 46,
+          "lineEnd": 47,
+          "excerpt": "[HttpPost] [Route(\"reset\")]"
+        },
+        {
+          "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs",
+          "lineStart": 31,
+          "lineEnd": 34,
+          "excerpt": "ApiVersionReader.Combine(new HeaderApiVersionReader(\"api-version\"), new QueryStringApiVersionReader(), new UrlSegmentApiVersionReader());"
+        },
+        {
+          "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs",
+          "lineStart": 43,
+          "lineEnd": 44,
+          "excerpt": "[HttpGet] [Route(\"healthcheck\")]"
+        }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines - URL structure (DO)",
+      "url": "https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#url-structure",
+      "recommendation": "Pick one versioning mechanism (Azure guidelines use the api-version query parameter rather than a path segment) and model actions as resource operations (e.g. POST /testing:reset or a resource noun) instead of a verb path segment.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    },
+    {
+      "id": "API-05#1",
+      "subject": "API Design",
+      "subSubject": "Azure API Guidelines",
+      "checkId": "API-05",
+      "severity": "Error",
+      "title": "Server-side failures returned as 400 with error text in deprecated Warning header instead of a structured error body",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs",
+          "lineStart": 55,
+          "lineEnd": 59,
+          "excerpt": "Response.Headers.Append(\"Warning\", response.ErrorMessage ?? \"An error occurred\"); return BadRequest();"
+        }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines - HTTP status codes / error handling (DO)",
+      "url": "https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#http-status-codes",
+      "recommendation": "Return 5xx for service/data-store failures (4xx only for client errors) and put a consistent error object (code + message, e.g. ProblemDetails) in the body with an error-code header, rather than using the deprecated Warning header.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-IA-01#1",
+      "subject": "Security",
+      "subSubject": "Identity & Access",
+      "checkId": "SEC-IA-01",
+      "severity": "Error",
+      "title": "No authentication is configured and every controller is marked [AllowAnonymous]",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs",
+          "lineStart": 15,
+          "lineEnd": 19,
+          "excerpt": "[ApiController] [ApiVersion(\"1.0\")] [Route(\"v{version:apiVersion}/[controller]\")] [AllowAnonymous]"
+        },
+        {
+          "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs",
+          "lineStart": 113,
+          "lineEnd": 127,
+          "excerpt": "builder.Services.AddVersioning(); ... AddControllers(...) (no AddAuthentication/AddAuthorization)"
+        },
+        {
+          "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs",
+          "lineStart": 83,
+          "lineEnd": 86,
+          "excerpt": "webApp.UseMiddleware<UnhandledExceptionMiddleware>(); webApp.MapControllers(); (no UseAuthentication/UseAuthorization)"
+        }
+      ],
+      "standard": "OWASP Authentication Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html",
+      "recommendation": "Register an authentication scheme (e.g. JWT bearer via a vetted IdP, or API key for this utility API), add UseAuthentication/UseAuthorization, and remove the class-level [AllowAnonymous] from TestingController.",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "SEC-IA-02#1",
+      "subject": "Security",
+      "subSubject": "Identity & Access",
+      "checkId": "SEC-IA-02",
+      "severity": "Error",
+      "title": "Destructive POST /v1/testing/reset and configuration-revealing /about?show-details have no authorization",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs",
+          "lineStart": 46,
+          "lineEnd": 53,
+          "excerpt": "[HttpPost] [Route(\"reset\")] ... await testingService.ResetTestingAsync(cancellationToken);"
+        },
+        {
+          "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs",
+          "lineStart": 18,
+          "lineEnd": 18,
+          "excerpt": "[AllowAnonymous]"
+        },
+        {
+          "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs",
+          "lineStart": 87,
+          "lineEnd": 87,
+          "excerpt": "ApplicationConfiguration = showDetails ? new ApplicationConfiguration(this.ApplicationConfiguration, true) : null"
+        }
+      ],
+      "standard": "OWASP Authorization Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html",
+      "recommendation": "Protect the reset endpoint with [Authorize(Policy = ...)] restricted to an admin/test role (and disable it outside test environments), and require authorization for show-details=true; keep only /healthcheck anonymous.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-WA-01#1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-01",
+      "severity": "Warning",
+      "title": "No Content-Security-Policy header is set; the pipeline also serves Swagger UI and Scalar HTML pages",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs",
+          "lineStart": 78,
+          "lineEnd": 86,
+          "excerpt": "webApp.OpenApiWebApplication(); webApp.LoggingWebApplication(); webApp.SwaggerWebApplication(); ... webApp.MapControllers();"
+        }
+      ],
+      "standard": "OWASP Content Security Policy Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html",
+      "recommendation": "Add security-header middleware (for example NetEscapades.AspNetCore.SecurityHeaders or a small custom middleware) that sets `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'` on API responses. Use a looser policy only for the Swagger/Scalar UI routes.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-WA-03#1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-03",
+      "severity": "Warning",
+      "title": "X-Content-Type-Options: nosniff is not set",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs",
+          "lineStart": 65,
+          "lineEnd": 87,
+          "excerpt": "public static void ApiWebApplication(this WebApplication webApp) ... no security-header middleware registered"
+        }
+      ],
+      "standard": "OWASP HTTP Headers Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-content-type-options",
+      "recommendation": "Add `X-Content-Type-Options: nosniff` to every response from the same security-header middleware.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-WA-04#1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-04",
+      "severity": "Warning",
+      "title": "No clickjacking protection (no X-Frame-Options or CSP frame-ancestors)",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/Swagger/Extensions/SwaggerExtensions.cs",
+          "lineStart": 38,
+          "lineEnd": 41,
+          "excerpt": "webApp.UseSwaggerUI(options => { options.SwaggerEndpoint(\"/openapi/v1.json\", \"v1\"); });"
+        },
+        {
+          "file": "src/PilotUtiltyApi.Shared/OpenApi/Extensions/OpenApiExtensions.cs",
+          "lineStart": 143,
+          "lineEnd": 143,
+          "excerpt": "webApp.MapScalarApiReference(options =>"
+        }
+      ],
+      "standard": "OWASP HTTP Headers Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-frame-options",
+      "recommendation": "Send `X-Frame-Options: DENY` and/or the CSP directive `frame-ancestors 'none'` on all responses, including the Swagger and Scalar UI pages.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-WA-06#1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-06",
+      "severity": "Error",
+      "title": "HTTPS redirection is enabled only in Development (the condition is inverted), and the launch profile listens on HTTP only",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs",
+          "lineStart": 73,
+          "lineEnd": 76,
+          "excerpt": "if (webApp.Environment.IsDevelopment()) { webApp.UseHttpsRedirection(); }"
+        },
+        {
+          "file": "src/PilotUtiltyApi.Web/Properties/launchSettings.json",
+          "lineStart": 12,
+          "lineEnd": 12,
+          "excerpt": "\"applicationUrl\": \"http://localhost:58401\""
+        }
+      ],
+      "standard": "OWASP REST Security Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html#https",
+      "recommendation": "Call `UseHttpsRedirection()` (with `UseHsts()`) in every environment except Development, or reject HTTP at the edge. Also add an HTTPS URL to the launch profile.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "TST-03#1",
+      "subject": "Implementation",
+      "subSubject": "Testing",
+      "checkId": "TST-03",
+      "severity": "Warning",
+      "title": "Placeholder and mis-arranged tests pass without asserting the behavior they name",
+      "evidence": [
+        {
+          "file": "test/PilotUtiltyApi.Domain.Tests/ExampleTest.cs",
+          "lineStart": 9,
+          "lineEnd": 14,
+          "excerpt": "public void ExampleClass_ExampleTest_Test() { ... Assert.Pass(\"Example Test\"); }"
+        },
+        {
+          "file": "test/PilotUtiltyApi.Web.Tests/Controllers/TestingControllerTests.cs",
+          "lineStart": 117,
+          "lineEnd": 121,
+          "excerpt": "expectedResult.ErrorMessage = null; ... .ReturnsAsync(new RetrieveResponse<int>(0, \"test error\"));"
+        },
+        {
+          "file": "test/PilotUtiltyApi.Repositories.Tests/Repositories/TestingRepositoryTests.cs",
+          "lineStart": 27,
+          "lineEnd": 47,
+          "excerpt": "Assert.DoesNotThrow(() => new TestingRepository(loggerFactory, mockConfig.Object));"
+        }
+      ],
+      "standard": "The Practical Test Pyramid (Martin Fowler)",
+      "url": "https://martinfowler.com/articles/practical-test-pyramid.html#WritingYourFirstUnitTest",
+      "recommendation": "Remove the Assert.Pass placeholder or replace it with real Domain model tests, fix the null-message controller test to actually return a null ErrorMessage and assert the default Warning header value, and replace 'DoesNotThrow' constructor tests with assertions on observable behavior.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "TST-06#1",
+      "subject": "Implementation",
+      "subSubject": "Testing",
+      "checkId": "TST-06",
+      "severity": "Error",
+      "title": "No CI pipeline runs the test suite on each change",
+      "evidence": [
+        {
+          "file": ".github/instructions/unit-tests.instructions.md",
+          "lineStart": 78,
+          "lineEnd": 84,
+          "excerpt": "After creating or updating tests, verify all unit tests can run successfully. - Run the relevant test projects."
+        }
+      ],
+      "standard": "The Practical Test Pyramid (Martin Fowler)",
+      "url": "https://martinfowler.com/articles/practical-test-pyramid.html#TheImportanceOfTestAutomation",
+      "recommendation": "Add a CI workflow (e.g. GitHub Actions) that runs 'dotnet test' with coverage collection on every push and pull request, and require it to pass before merge.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "OBS-02#1",
+      "subject": "Implementation",
+      "subSubject": "Observability",
+      "checkId": "OBS-02",
+      "severity": "Warning",
+      "title": "User-facing correlation ID is a random GUID that is not linked to the OpenTelemetry trace ID",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/Logging/Models/LoggingCorrelation.cs",
+          "lineStart": 13,
+          "lineEnd": 16,
+          "excerpt": "public LoggingCorrelation() { this.CorrelationId = Guid.NewGuid().ToString(); }"
+        },
+        {
+          "file": "src/PilotUtiltyApi.Shared/Logging/LoggingUtilities.cs",
+          "lineStart": 17,
+          "lineEnd": 20,
+          "excerpt": "public static LoggingCorrelation GetLoggingCorrelation() { return new LoggingCorrelation(); }"
+        }
+      ],
+      "standard": "OpenTelemetry documentation (context propagation / log-trace correlation)",
+      "url": "https://opentelemetry.io/docs/",
+      "recommendation": "Derive the correlation ID from Activity.Current?.TraceId (falling back to HttpContext.TraceIdentifier), so the ID shown to callers can be used to find the trace in Tempo and the related logs in Loki.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "OBS-07#1",
+      "subject": "Implementation",
+      "subSubject": "Observability",
+      "checkId": "OBS-07",
+      "severity": "Information",
+      "title": "No SLOs or SLIs are documented in the repository",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/OpenTelemetry/Extensions/OpenTelemetryExtensions.cs",
+          "lineStart": 78,
+          "lineEnd": 86,
+          "excerpt": ".WithMetrics(metrics => ... .AddAspNetCoreInstrumentation() ... .AddOtlpExporter(...)"
+        }
+      ],
+      "standard": "Azure Well-Architected Framework - Operational Excellence",
+      "url": "https://learn.microsoft.com/azure/well-architected/operational-excellence/",
+      "recommendation": "Document target SLIs, such as availability and p95 latency from http.server.request.duration, along with SLO thresholds (for example in docs/ or the README), so the exported metrics can be alerted on.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "DEP-05#1",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "checkId": "DEP-05",
+      "severity": "Information",
+      "title": "No SBOM or third-party license inventory present",
+      "evidence": [
+        {
+          "file": "Directory.Packages.props",
+          "lineStart": 5,
+          "lineEnd": 40,
+          "excerpt": "34 PackageVersion entries; no sbom.json, *.cdx.json, *.spdx.json or THIRD-PARTY-NOTICES file found in repository"
+        }
+      ],
+      "standard": "fallback rubric (SBOM / license inventory)",
+      "url": "https://learn.microsoft.com/en-us/dotnet/core/project-sdk/msbuild-props",
+      "recommendation": "Generate a CycloneDX or SPDX SBOM (e.g. via CycloneDX dotnet tool or Microsoft sbom-tool) as part of the build and publish it with releases.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "REL-02#1",
+      "subject": "Operations",
+      "subSubject": "Reliability",
+      "checkId": "REL-02",
+      "severity": "Warning",
+      "title": "No retry with backoff for transient database failures",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+          "lineStart": 73,
+          "lineEnd": 89,
+          "excerpt": "var connection = CreateConnection(...); connection.Open(); ... await connection.QueryFirstOrDefaultAsync<int>(command);"
+        },
+        {
+          "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+          "lineStart": 148,
+          "lineEnd": 153,
+          "excerpt": "$\"Connect Timeout={dataSource.ConnectTimeout};\" + \"TrustServerCertificate=True;\""
+        }
+      ],
+      "standard": "Azure Well-Architected Framework - Reliability",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/",
+      "recommendation": "Add a bounded exponential-backoff retry for transient connection errors (e.g. a Polly resilience pipeline, SqlRetryLogicProvider, or Npgsql retry), applied to the connect step and the idempotent reset.",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "REL-04#1",
+      "subject": "Operations",
+      "subSubject": "Reliability",
+      "checkId": "REL-04",
+      "severity": "Warning",
+      "title": "No circuit breaker protecting calls to the database dependency",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Services/Extensions/ServicesInjectionExtensions.cs",
+          "lineStart": 71,
+          "lineEnd": 73,
+          "excerpt": "builder.Services.AddTransient<...ITestingRepository, ...TestingRepository>();"
+        }
+      ],
+      "standard": "Azure Well-Architected Framework - Reliability",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/",
+      "recommendation": "Add a circuit breaker (e.g. Polly CircuitBreaker strategy in a shared resilience pipeline) around database access so a degraded DB fails fast instead of tying up requests for the full connect timeout.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    },
+    {
+      "id": "MAINT-02#1",
+      "subject": "Operations",
+      "subSubject": "Maintainability",
+      "checkId": "MAINT-02",
+      "severity": "Information",
+      "title": "Project folder names misspelled (PilotUtiltyApi.*) and inconsistent with csproj names, namespaces and README structure",
+      "evidence": [
+        {
+          "file": "PilotUtilityApi.sln",
+          "lineStart": 19,
+          "lineEnd": 27,
+          "excerpt": "\"PilotUtilityApi.Shared\", \"src\\PilotUtiltyApi.Shared\\PilotUtilityApi.Shared.csproj\""
+        },
+        {
+          "file": "README.md",
+          "lineStart": 49,
+          "lineEnd": 64,
+          "excerpt": "│   ├── PilotUtilityApi.Domain/           # DTOs and domain models"
+        },
+        {
+          "file": "README.md",
+          "lineStart": 288,
+          "lineEnd": 297,
+          "excerpt": "dotnet test test/PilotUtiltyApi.Shared.Tests"
+        }
+      ],
+      "standard": "Maintainability fallback rubric (consistent module/folder boundaries)",
+      "url": "",
+      "recommendation": "Rename the src/ and test/ folders to PilotUtilityApi.* to match project names and namespaces (dotnet_style_namespace_match_folder is enabled), then update the .sln paths and README.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "MAINT-03#1",
+      "subject": "Operations",
+      "subSubject": "Maintainability",
+      "checkId": "MAINT-03",
+      "severity": "Warning",
+      "title": "Database provisioning and secret/environment configuration steps are not documented",
+      "evidence": [
+        {
+          "file": "README.md",
+          "lineStart": 84,
+          "lineEnd": 86,
+          "excerpt": "One of the following databases: SQL Server ... PostgreSQL (version 12+)"
+        },
+        {
+          "file": "README.md",
+          "lineStart": 189,
+          "lineEnd": 192,
+          "excerpt": "For local development and testing, the following User Secret can be used:"
+        }
+      ],
+      "standard": "Maintainability fallback rubric (onboarding prerequisites and environment documentation)",
+      "url": "",
+      "recommendation": "Document how to create the NorthWind/northwind database and the test tables/schema, give the `dotnet user-secrets set` commands, and show environment-variable overrides (e.g. Application__DataSources__0__Password) instead of editing appsettings.json.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "MAINT-05#1",
+      "subject": "Operations",
+      "subSubject": "Maintainability",
+      "checkId": "MAINT-05",
+      "severity": "Information",
+      "title": "Stale references: solution lists a missing .runsettings file and CONTRIBUTING links a non-existent README section",
+      "evidence": [
+        {
+          "file": "PilotUtilityApi.sln",
+          "lineStart": 9,
+          "lineEnd": 9,
+          "excerpt": ".runsettings = .runsettings"
+        },
+        {
+          "file": "CONTRIBUTING.md",
+          "lineStart": 14,
+          "lineEnd": 14,
+          "excerpt": "review the customization notes in [README.md](README.md#copilot-customization)"
+        }
+      ],
+      "standard": "Maintainability fallback rubric (remove stale artifacts)",
+      "url": "",
+      "recommendation": "Add the .runsettings file or remove it from Solution Items, and either add a 'Copilot Customization' README section or point CONTRIBUTING at .github/copilot-instructions.md.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "S-AP-01",
+      "subject": "Software Quality",
+      "subSubject": "Architecture Patterns",
+      "checkId": "AP-01",
+      "title": "Clean controller -> service -> repository layering via interfaces and DI",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Services/Extensions/ServicesInjectionExtensions.cs",
+          "lineStart": 71,
+          "lineEnd": 73,
+          "excerpt": "AddTransient<ITestingRepository, TestingRepository>(); AddTransient<ITestingService, TestingService>();"
+        }
+      ]
+    },
+    {
+      "id": "S-SQ-06",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-06",
+      "title": "Configuration is validated fail-fast at startup with explicit messages",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/Configuration/ApplicationConfiguration.cs",
+          "lineStart": 69,
+          "lineEnd": 86,
+          "excerpt": "if (activeDataSources.Length > 1) { throw new ConfigurationException(...) }"
+        }
+      ]
+    },
+    {
+      "id": "S-CS-04",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-04",
+      "title": "Public types and members consistently carry XML documentation comments",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Domain/Models/Responses/RetrieveResponse.cs",
+          "lineStart": 15,
+          "lineEnd": 31,
+          "excerpt": "/// Instantiate a <see cref=\"RetrieveResponse{TReturn}\"/> object."
+        }
+      ]
+    },
+    {
+      "id": "STR-SL-1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Branching Model",
+      "checkId": "SL-04",
+      "title": "Contributing guide requires sign-off from two other developers before merge",
+      "evidence": [
+        {
+          "file": "CONTRIBUTING.md",
+          "lineStart": 17,
+          "lineEnd": 18,
+          "excerpt": "5. You may merge the Pull Request in once you have the sign-off of two other developers"
+        }
+      ]
+    },
+    {
+      "id": "STR-SL-2",
+      "subject": "Software Lifecycle",
+      "subSubject": "Versioning",
+      "checkId": "SL-03",
+      "title": "SemVer adopted explicitly and assembly version centralised in Directory.Build.props",
+      "evidence": [
+        {
+          "file": "CONTRIBUTING.md",
+          "lineStart": 16,
+          "lineEnd": 16,
+          "excerpt": "The versioning scheme we use is [SemVer](http://semver.org/)."
+        },
+        {
+          "file": "Directory.Build.props",
+          "lineStart": 3,
+          "lineEnd": 3,
+          "excerpt": "<Version>1.0.0</Version>"
+        }
+      ],
+      "standard": "Semantic Versioning 2.0.0",
+      "url": "https://semver.org/"
+    },
+    {
+      "id": "STR-SL-3",
+      "subject": "Software Lifecycle",
+      "subSubject": "Documentation",
+      "title": "README documents prerequisites, build, run and test steps clearly",
+      "evidence": [
+        {
+          "file": "README.md",
+          "lineStart": 79,
+          "lineEnd": 118,
+          "excerpt": "## Getting Started ... dotnet restore ... dotnet build"
+        }
+      ]
+    },
+    {
+      "id": "TF-04#S1",
+      "subject": "Application Design",
+      "subSubject": "Twelve-Factor",
+      "checkId": "TF-04",
+      "title": "Database and OTEL collector are attached resources selected purely by configuration",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/appsettings.json",
+          "lineStart": 3,
+          "lineEnd": 9,
+          "excerpt": "\"DataSources\": [ { \"Active\": true, ... \"DataSourceType\": \"SqlServer\""
+        },
+        {
+          "file": "src/PilotUtiltyApi.Web/appsettings.json",
+          "lineStart": 41,
+          "lineEnd": 44,
+          "excerpt": "\"OpenTelemetry\": { \"Server\": \"otel-collector\", \"Port\": 4318 }"
+        }
+      ],
+      "standard": "The Twelve-Factor App - IV. Backing services",
+      "url": "https://12factor.net/backing-services"
+    },
+    {
+      "id": "TF-09#S1",
+      "subject": "Application Design",
+      "subSubject": "Twelve-Factor",
+      "checkId": "TF-09",
+      "title": "Generic host handles SIGTERM and logs are flushed on shutdown",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/Program.cs",
+          "lineStart": 32,
+          "lineEnd": 41,
+          "excerpt": "webApp.Run(); ... finally { Log.CloseAndFlush(); }"
+        }
+      ],
+      "standard": "The Twelve-Factor App - IX. Disposability",
+      "url": "https://12factor.net/disposability"
+    },
+    {
+      "id": "TF-07#S1",
+      "subject": "Application Design",
+      "subSubject": "Twelve-Factor",
+      "checkId": "TF-07",
+      "title": "Self-contained Kestrel host exports HTTP via port binding",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/Program.cs",
+          "lineStart": 16,
+          "lineEnd": 32,
+          "excerpt": "var webAppBuilder = WebApplication.CreateBuilder(args); ... webApp.Run();"
+        }
+      ],
+      "standard": "The Twelve-Factor App - VII. Port binding",
+      "url": "https://12factor.net/port-binding"
+    },
+    {
+      "id": "API-01#S1",
+      "subject": "API Design",
+      "subSubject": "OpenAPI Specification",
+      "checkId": "API-01",
+      "title": "OpenAPI 3.1 spec is generated and a copy is committed under docs/",
+      "evidence": [
+        {
+          "file": "docs/PilotUtilityApi_v1.json",
+          "lineStart": 1,
+          "lineEnd": 5,
+          "excerpt": "\"openapi\": \"3.1.1\", \"info\": { \"title\": \"PilotUtilityApi.Web | v1\""
+        },
+        {
+          "file": "src/PilotUtiltyApi.Shared/OpenApi/Extensions/OpenApiExtensions.cs",
+          "lineStart": 90,
+          "lineEnd": 93,
+          "excerpt": "options.OpenApiVersion = Microsoft.OpenApi.OpenApiSpecVersion.OpenApi3_1;"
+        }
+      ],
+      "standard": "OpenAPI Specification 3.1",
+      "url": "https://spec.openapis.org/oas/latest.html"
+    },
+    {
+      "id": "API-07#S1",
+      "subject": "API Design",
+      "subSubject": "Azure API Guidelines",
+      "checkId": "API-07",
+      "title": "Explicit API versioning via Asp.Versioning with supported versions reported",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs",
+          "lineStart": 35,
+          "lineEnd": 37,
+          "excerpt": "options.DefaultApiVersion = new ApiVersion(1, 0); options.ReportApiVersions = true;"
+        },
+        {
+          "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs",
+          "lineStart": 16,
+          "lineEnd": 16,
+          "excerpt": "[ApiVersion(\"1.0\")]"
+        }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines - Versioning",
+      "url": "https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#versioning"
+    },
+    {
+      "id": "API-04#S1",
+      "subject": "API Design",
+      "subSubject": "Azure API Guidelines",
+      "checkId": "API-04",
+      "title": "Route tokens forced to lowercase for consistent URL casing",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs",
+          "lineStart": 119,
+          "lineEnd": 120,
+          "excerpt": "options.Conventions.Add(new RouteTokenTransformerConvention(new LowercaseParameterTransformer()));"
+        }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines - URL structure",
+      "url": "https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#url-structure"
+    },
+    {
+      "id": "S-SEC-II-02",
+      "subject": "Security",
+      "subSubject": "Input & Injection",
+      "checkId": "SEC-II-02",
+      "title": "SQL is fixed compile-time constants selected by configured provider; no request input reaches SQL",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+          "lineStart": 200,
+          "lineEnd": 204,
+          "excerpt": "\"sqlserver\" => SqlConstants.SqlServerResetTestingScript, \"postgresql\" => SqlConstants.PostgreSqlResetTestingScript,"
+        }
+      ],
+      "standard": "OWASP SQL Injection Prevention Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html"
+    },
+    {
+      "id": "S-SEC-II-01",
+      "subject": "Security",
+      "subSubject": "Input & Injection",
+      "checkId": "SEC-II-01",
+      "title": "Only strongly typed input is accepted ([ApiController] model binding of a bool query parameter)",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs",
+          "lineStart": 63,
+          "lineEnd": 64,
+          "excerpt": "[FromQuery(Name = \"show-details\"), BindRequired] bool showDetails = false"
+        }
+      ],
+      "standard": "OWASP Input Validation Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html"
+    },
+    {
+      "id": "STR-SEC-WA-07#1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-07",
+      "title": "Global exception middleware returns a ProblemDetails body with only a generic user message; stack traces are logged on the server and never returned",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs",
+          "lineStart": 81,
+          "lineEnd": 87,
+          "excerpt": "var problemDetails = new ProblemDetails { Status = 500, Title = \"Internal Server Error\", Detail = loggingCorrelation.UserMessage, ..."
+        }
+      ],
+      "standard": "OWASP REST Security Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html#error-handling"
+    },
+    {
+      "id": "STR-SEC-WA-05#1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-05",
+      "title": "No permissive CORS policy is registered, so browsers keep the default same-origin restriction",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs",
+          "lineStart": 113,
+          "lineEnd": 121,
+          "excerpt": "builder.Services.AddVersioning(); ... builder.Services.AddControllers(...) (no AddCors/UseCors)"
+        }
+      ],
+      "standard": "OWASP REST Security Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html#cors"
+    },
+    {
+      "id": "STR-SEC-OP-01",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-01",
+      "title": "Global exception middleware returns generic ProblemDetails with a correlation ID instead of exception details",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs",
+          "lineStart": 73,
+          "lineEnd": 87,
+          "excerpt": "this.logger.LogError(exception, \"{UserMessage}\", loggingCorrelation.UserMessage); ... Detail = loggingCorrelation.UserMessage,"
+        }
+      ],
+      "standard": "OWASP Error Handling Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Error_Handling_Cheat_Sheet.html"
+    },
+    {
+      "id": "STR-SEC-OP-03",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-03",
+      "title": "Data source password is redacted in ToString and can be suppressed when copying configuration",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/Configuration/Models/DataSourceConfiguration.cs",
+          "lineStart": 89,
+          "lineEnd": 89,
+          "excerpt": "$\"{nameof(this.Password)}={(string.IsNullOrEmpty(this.Password) ? \"--Empty--\" : \"[Redacted]\")}, \""
+        },
+        {
+          "file": "src/PilotUtiltyApi.Shared/Configuration/Models/DataSourceConfiguration.cs",
+          "lineStart": 118,
+          "lineEnd": 118,
+          "excerpt": "this.Password = suppressSensitiveValues? \"[Redacted]\" : sourceConfiguration.Password;"
+        }
+      ],
+      "standard": "OWASP Logging Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html"
+    },
+    {
+      "id": "STR-SEC-OP-04",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-04",
+      "title": "Structured Serilog logging with a compact JSON formatter encodes logged values",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/appsettings.json",
+          "lineStart": 66,
+          "lineEnd": 66,
+          "excerpt": "\"formatter\": \"Serilog.Formatting.Compact.CompactJsonFormatter, Serilog.Formatting.Compact\""
+        }
+      ],
+      "standard": "OWASP Logging Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html"
+    },
+    {
+      "id": "S-TST-01",
+      "subject": "Implementation",
+      "subSubject": "Testing",
+      "checkId": "TST-01",
+      "title": "Healthy pyramid: fast NUnit unit tests per layer with a single Bruno API smoke test",
+      "evidence": [
+        {
+          "file": "test/PilotUtiltyApi.Services.Tests/Services/TestingServiceTests.cs",
+          "lineStart": 34,
+          "lineEnd": 49,
+          "excerpt": "mockRepository.Setup(r => r.ResetTestingAsync()).ReturnsAsync(expectedResult);"
+        },
+        {
+          "file": "test/Bruno/PilotUtilityApi/System/HealthCheck.yml",
+          "lineStart": 15,
+          "lineEnd": 17,
+          "excerpt": "expect(res.getStatus()).to.equal(200);"
+        }
+      ],
+      "standard": "The Practical Test Pyramid (Martin Fowler)",
+      "url": "https://martinfowler.com/articles/practical-test-pyramid.html"
+    },
+    {
+      "id": "S-TST-02",
+      "subject": "Implementation",
+      "subSubject": "Testing",
+      "title": "Controller and configuration tests assert concrete status codes, headers and validation messages across edge cases",
+      "evidence": [
+        {
+          "file": "test/PilotUtiltyApi.Web.Tests/Controllers/TestingControllerTests.cs",
+          "lineStart": 105,
+          "lineEnd": 110,
+          "excerpt": "Assert.That(controller.Response.Headers[\"Warning\"].ToString(), Is.EqualTo(errorMessage));"
+        },
+        {
+          "file": "test/PilotUtiltyApi.Shared.Tests/Configuration/ApplicationConfigurationTests.cs",
+          "lineStart": 88,
+          "lineEnd": 91,
+          "excerpt": "Assert.That(exception.Message, Does.Contain(\"Multiple active data sources configured\"));"
+        }
+      ]
+    },
+    {
+      "id": "S-TST-03",
+      "subject": "Implementation",
+      "subSubject": "Testing",
+      "title": "Documented test standards (AAA, naming, mirrored structure, determinism, avoid unnecessary mocking)",
+      "evidence": [
+        {
+          "file": ".github/instructions/unit-tests.instructions.md",
+          "lineStart": 95,
+          "lineEnd": 102,
+          "excerpt": "Avoid reliance on current time, random values, external state ... Avoid unnecessary mocking"
+        }
+      ]
+    },
+    {
+      "id": "OBS-S1",
+      "subject": "Implementation",
+      "subSubject": "Observability",
+      "checkId": "OBS-03",
+      "title": "Full OpenTelemetry tracing, metrics and logging pipeline with ASP.NET Core, HttpClient, Npgsql and SqlClient instrumentation",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/OpenTelemetry/Extensions/OpenTelemetryExtensions.cs",
+          "lineStart": 94,
+          "lineEnd": 103,
+          "excerpt": ".AddAspNetCoreInstrumentation().AddHttpClientInstrumentation().AddNpgsql().AddSqlClientInstrumentation().AddOtlpExporter(...)"
+        }
+      ],
+      "standard": "OpenTelemetry documentation",
+      "url": "https://opentelemetry.io/docs/"
+    },
+    {
+      "id": "OBS-S2",
+      "subject": "Implementation",
+      "subSubject": "Observability",
+      "checkId": "OBS-01",
+      "title": "Structured logging through Serilog with a compact JSON file formatter, LogContext enrichment and forwarding to the OTel provider",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/appsettings.json",
+          "lineStart": 66,
+          "lineEnd": 66,
+          "excerpt": "\"formatter\": \"Serilog.Formatting.Compact.CompactJsonFormatter, Serilog.Formatting.Compact\""
+        },
+        {
+          "file": "src/PilotUtiltyApi.Shared/Logging/Extensions/LoggingExtensions.cs",
+          "lineStart": 71,
+          "lineEnd": 78,
+          "excerpt": ".Enrich.FromLogContext() ... writeToProviders: true"
+        }
+      ],
+      "standard": "OpenTelemetry documentation",
+      "url": "https://opentelemetry.io/docs/"
+    },
+    {
+      "id": "OBS-S3",
+      "subject": "Implementation",
+      "subSubject": "Observability",
+      "checkId": "OBS-05",
+      "title": "All three signals are exported over OTLP to a collector, and console exporters are limited to Development",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/OpenTelemetry/Extensions/OpenTelemetryExtensions.cs",
+          "lineStart": 58,
+          "lineEnd": 62,
+          "excerpt": "options.Endpoint = new Uri($\"{otelBaseUrl}/{signalPath}\"); options.Protocol = OtlpExportProtocol.HttpProtobuf;"
+        }
+      ],
+      "standard": "OpenTelemetry documentation",
+      "url": "https://opentelemetry.io/docs/"
+    },
+    {
+      "id": "DEP-01#S1",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "checkId": "DEP-01",
+      "title": "Central Package Management with exact pinned versions for all packages",
+      "evidence": [
+        {
+          "file": "Directory.Packages.props",
+          "lineStart": 3,
+          "lineEnd": 8,
+          "excerpt": "<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally> ... <PackageVersion Include=\"Dapper\" Version=\"2.1.79\" />"
+        }
+      ]
+    },
+    {
+      "id": "DEP-04#S1",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "checkId": "DEP-04",
+      "title": "Solution-wide target of supported LTS runtime net10.0",
+      "evidence": [
+        {
+          "file": "Directory.Build.props",
+          "lineStart": 4,
+          "lineEnd": 4,
+          "excerpt": "<TargetFramework>net10.0</TargetFramework>"
+        }
+      ]
+    },
+    {
+      "id": "DEP-01#S2",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "title": "Test-only and analyzer packages marked PrivateAssets=all so they do not flow to consumers",
+      "evidence": [
+        {
+          "file": "test/PilotUtiltyApi.Web.Tests/PilotUtilityApi.Web.Tests.csproj",
+          "lineStart": 9,
+          "lineEnd": 19,
+          "excerpt": "<PackageReference Include=\"coverlet.collector\"> <PrivateAssets>all</PrivateAssets>"
+        }
+      ]
+    },
+    {
+      "id": "S-REL-01",
+      "subject": "Operations",
+      "subSubject": "Reliability",
+      "checkId": "REL-01",
+      "title": "Database connect timeout is explicitly configured and applied to connection strings",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/appsettings.json",
+          "lineStart": 5,
+          "lineEnd": 6,
+          "excerpt": "\"Active\": true, \"ConnectTimeout\": 30,"
+        }
+      ]
+    },
+    {
+      "id": "S-REL-CFG",
+      "subject": "Operations",
+      "subSubject": "Reliability",
+      "title": "Configuration is validated at startup so misconfiguration fails fast",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Services/Extensions/ServicesInjectionExtensions.cs",
+          "lineStart": 39,
+          "lineEnd": 43,
+          "excerpt": "builder.Configuration.GetSection(\"Application\").Bind(applicationSettings); applicationSettings.Validate();"
+        }
+      ]
+    },
+    {
+      "id": "S-REL-TX",
+      "subject": "Operations",
+      "subSubject": "Reliability",
+      "title": "Destructive reset runs inside a transaction with rollback on exception",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+          "lineStart": 100,
+          "lineEnd": 102,
+          "excerpt": "catch (Exception exInner) { transaction.Rollback();"
+        }
+      ]
+    },
+    {
+      "id": "S-PERF-02",
+      "subject": "Operations",
+      "subSubject": "Performance",
+      "checkId": "PERF-02",
+      "title": "Async end-to-end controller/service/query path with CancellationToken propagated",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs",
+          "lineStart": 51,
+          "lineEnd": 53,
+          "excerpt": "public async Task<IActionResult> ResetTesting(CancellationToken cancellationToken) { var response = await testingService.ResetTestingAsync(cancellationToken);"
+        }
+      ]
+    },
+    {
+      "id": "S-PERF-04",
+      "subject": "Operations",
+      "subSubject": "Performance",
+      "checkId": "PERF-04",
+      "title": "Reset runs as a single batched script in one round trip",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+          "lineStart": 81,
+          "lineEnd": 89,
+          "excerpt": "var command = new CommandDefinition(sqlScript, transaction: transaction, cancellationToken: cancellationToken);"
+        }
+      ]
+    },
+    {
+      "id": "STR-MAINT-01",
+      "subject": "Operations",
+      "subSubject": "Maintainability",
+      "checkId": "MAINT-02",
+      "title": "README documents layered architecture with explicit inter-layer dependency rules",
+      "evidence": [
+        {
+          "file": "README.md",
+          "lineStart": 311,
+          "lineEnd": 343,
+          "excerpt": "The application follows **Clean Architecture** principles ... Depends on: Domain, Repository, Shared"
+        }
+      ]
+    },
+    {
+      "id": "STR-MAINT-02",
+      "subject": "Operations",
+      "subSubject": "Maintainability",
+      "title": "Comprehensive .editorconfig and written architecture guardrails enforce consistent style and layering",
+      "evidence": [
+        {
+          "file": ".editorconfig",
+          "lineStart": 1,
+          "lineEnd": 2,
+          "excerpt": "root = true"
+        },
+        {
+          "file": ".github/instructions/architecture.instructions.md",
+          "lineStart": 41,
+          "lineEnd": 44,
+          "excerpt": "No dead code, placeholders, or TODO stubs in core paths."
+        }
+      ]
+    },
+    {
+      "id": "STR-MAINT-03",
+      "subject": "Operations",
+      "subSubject": "Maintainability",
+      "checkId": "MAINT-04",
+      "title": "Thin composition root with no TODO/FIXME/HACK markers in reviewed code",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/Program.cs",
+          "lineStart": 18,
+          "lineEnd": 29,
+          "excerpt": "webAppBuilder.ApplicationRegistration(); webAppBuilder.ApiWebApplicationBuilder(); ... webApp.ApiWebApplication();"
+        }
+      ]
+    }
+  ],
+  "duplicatesSuppressed": [
+    {
+      "suppressedId": "SEC-OP-06#1",
+      "primaryId": "TF-03#1",
+      "reason": "overlapping evidence; Error finding in Application Design/Twelve-Factor outranks or precedes Error in Security/Operational"
+    },
+    {
+      "suppressedId": "SEC-IA-08#1",
+      "primaryId": "SEC-WA-06#1",
+      "reason": "overlapping evidence; Error finding in Security/Web & API outranks or precedes Warning in Security/Identity & Access"
+    },
+    {
+      "suppressedId": "SEC-WA-02#1",
+      "primaryId": "SEC-WA-06#1",
+      "reason": "overlapping evidence; Error finding in Security/Web & API outranks or precedes Warning in Security/Web & API"
+    },
+    {
+      "suppressedId": "DEP-02#1",
+      "primaryId": "TF-02#1",
+      "reason": "overlapping evidence; Error finding in Application Design/Twelve-Factor outranks or precedes Warning in Implementation/Dependency Management"
+    },
+    {
+      "suppressedId": "PERF-02#1",
+      "primaryId": "CS-05#1",
+      "reason": "overlapping evidence; Warning finding in Software Quality/Coding Standards outranks or precedes Warning in Operations/Performance"
+    },
+    {
+      "suppressedId": "MAINT-01#1",
+      "primaryId": "SEC-WA-06#1",
+      "reason": "overlapping evidence; Error finding in Security/Web & API outranks or precedes Warning in Operations/Maintainability"
+    },
+    {
+      "suppressedId": "AP-05#1",
+      "primaryId": "REL-02#1",
+      "reason": "overlapping evidence; Warning finding in Operations/Reliability outranks or precedes Information in Software Quality/Architecture Patterns"
+    }
+  ],
+  "suppressedChecks": [
+    {
+      "skill": "review-security-operational",
+      "checkId": "SEC-OP-06",
+      "subSubject": "Operational",
+      "findingId": "SEC-OP-06#1",
+      "primaryId": "TF-03#1",
+      "primarySubject": "Application Design/Twelve-Factor"
+    },
+    {
+      "skill": "review-security-identity-access",
+      "checkId": "SEC-IA-08",
+      "subSubject": "Identity & Access",
+      "findingId": "SEC-IA-08#1",
+      "primaryId": "SEC-WA-06#1",
+      "primarySubject": "Security/Web & API"
+    },
+    {
+      "skill": "review-security-web-api",
+      "checkId": "SEC-WA-02",
+      "subSubject": "Web & API",
+      "findingId": "SEC-WA-02#1",
+      "primaryId": "SEC-WA-06#1",
+      "primarySubject": "Security/Web & API"
+    },
+    {
+      "skill": "review-dependency-management",
+      "checkId": "DEP-02",
+      "subSubject": "Dependency Management",
+      "findingId": "DEP-02#1",
+      "primaryId": "TF-02#1",
+      "primarySubject": "Application Design/Twelve-Factor"
+    },
+    {
+      "skill": "review-performance",
+      "checkId": "PERF-02",
+      "subSubject": "Performance",
+      "findingId": "PERF-02#1",
+      "primaryId": "CS-05#1",
+      "primarySubject": "Software Quality/Coding Standards"
+    },
+    {
+      "skill": "review-maintainability",
+      "checkId": "MAINT-01",
+      "subSubject": "Maintainability",
+      "findingId": "MAINT-01#1",
+      "primaryId": "SEC-WA-06#1",
+      "primarySubject": "Security/Web & API"
+    },
+    {
+      "skill": "review-software-quality",
+      "checkId": "AP-05",
+      "subSubject": "Architecture Patterns",
+      "findingId": "AP-05#1",
+      "primaryId": "REL-02#1",
+      "primarySubject": "Operations/Reliability"
+    }
+  ],
+  "notes": "checkResults are not embedded; render reads them from the per-subject transition files and applies suppressedChecks."
+}

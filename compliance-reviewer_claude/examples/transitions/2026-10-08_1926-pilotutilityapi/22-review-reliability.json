@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1926-pilotutilityapi",
+  "stepId": "22-review-reliability",
+  "status": "completed",
+  "startedAt": "2026-10-09T01:26:05Z",
+  "completedAt": "2026-10-09T01:45:00Z",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "929741f5c04d8218a6852d5d6eb33cbeb2f1d20b",
+  "inputsHash": "sha256:0562d896a8fce07e",
+  "batchId": "batch-1",
+  "skill": "review-reliability",
+  "subject": "Operations",
+  "findings": [
+    {
+      "id": "REL-02#1",
+      "subject": "Operations",
+      "subSubject": "Reliability",
+      "checkId": "REL-02",
+      "severity": "Warning",
+      "title": "No retry with backoff for transient database failures",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 73, "lineEnd": 89, "excerpt": "var connection = CreateConnection(...); connection.Open(); ... await connection.QueryFirstOrDefaultAsync<int>(command);" },
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 148, "lineEnd": 153, "excerpt": "$\"Connect Timeout={dataSource.ConnectTimeout};\" + \"TrustServerCertificate=True;\"" }
+      ],
+      "standard": "Azure Well-Architected Framework - Reliability",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/",
+      "recommendation": "Add a bounded exponential-backoff retry for transient connection errors (e.g. a Polly resilience pipeline, SqlRetryLogicProvider, or Npgsql retry), applied to the connect step and the idempotent reset.",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "REL-04#1",
+      "subject": "Operations",
+      "subSubject": "Reliability",
+      "checkId": "REL-04",
+      "severity": "Warning",
+      "title": "No circuit breaker protecting calls to the database dependency",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Services/Extensions/ServicesInjectionExtensions.cs", "lineStart": 71, "lineEnd": 73, "excerpt": "builder.Services.AddTransient<...ITestingRepository, ...TestingRepository>();" }
+      ],
+      "standard": "Azure Well-Architected Framework - Reliability",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/",
+      "recommendation": "Add a circuit breaker (e.g. Polly CircuitBreaker strategy in a shared resilience pipeline) around database access so a degraded DB fails fast instead of tying up requests for the full connect timeout.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "S-REL-01",
+      "subject": "Operations",
+      "subSubject": "Reliability",
+      "checkId": "REL-01",
+      "title": "Database connect timeout is explicitly configured and applied to connection strings",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 5, "lineEnd": 6, "excerpt": "\"Active\": true, \"ConnectTimeout\": 30," }
+      ]
+    },
+    {
+      "id": "S-REL-CFG",
+      "subject": "Operations",
+      "subSubject": "Reliability",
+      "title": "Configuration is validated at startup so misconfiguration fails fast",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Services/Extensions/ServicesInjectionExtensions.cs", "lineStart": 39, "lineEnd": 43, "excerpt": "builder.Configuration.GetSection(\"Application\").Bind(applicationSettings); applicationSettings.Validate();" }
+      ]
+    },
+    {
+      "id": "S-REL-TX",
+      "subject": "Operations",
+      "subSubject": "Reliability",
+      "title": "Destructive reset runs inside a transaction with rollback on exception",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 100, "lineEnd": 102, "excerpt": "catch (Exception exInner) { transaction.Rollback();" }
+      ]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "REL-01", "subject": "Operations", "subSubject": "Reliability", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "REL-02", "subject": "Operations", "subSubject": "Reliability", "severityIfFailed": "Warning", "result": "fail", "reason": "No retry/backoff for transient DB errors.", "findingIds": ["REL-02#1"] },
+    { "checkId": "REL-03", "subject": "Operations", "subSubject": "Reliability", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "REL-04", "subject": "Operations", "subSubject": "Reliability", "severityIfFailed": "Warning", "result": "fail", "reason": "No circuit breaker around the database dependency.", "findingIds": ["REL-04#1"] },
+    { "checkId": "REL-05", "subject": "Operations", "subSubject": "Reliability", "severityIfFailed": "Warning", "result": "N/A", "reason": "No IaC, Dockerfile or deployment manifests found to assess replica count.", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "REL-01 passes on explicit DB connect timeout; command timeout relies on the finite provider default (30s) and OTLP exporters use SDK default timeouts. Out-of-checklist observations: /healthcheck returns OK without probing the database (no ASP.NET Core health checks registered), and TestingRepository commits only when 0 rows are deleted (reported as software-quality SQ-06#1)."
+}

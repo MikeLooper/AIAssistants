@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1926-pilotutilityapi",
+  "stepId": "14-review-security-identity-access",
+  "status": "completed",
+  "startedAt": "2026-10-09T01:26:05Z",
+  "completedAt": "2026-10-09T01:46:00Z",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "929741f5c04d8218a6852d5d6eb33cbeb2f1d20b",
+  "inputsHash": "sha256:0562d896a8fce07e",
+  "batchId": "batch-1",
+  "skill": "review-security-identity-access",
+  "subject": "Security",
+  "findings": [
+    {
+      "id": "SEC-IA-01#1",
+      "subject": "Security",
+      "subSubject": "Identity & Access",
+      "checkId": "SEC-IA-01",
+      "severity": "Error",
+      "title": "No authentication is configured and every controller is marked [AllowAnonymous]",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 15, "lineEnd": 19, "excerpt": "[ApiController] [ApiVersion(\"1.0\")] [Route(\"v{version:apiVersion}/[controller]\")] [AllowAnonymous]" },
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 113, "lineEnd": 127, "excerpt": "builder.Services.AddVersioning(); ... AddControllers(...) (no AddAuthentication/AddAuthorization)" },
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 83, "lineEnd": 86, "excerpt": "webApp.UseMiddleware<UnhandledExceptionMiddleware>(); webApp.MapControllers(); (no UseAuthentication/UseAuthorization)" }
+      ],
+      "standard": "OWASP Authentication Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html",
+      "recommendation": "Register an authentication scheme (e.g. JWT bearer via a vetted IdP, or API key for this utility API), add UseAuthentication/UseAuthorization, and remove the class-level [AllowAnonymous] from TestingController.",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "SEC-IA-02#1",
+      "subject": "Security",
+      "subSubject": "Identity & Access",
+      "checkId": "SEC-IA-02",
+      "severity": "Error",
+      "title": "Destructive POST /v1/testing/reset and configuration-revealing /about?show-details have no authorization",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 46, "lineEnd": 53, "excerpt": "[HttpPost] [Route(\"reset\")] ... await testingService.ResetTestingAsync(cancellationToken);" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 18, "lineEnd": 18, "excerpt": "[AllowAnonymous]" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 87, "lineEnd": 87, "excerpt": "ApplicationConfiguration = showDetails ? new ApplicationConfiguration(this.ApplicationConfiguration, true) : null" }
+      ],
+      "standard": "OWASP Authorization Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html",
+      "recommendation": "Protect the reset endpoint with [Authorize(Policy = ...)] restricted to an admin/test role (and disable it outside test environments), and require authorization for show-details=true; keep only /healthcheck anonymous.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-IA-08#1",
+      "subject": "Security",
+      "subSubject": "Identity & Access",
+      "checkId": "SEC-IA-08",
+      "severity": "Warning",
+      "title": "Implicit trust posture: HTTPS redirection only in Development and any Host header allowed",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 73, "lineEnd": 76, "excerpt": "if (webApp.Environment.IsDevelopment()) { webApp.UseHttpsRedirection(); }" },
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 78, "lineEnd": 78, "excerpt": "\"AllowedHosts\": \"*\"" }
+      ],
+      "standard": "OWASP Zero Trust Architecture Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+      "recommendation": "Enforce HTTPS (and HSTS) in all non-development environments rather than only Development, restrict AllowedHosts per environment, and verify every request explicitly instead of relying on network placement.",
+      "confidence": "Medium",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [],
+  "checkResults": [
+    { "checkId": "SEC-IA-01", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "fail", "reason": "No authentication configured; controllers are [AllowAnonymous].", "findingIds": ["SEC-IA-01#1"] },
+    { "checkId": "SEC-IA-02", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "fail", "reason": "Destructive reset and config-details endpoints lack authorization.", "findingIds": ["SEC-IA-02#1"] },
+    { "checkId": "SEC-IA-03", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No JWT handling in the reviewed files.", "findingIds": [] },
+    { "checkId": "SEC-IA-04", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No OAuth2 flows implemented.", "findingIds": [] },
+    { "checkId": "SEC-IA-05", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No session/cookie management; stateless API.", "findingIds": [] },
+    { "checkId": "SEC-IA-06", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No user password storage in the application.", "findingIds": [] },
+    { "checkId": "SEC-IA-07", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No credential hashing or cryptography code present.", "findingIds": [] },
+    { "checkId": "SEC-IA-08", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Warning", "result": "fail", "reason": "HTTPS redirection only in Development and AllowedHosts '*' rely on implicit network trust.", "findingIds": ["SEC-IA-08#1"] }
+  ],
+  "urlsFetched": [],
+  "notes": "SEC-IA-08 evidence may overlap review-security-web-api transport checks; deduplication is left to aggregation."
+}
