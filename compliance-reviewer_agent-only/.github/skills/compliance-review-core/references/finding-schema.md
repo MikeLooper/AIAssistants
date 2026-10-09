@@ -59,20 +59,59 @@ One entry per checklist item, regardless of outcome, so `compliance-report` can 
 
 - When `compliance-report`'s aggregate step (step 90) identifies a cross-subject semantic duplicate — a different `checkId`/`subject` whose evidence overlaps an existing finding's file+line range — the *suppressed* check still reports `result: fail` here with its own `reason`, but `findingIds` points at the other subject's finding id instead of creating a new one. This keeps every subject's Full Results accurate while the deduplicated `findings` array (and severity counts, top-5 risks) only lists the issue once. Worker subagents don't need to do this themselves; it happens only at aggregation, across all subjects' transition files.
 
-## Worker Output Envelope
+## Output Size Caps
 
-The worker subagent returns exactly one JSON object (no prose) with this shape; the orchestrator writes it to the transition file:
+Every token a worker writes is paid for, so keep results compact:
+
+- At most **3 strengths** per subject skill (pick the most significant).
+- `excerpt`: one or two lines, at most about 200 characters. `evidence` lists at most 3 locations per finding (the aggregator can still merge more).
+- `reason` only for `fail` and `N/A` check results; omit it for `pass`. Keep it to one sentence.
+- `recommendation`: one or two sentences.
+
+## Subject Transition File (written by the worker)
+
+The worker writes one file per subject it was given, directly to `transitions/<runId>/<stepId>.json`, as a single JSON object: the required header fields from `transition-schema.md` (with `status: "completed"`) followed by the subject content below. The orchestrator supplies the header values and the `stepId` for each skill.
 
 ```json
 {
   "schemaVersion": 1,
+  "runId": "...",
+  "stepId": "10-review-software-quality",
+  "status": "completed",
+  "startedAt": "ISO-8601",
+  "completedAt": "ISO-8601",
+  "targetPath": "...",
+  "targetGitHead": null,
+  "inputsHash": "...",
+  "batchId": "batch-1",
   "skill": "review-<name>",
   "subject": "string",
-  "batchIndex": 0,
   "findings": [ /* Finding[] */ ],
   "strengths": [ /* Strength[] */ ],
   "checkResults": [ /* CheckResult[] */ ],
   "urlsFetched": ["https://..."],
-  "notes": "optional short string, e.g. why a subject is N/A"
+  "notes": "optional short string"
 }
 ```
+
+- Finding ids are `<checkId>#<sequence>` (no batch suffix; a subject runs in exactly one batch).
+- Every checklist item gets one `checkResults` entry; every `fail` result names its `findingIds`.
+- Each file is self-contained, so a malformed file only costs a single-subject retry.
+
+## Worker Status Reply
+
+The worker returns only this short JSON object (no prose, no fences). It does not echo findings back; the orchestrator never needs them in context.
+
+```json
+{
+  "batchId": "batch-1",
+  "written": [
+    { "skill": "review-api-design", "path": "transitions/<runId>/13-review-api-design.json", "findings": 2, "strengths": 1, "checks": 8 }
+  ],
+  "failed": [
+    { "skill": "review-security-web-api", "reason": "short reason" }
+  ]
+}
+```
+
+Fallback only when the worker has no file-writing tool: add `"inline": [ { "skill": "review-<name>", "path": "transitions/<runId>/NN-review-<name>.json", "document": { /* the complete Subject Transition File */ } } ]` instead of `written`. The orchestrator then writes each `document` verbatim to `path` (this costs output tokens, so treat it as a degraded mode and tell the user).

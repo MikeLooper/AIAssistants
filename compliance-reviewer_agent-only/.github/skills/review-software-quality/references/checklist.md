@@ -1,6 +1,6 @@
 # Checklist — Software Quality
 
-Merged from the former `review-software-quality`, `review-design-patterns` and `review-architecture-patterns` skills. `DP-03` ("no God object/class") was dropped as a duplicate of `SQ-04`; keep evidence for that check under `SQ-04` going forward.
+Merged from the former `review-software-quality`, `review-design-patterns`, `review-architecture-patterns` and `review-coding-standards` skills. `DP-03` ("no God object/class") was dropped as a duplicate of `SQ-04`; keep evidence for that check under `SQ-04` going forward.
 
 ## Sub-subject: Software Quality
 
@@ -35,4 +35,14 @@ Merged from the former `review-software-quality`, `review-design-patterns` and `
 | AP-04 | Modules have high cohesion (related functionality grouped together) | Information | fallback rubric |
 | AP-05 | Cloud design patterns (retry, circuit breaker, cache-aside, queue-based leveling) are used where the architecture needs resilience/scale | Information | https://learn.microsoft.com/azure/architecture/patterns/ |
 | AP-06 | Cross-cutting concerns (logging, auth, validation) are centralized, not duplicated per module | Warning | fallback rubric |
+
+## Sub-subject: Coding Standards
+
+| id | Check | Default severity | Source |
+|----|-------|-------------------|--------|
+| CS-01 | Naming is consistent and descriptive across the codebase | Information | fallback rubric |
+| CS-02 | Formatting/indentation is consistent (or enforced by a formatter/linter config) | Information | fallback rubric |
+| CS-03 | Comments explain *why*, not *what*; no large blocks of commented-out code | Information | fallback rubric |
+| CS-04 | Public APIs (exported functions/classes) have documentation comments | Information | fallback rubric |
+| CS-05 | No obvious violation of the applicable language style guide (see `references/languages/<id>.md`) | Warning | see language file |
 

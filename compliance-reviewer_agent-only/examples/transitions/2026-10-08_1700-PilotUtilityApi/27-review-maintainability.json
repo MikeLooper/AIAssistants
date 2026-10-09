@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1700-PilotUtilityApi",
+  "stepId": "27-review-maintainability",
+  "status": "completed",
+  "startedAt": "2026-10-08T17:03:00-06:00",
+  "completedAt": "2026-10-08T17:04:30-06:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "da998a707579ccdd",
+  "batchId": "batch-10",
+  "skill": "review-maintainability",
+  "subject": "Maintainability",
+  "findings": [
+    {
+      "id": "MAINT-02#1",
+      "subject": "Maintainability",
+      "subSubject": "Maintainability",
+      "checkId": "MAINT-02",
+      "severity": "Information",
+      "title": "Folder names (PilotUtiltyApi.*) differ from documented/project names (PilotUtilityApi.*)",
+      "evidence": [
+        {
+          "file": "README.md",
+          "lineStart": 46,
+          "lineEnd": 52,
+          "excerpt": "PilotUtilityApi/ ├── src/ │ ├── PilotUtilityApi.Domain/ # DTOs and domain models"
+        },
+        {
+          "file": "README.md",
+          "lineStart": 114,
+          "lineEnd": 118,
+          "excerpt": "cd src/PilotUtilityApi.Web  dotnet run"
+        },
+        {
+          "file": "Directory.Build.props",
+          "lineStart": 1,
+          "lineEnd": 9,
+          "excerpt": "Folders on disk are src/PilotUtiltyApi.* while projects/namespaces are PilotUtilityApi.* (e.g. PilotUtilityApi.Web.csproj)"
+        }
+      ],
+      "standard": "Maintainability fallback rubric (consistent module/folder naming)",
+      "url": "",
+      "recommendation": "Rename the src/ and test/ folders to the PilotUtilityApi.* spelling (or align project names), and make README paths and dotnet test commands match the real folders so the documented steps work verbatim.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "MAINT-01#S1",
+      "subject": "Maintainability",
+      "subSubject": "Maintainability",
+      "checkId": "MAINT-01",
+      "title": "README covers prerequisites, build, run, configuration, test commands and architecture layers",
+      "evidence": [
+        {
+          "file": "README.md",
+          "lineStart": 1,
+          "lineEnd": 30,
+          "excerpt": "Table of Contents: Getting Started, Prerequisites, Building, Running, Configuration, Testing, Architecture"
+        }
+      ]
+    },
+    {
+      "id": "MAINT-02#S1",
+      "subject": "Maintainability",
+      "subSubject": "Maintainability",
+      "checkId": "MAINT-02",
+      "title": "Clear layered structure (Domain/Repositories/Services/Shared/Web) with documented dependency rules and written architecture instructions",
+      "evidence": [
+        {
+          "file": ".github/instructions/architecture.instructions.md",
+          "lineStart": 8,
+          "lineEnd": 15,
+          "excerpt": "Keep controller layer thin... Implement business logic in the service layer. Isolate persistence in the repository layer."
+        }
+      ]
+    },
+    {
+      "id": "MAINT-03#S1",
+      "subject": "Maintainability",
+      "subSubject": "Maintainability",
+      "checkId": "MAINT-03",
+      "title": "Configuration properties, defaults and local User Secrets example are documented; CONTRIBUTING requires README updates",
+      "evidence": [
+        {
+          "file": "README.md",
+          "lineStart": 140,
+          "lineEnd": 152,
+          "excerpt": "The `Application.DataSources` array defines database connections... | Property | Type | Description | Default |"
+        }
+      ]
+    }
+  ],
+  "checkResults": [
+    {
+      "checkId": "MAINT-01",
+      "subject": "Maintainability",
+      "subSubject": "Maintainability",
+      "severityIfFailed": "Warning",
+      "result": "pass"
+    },
+    {
+      "checkId": "MAINT-02",
+      "subject": "Maintainability",
+      "subSubject": "Maintainability",
+      "severityIfFailed": "Information",
+      "result": "fail",
+      "reason": "Folder names on disk (PilotUtiltyApi.*) do not match README paths and project names (PilotUtilityApi.*), so documented run commands break.",
+      "findingIds": ["MAINT-02#1"]
+    },
+    {
+      "checkId": "MAINT-03",
+      "subject": "Maintainability",
+      "subSubject": "Maintainability",
+      "severityIfFailed": "Warning",
+      "result": "pass"
+    },
+    {
+      "checkId": "MAINT-04",
+      "subject": "Maintainability",
+      "subSubject": "Maintainability",
+      "severityIfFailed": "Information",
+      "result": "pass"
+    },
+    {
+      "checkId": "MAINT-05",
+      "subject": "Maintainability",
+      "subSubject": "Maintainability",
+      "severityIfFailed": "Information",
+      "result": "pass"
+    }
+  ],
+  "urlsFetched": [],
+  "notes": "Reviewed only the 10 batch-10 files; no TODO/FIXME/HACK or deprecated markers in them. No languages/ file exists for csharp in this skill. Line numbers for README.md are approximate."
+}

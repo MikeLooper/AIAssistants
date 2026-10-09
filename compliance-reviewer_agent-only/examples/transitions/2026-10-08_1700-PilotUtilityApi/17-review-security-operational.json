@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1700-PilotUtilityApi",
+  "stepId": "17-review-security-operational",
+  "status": "completed",
+  "startedAt": "2026-10-08T17:03:00-06:00",
+  "completedAt": "2026-10-08T17:04:00-06:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "da998a707579ccdd",
+  "batchId": "batch-4",
+  "skill": "review-security-operational",
+  "subject": "Security",
+  "findings": [],
+  "strengths": [
+    {
+      "id": "SEC-OP-01-S1",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-01",
+      "title": "Global exception middleware logs the exception and returns a generic message with a correlation ID",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs",
+          "lineStart": 70,
+          "lineEnd": 75,
+          "excerpt": "catch (Exception exception) { ... this.logger.LogError(exception, \"{UserMessage}\", loggingCorrelation.UserMessage);"
+        }
+      ],
+      "standard": "OWASP Error Handling Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Error_Handling_Cheat_Sheet.html"
+    },
+    {
+      "id": "SEC-OP-03-S1",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-03",
+      "title": "Password is redacted in ToString() and can be suppressed when configuration is copied",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/Configuration/Models/DataSourceConfiguration.cs",
+          "lineStart": 78,
+          "lineEnd": 86,
+          "excerpt": "{nameof(this.Password)}={(string.IsNullOrEmpty(this.Password) ? \"--Empty--\" : \"[Redacted]\")}"
+        }
+      ],
+      "standard": "OWASP Logging Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html"
+    },
+    {
+      "id": "SEC-OP-05-S1",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-05",
+      "title": "Committed config contains only placeholder passwords and runtime log files are git-ignored",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/appsettings.json",
+          "lineStart": 10,
+          "lineEnd": 10,
+          "excerpt": "\"Password\": \"<DevUser password>\","
+        },
+        {
+          "file": ".gitignore",
+          "lineStart": 4,
+          "lineEnd": 4,
+          "excerpt": "logs/"
+        }
+      ],
+      "standard": "OWASP Secrets Management Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html"
+    }
+  ],
+  "checkResults": [
+    {
+      "checkId": "SEC-OP-01",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "severityIfFailed": "Warning",
+      "result": "pass"
+    },
+    {
+      "checkId": "SEC-OP-02",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "severityIfFailed": "Warning",
+      "result": "pass"
+    },
+    {
+      "checkId": "SEC-OP-03",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "severityIfFailed": "Error",
+      "result": "pass"
+    },
+    {
+      "checkId": "SEC-OP-04",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "severityIfFailed": "Warning",
+      "result": "pass"
+    },
+    {
+      "checkId": "SEC-OP-05",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "severityIfFailed": "Error",
+      "result": "pass"
+    },
+    {
+      "checkId": "SEC-OP-06",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "severityIfFailed": "Error",
+      "result": "pass"
+    },
+    {
+      "checkId": "SEC-OP-07",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "severityIfFailed": "Information",
+      "result": "pass"
+    }
+  ],
+  "urlsFetched": [],
+  "notes": "UserException handler does not log (relies on the documented convention that it was already logged at the throw site; throw sites not in this file list). Serilog uses structured templates and a JSON file sink, so log injection risk is low; the Console sink is not sanitized. Committed appsettings hold placeholder passwords; WebApplication.CreateBuilder supports env/user-secrets overrides, but no vault/env injection is documented in the reviewed files."
+}

@@ -1,0 +1,174 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1700-PilotUtilityApi",
+  "stepId": "20-review-observability",
+  "status": "completed",
+  "startedAt": "2026-10-08T17:03:00-06:00",
+  "completedAt": "2026-10-08T17:05:00-06:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "da998a707579ccdd",
+  "batchId": "batch-6",
+  "skill": "review-observability",
+  "subject": "Observability",
+  "findings": [
+    {
+      "id": "OBS-02#1",
+      "subject": "Observability",
+      "subSubject": "Observability",
+      "checkId": "OBS-02",
+      "severity": "Warning",
+      "title": "Error correlation ID is an ad-hoc GUID, not tied to the trace ID or logged as a structured property",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/Logging/Models/LoggingCorrelation.cs",
+          "lineStart": 14,
+          "lineEnd": 17,
+          "excerpt": "this.CorrelationId = Guid.NewGuid().ToString();"
+        },
+        {
+          "file": "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs",
+          "lineStart": 62,
+          "lineEnd": 66,
+          "excerpt": "this.logger.LogError(exception, \"{UserMessage}\", loggingCorrelation.UserMessage);"
+        }
+      ],
+      "standard": "OpenTelemetry documentation (context propagation / logs correlation)",
+      "url": "https://opentelemetry.io/docs/concepts/signals/traces/#context-propagation",
+      "recommendation": "Use Activity.Current?.TraceId as the correlation ID (or push it and any inbound X-Correlation-ID into Serilog LogContext as a separate CorrelationId property) so it is searchable and links logs to traces. Also return it for the UserException path.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "OBS-07#1",
+      "subject": "Observability",
+      "subSubject": "Observability",
+      "checkId": "OBS-07",
+      "severity": "Information",
+      "title": "No SLOs or SLIs documented",
+      "evidence": [
+        {
+          "file": "README.md",
+          "lineStart": 1,
+          "lineEnd": 1,
+          "excerpt": "README and docs/ contain no availability/latency objectives or indicators"
+        }
+      ],
+      "standard": "Azure Well-Architected Framework - Operational Excellence",
+      "url": "https://learn.microsoft.com/azure/well-architected/operational-excellence/",
+      "recommendation": "Document at least SLIs (e.g. request success rate, p95 latency from http.server.request.duration) and target SLOs in the README or docs/.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "OBS-01-S1",
+      "subject": "Observability",
+      "subSubject": "Observability",
+      "checkId": "OBS-01",
+      "title": "Serilog structured logging with compact JSON file sink, message templates and enrichers",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/appsettings.json",
+          "lineStart": 54,
+          "lineEnd": 66,
+          "excerpt": "\"formatter\": \"Serilog.Formatting.Compact.CompactJsonFormatter, Serilog.Formatting.Compact\""
+        }
+      ],
+      "standard": "OpenTelemetry documentation",
+      "url": "https://opentelemetry.io/docs/"
+    },
+    {
+      "id": "OBS-03-S1",
+      "subject": "Observability",
+      "subSubject": "Observability",
+      "checkId": "OBS-03",
+      "title": "OpenTelemetry tracing instrumented for ASP.NET Core, HttpClient, Npgsql and SqlClient",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/OpenTelemetry/Extensions/OpenTelemetryExtensions.cs",
+          "lineStart": 88,
+          "lineEnd": 97,
+          "excerpt": ".AddAspNetCoreInstrumentation().AddHttpClientInstrumentation().AddNpgsql().AddSqlClientInstrumentation()"
+        }
+      ],
+      "standard": "OpenTelemetry documentation",
+      "url": "https://opentelemetry.io/docs/"
+    },
+    {
+      "id": "OBS-05-S1",
+      "subject": "Observability",
+      "subSubject": "Observability",
+      "checkId": "OBS-05",
+      "title": "Logs, metrics and traces exported via OTLP to a collector; console exporter limited to Development",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/OpenTelemetry/Extensions/OpenTelemetryExtensions.cs",
+          "lineStart": 60,
+          "lineEnd": 100,
+          "excerpt": ".AddOtlpExporter(options => ConfigureOtlpExporter(options, \"v1/traces\"))"
+        }
+      ],
+      "standard": "OpenTelemetry documentation",
+      "url": "https://opentelemetry.io/docs/"
+    }
+  ],
+  "checkResults": [
+    {
+      "checkId": "OBS-01",
+      "subject": "Observability",
+      "subSubject": "Observability",
+      "severityIfFailed": "Warning",
+      "result": "pass"
+    },
+    {
+      "checkId": "OBS-02",
+      "subject": "Observability",
+      "subSubject": "Observability",
+      "severityIfFailed": "Warning",
+      "result": "fail",
+      "reason": "Correlation ID is a random GUID embedded in a message string, unrelated to the trace ID and not an inbound/propagated ID.",
+      "findingIds": ["OBS-02#1"]
+    },
+    {
+      "checkId": "OBS-03",
+      "subject": "Observability",
+      "subSubject": "Observability",
+      "severityIfFailed": "Warning",
+      "result": "pass"
+    },
+    {
+      "checkId": "OBS-04",
+      "subject": "Observability",
+      "subSubject": "Observability",
+      "severityIfFailed": "Warning",
+      "result": "pass"
+    },
+    {
+      "checkId": "OBS-05",
+      "subject": "Observability",
+      "subSubject": "Observability",
+      "severityIfFailed": "Information",
+      "result": "pass"
+    },
+    {
+      "checkId": "OBS-06",
+      "subject": "Observability",
+      "subSubject": "Observability",
+      "severityIfFailed": "Warning",
+      "result": "pass"
+    },
+    {
+      "checkId": "OBS-07",
+      "subject": "Observability",
+      "subSubject": "Observability",
+      "severityIfFailed": "Information",
+      "result": "fail",
+      "reason": "No SLO/SLI documentation found in README.md or docs/.",
+      "findingIds": ["OBS-07#1"]
+    }
+  ],
+  "urlsFetched": [],
+  "notes": "No languages/ file for csharp in review-observability. /healthcheck is a static liveness 'OK' with no dependency (DB) readiness check. OTLP exporters are registered regardless of OpenTelemetry.Active, and AddSource(\"PilotApi.Web\") has no matching ActivitySource in the reviewed files. Azure WAF source is a proposed source; not fetched."
+}

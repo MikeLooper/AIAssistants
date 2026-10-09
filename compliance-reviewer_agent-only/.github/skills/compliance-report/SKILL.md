@@ -1,38 +1,41 @@
 ---
 name: compliance-report
-description: 'Aggregates transition files into merged findings and scores, then renders the final scored Markdown compliance report. Use when the compliance-reviewer orchestrator runs step 90 (aggregate) and step 99 (report) of a compliance review.'
+description: 'Validates subject transition files, then aggregates them into merged findings and scores and renders the final scored Markdown compliance report, using a deterministic Python script. Use when the compliance-reviewer orchestrator validates subject output or runs step 90 (aggregate) and step 99 (report) of a compliance review.'
 user-invocable: false
 ---
 
 # Compliance Report
 
-Two procedures: **Aggregate** (step 90) merges every subject's transition file into scores and a deduplicated finding set; **Render** (step 99) fills the report template and writes it to `docs/reports/`.
+Three procedures: **Validate** checks the workers' transition files; **Aggregate** (step 90) merges them into scores and a deduplicated finding set; **Render** (step 99) fills the report template and writes it to `docs/reports/`. All three are done by a deterministic script — they need no model tokens beyond the one `execute` call each. Use the manual fallback only when Python is unavailable.
 
-## Aggregate Procedure
+```
+python .github/skills/compliance-report/scripts/compliance_report.py validate  transitions/<runId>
+python .github/skills/compliance-report/scripts/compliance_report.py aggregate transitions/<runId>
+python .github/skills/compliance-report/scripts/compliance_report.py render    transitions/<runId> --out docs/reports/<target-name>-compliance-review-<YYYY-MM-DD_HHmm>.md
+```
 
-1. Read every `NN-review-*.json` (and `.part-K.json`) transition file for the run.
-2. Merge exact-duplicate findings: two findings are duplicates if they share the same `checkId` and `subject`/`subSubject` and point at overlapping evidence (same file, overlapping line range). Collapse duplicates into one finding whose `evidence` array holds every location.
-3. Merge cross-subject semantic duplicates: after step 2, some checklists intentionally overlap in scope across different skills (e.g. a cloud-resilience check in Software Quality's Architecture Patterns sub-subject vs. a retry/circuit-breaker check in Reliability). If two *different* findings (different `checkId` and/or `subject`) point at overlapping evidence (same file, overlapping line range), treat them as the same underlying issue:
-   - Keep the higher-severity finding (Error > Warning > Information; if tied, keep the one from the subject that runs earlier in the pipeline order) as the **primary** finding in the deduplicated `findings` array.
-   - Do not add the other finding to `findings` — this keeps severity counts and the top-5-risks list from double-counting one code issue.
-   - In that finding's own subject's `checkResults`, still record the check as `fail`, but set `findingIds` to reference the primary finding's `id` (not a new id) and note in `reason`: `"duplicate evidence of <primary finding id>, see <primary subject>/<primary subSubject>"`. This keeps Full Results accurate per subject without inflating the finding count.
-4. Compute each subject's score and band using the formula and bands in `compliance-review-core`'s `severity-and-scoring.md`. Scoring is based on `checkResults` (pass/fail/N/A), so a check suppressed as a semantic duplicate in step 3 still counts as `fail` for its own subject's score — only the top-level `findings` list (and counts derived from it) is deduplicated.
-5. Compute the overall score as the weighted average of subject scores (weight = each subject's total applicable weight), then its band.
-6. Count findings by severity, overall and per subject, using the deduplicated `findings` list from steps 2–3.
-7. Select the top 5 risks: the highest-severity, highest-confidence findings, preferring Errors, then Warnings, ordered by effort ascending (quick wins first) as a tiebreaker.
-8. Write `90-aggregate.json` with: `schemaVersion`, `runId`, subject scores/bands, overall score/band, severity counts, deduplicated `findings`, `strengths`, and the top-5-risks list (by finding id).
+## Validate (after the subject steps)
 
-## Render Procedure
+`validate` prints JSON `{ok, missing, problems, warnings}` and exits non-zero if any subject file is missing, unparsable, not `status: completed`, or malformed. The orchestrator re-runs only the affected subjects (single-subject worker call) and validates again. Warnings (for example more than 3 strengths) never block the run.
 
-1. Read `90-aggregate.json` and `state.json`.
-2. Fill [`assets/report-template.md`](./assets/report-template.md) with:
-   - **Summary**: overall score/band, subject score table, severity counts, top 5 risks.
-   - **Things Done Well**: from `strengths`, grouped by subject.
-   - **Recommended Improvements**: from `findings`, grouped Errors then Warnings then Information; each item links to its `url`.
-   - **Full Results**: every `checkResults` entry per subject with pass/fail/N/A and evidence.
-   - **Appendix**: run metadata (`runId`, `targetPath`, `targetGitHead`, start/end times), skipped subjects and why, every URL fetched across all steps, and link approval decisions from `state.json`.
-3. Write the filled report to `docs/reports/<target-name>-compliance-review-<YYYY-MM-DD_HHmm>.md`, using the same date/time as `runId` for consistency.
-4. Write `99-report.json` with the report path and `status: completed`, then update `state.json`'s `reportPath` and `status`.
+## Aggregate (step 90)
+
+`aggregate` reads every `NN-review-*.json` (and legacy `.part-K.json`) file and writes `90-aggregate.json`:
+
+1. **Exact duplicates.** Same `checkId` + `subject`/`subSubject` with overlapping evidence collapse into one finding holding every location.
+2. **Cross-subject semantic duplicates.** Findings with a different `checkId`/`subject` whose evidence is at the *same location* (same real file and line ranges with intersection-over-union of at least 0.5, or both whole-file) are one issue. The highest severity wins (ties go to the subject earlier in pipeline order); the other is suppressed from `findings` and recorded in `duplicatesSuppressed` and `suppressedChecks`. Its own subject's check stays `fail`, and the Full Results row reads `duplicate evidence of <primary id>, see <primary subject>/<primary subSubject>`. Findings without a real file location never match.
+3. **Scores** per `compliance-review-core`'s `severity-and-scoring.md`, from `checkResults` (a suppressed duplicate still counts as `fail` for its own subject), grouped by `subject`, plus the weighted overall score. Subjects with no applicable checks are left out of the score table.
+4. **Severity counts** over the deduplicated findings, and the **top 5 risks** ordered by severity, then confidence (High first), then effort (Small first), then pipeline order.
+
+`90-aggregate.json` holds scores, `severityCounts`, `topRisks`, `findings`, `strengths`, `duplicatesSuppressed` and `suppressedChecks`. It does **not** embed `checkResults`; `render` reads them from the per-subject files.
+
+## Render (step 99)
+
+`render` fills [`assets/report-template.md`](./assets/report-template.md) (sections: Summary with subject score table, severity counts and top 5 risks; Things Done Well; Recommended Improvements by severity; Full Results grouped by subject then sub-subject; Appendix with run metadata, skipped subjects, fetched URLs and link approvals), writes the report to `--out`, writes `99-report.json`, and sets `state.json` to `status: completed` with `reportPath`. It prints the overall score/band and top risks for the final message.
+
+## Manual fallback (no Python)
+
+Apply the same rules by hand: read the subject files, merge duplicates as above, compute scores and counts, write `90-aggregate.json` without `checkResults`, then fill the template reading Full Results from the subject files. Expect this to cost far more than the script.
 
 ## Output
 

@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1700-PilotUtilityApi",
+  "stepId": "22-review-reliability",
+  "status": "completed",
+  "startedAt": "2026-10-08T17:03:00-06:00",
+  "completedAt": "2026-10-08T17:07:00-06:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "da998a707579ccdd",
+  "batchId": "batch-1",
+  "skill": "review-reliability",
+  "subject": "Operations",
+  "findings": [
+    {
+      "id": "REL-02#1",
+      "subject": "Operations",
+      "subSubject": "Reliability",
+      "checkId": "REL-02",
+      "severity": "Warning",
+      "title": "No retry with backoff for transient database failures",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 73, "lineEnd": 89, "excerpt": "connection.Open(); ... result = await connection.QueryFirstOrDefaultAsync<int>(command);" }
+      ],
+      "standard": "Azure Well-Architected Framework - Reliability",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/",
+      "recommendation": "Add a bounded retry with exponential backoff and jitter for transient connection errors (e.g. Polly/Microsoft.Extensions.Resilience, or provider retry options such as EnableRetryOnFailure/Npgsql retry).",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "REL-04#1",
+      "subject": "Operations",
+      "subSubject": "Reliability",
+      "checkId": "REL-04",
+      "severity": "Warning",
+      "title": "No circuit breaker (or equivalent) protecting calls to the database dependency",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 57, "lineEnd": 133, "excerpt": "var connection = CreateConnection(activeDataSource.DataSourceType, connectionString);" },
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 113, "lineEnd": 128, "excerpt": "builder.Services.AddVersioning(); builder.Services.AddEndpointsApiExplorer(); builder.Services.AddOpenApi();" }
+      ],
+      "standard": "Azure Well-Architected Framework - Reliability",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/",
+      "recommendation": "Wrap data access in a resilience pipeline with a circuit breaker so a degraded database fails fast instead of tying up request threads; note the health check also does not probe the database.",
+      "confidence": "High",
+      "effort": "Medium"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "REL-S1",
+      "subject": "Operations",
+      "subSubject": "Reliability",
+      "checkId": "REL-01",
+      "title": "Connection timeout is configurable per data source (30s) and the request CancellationToken is propagated to the database command",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 5, "lineEnd": 6, "excerpt": "\"ConnectTimeout\": 30," },
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 81, "lineEnd": 84, "excerpt": "cancellationToken: cancellationToken);" }
+      ],
+      "standard": "Azure Well-Architected Framework - Reliability",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "REL-01", "subject": "Operations", "subSubject": "Reliability", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "REL-02", "subject": "Operations", "subSubject": "Reliability", "severityIfFailed": "Warning", "result": "fail", "reason": "No retry/backoff logic for transient DB failures.", "findingIds": ["REL-02#1"] },
+    { "checkId": "REL-03", "subject": "Operations", "subSubject": "Reliability", "severityIfFailed": "Error", "result": "N/A", "reason": "No retry logic exists, so nothing is retried unsafely.", "findingIds": [] },
+    { "checkId": "REL-04", "subject": "Operations", "subSubject": "Reliability", "severityIfFailed": "Warning", "result": "fail", "reason": "No circuit breaker around the database dependency.", "findingIds": ["REL-04#1"] },
+    { "checkId": "REL-05", "subject": "Operations", "subSubject": "Reliability", "severityIfFailed": "Warning", "result": "N/A", "reason": "No infrastructure-as-code found; replica count cannot be assessed.", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "REL-01 passed: explicit connect timeout configured; command timeout relies on provider default (30s) and ConnectTimeout is not validated > 0 in ApplicationConfiguration.Validate (0 can mean unlimited with SqlClient). No outbound HTTP calls found. Line numbers approximate."
+}

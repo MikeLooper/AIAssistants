@@ -10,11 +10,11 @@ After each step completes, post exactly one status line (in addition to updating
 
 ```
 Step N/T: <name> done. Next: <name>. Remaining: <list>
-Findings so far — Error: <n>, Warning: <n>, Information: <n>
+Findings so far — <n> raised (severity breakdown after aggregation)
 ```
 
 - `N/T` is the step's position out of the total chosen steps (e.g. `Step 4/9`).
 - `<name>` values are the human-readable step names (e.g. `Security — Identity & Access`), not file names.
 - `Remaining` lists the human-readable names of steps not yet started, comma-separated. Use `none` when this is the last step.
-- The findings totals are a running count across all steps completed so far in the run, taken from each step's `checkResults`/`findings`.
+- The findings total is a running sum of the `findings` counts in the workers' status replies. The Error/Warning/Information breakdown is only available after step 90; the final status line reports it from the `aggregate` output.
 - On the final step (report), replace `Next` with `done` and state the report path instead of remaining steps.

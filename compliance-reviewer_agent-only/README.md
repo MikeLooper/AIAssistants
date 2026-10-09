@@ -4,14 +4,14 @@ A VS Code GitHub Copilot orchestrator agent that reviews a codebase you point it
 
 ## Purpose and Structure
 
-The orchestrator (`compliance-reviewer`) breaks the review into one subject at a time (e.g. Security — Identity & Access, API Design, Testing). For each subject it delegates to a hidden worker subagent (`compliance-subject-reviewer`), which loads exactly one `review-*` skill, reads only the files relevant to that subject, and returns findings as JSON. The orchestrator writes every step's output to a transition file so an interrupted run can be resumed, then aggregates everything into a scored report.
+The orchestrator (`compliance-reviewer`) inventories the target and gives each subject a small, capped list of concrete files (at most 12). Subjects whose lists mostly overlap are grouped into a batch. For each batch it delegates once to a hidden worker subagent (`compliance-subject-reviewer`), which loads the applicable `review-*` skills, reads the files once, reviews each subject only against that subject's own files, and writes one transition file per subject itself — returning just a short status, so findings never pass back through the orchestrator. A deterministic script (`compliance_report.py`) then validates, aggregates and renders the scored report, so those steps cost no model tokens. Transition files make an interrupted run resumable.
 
 ```mermaid
 flowchart TD
     U[User] --> O[compliance-reviewer.agent.md<br/>orchestrator]
     O --> C[compliance-review-core skill<br/>schemas, scoring, sources, resume]
     O --> I[compliance-inventory skill]
-    O -->|one per subject| W[compliance-subject-reviewer.agent.md<br/>worker subagent]
+    O -->|one per file batch| W[compliance-subject-reviewer.agent.md<br/>worker subagent]
     W --> S[review-* subject skills<br/>checklist + sources + languages]
     O --> R[compliance-report skill]
     O --> T[(transitions/run-id/)]
@@ -25,9 +25,9 @@ flowchart TD
 | `.github/agents/compliance-reviewer.agent.md` | Orchestrator agent (user-invocable) |
 | `.github/agents/compliance-subject-reviewer.agent.md` | Worker subagent (hidden) |
 | `.github/skills/compliance-review-core/` | Shared schemas, scoring rubric, source allowlist, resume rules |
-| `.github/skills/compliance-inventory/` | Repo mapping and file-list batching |
-| `.github/skills/review-*/` | One skill per subject (18 total): checklist, sources, optional per-language files |
-| `.github/skills/compliance-report/` | Aggregation and report rendering, including the report template |
+| `.github/skills/compliance-inventory/` | Repo mapping, capped per-subject file lists and batching |
+| `.github/skills/review-*/` | One skill per subject (17 total): checklist, sources, optional per-language files |
+| `.github/skills/compliance-report/` | Validate, aggregate and render (`scripts/compliance_report.py`, needs Python 3), plus the report template |
 | `transitions/<run-id>/` | Per-run transition files and `state.json` (resumable) |
 | `docs/reports/` | Final scored Markdown reports |
 
@@ -35,7 +35,7 @@ flowchart TD
 
 1. Open chat and invoke the `compliance-reviewer` agent (or `@compliance-reviewer`, depending on your Copilot version).
 2. Give it the path to the codebase to review — this can be outside the current workspace. The target is always read-only.
-3. Optionally name which subjects to review (default: all 18). See the subject table in [`docs/compliance-review-agent-plan.md`](../compliance-review-agent-plan.md). Disaster Recovery, Monitoring and Cost & Sustainability are automatically marked N/A (no subagent invoked) when the target has no infrastructure-as-code.
+3. Confirm the subjects to review or name a subset when asked; "all" selects all 17 subject skills. The available subject list is in [the orchestrator definition](./.github/agents/compliance-reviewer.agent.md). Coding Standards is a sub-subject of Software Quality. Disaster Recovery, Monitoring and Cost & Sustainability are automatically marked N/A (no subagent invoked) when the target has no infrastructure-as-code.
 4. If you want CLI analyzers run (`dotnet list package --vulnerable`, `mvn dependency:tree`, `pip-audit`, configured linters), approve them when asked. Otherwise the agent reviews by reading files only.
 5. If the agent needs to fetch a URL that isn't on the pre-approved allowlist (`.github/skills/compliance-review-core/references/approved-sources.md`), it will ask before fetching.
 6. Watch the todo list and status line update after each step; the final message links to the report under `docs/reports/`.
@@ -57,4 +57,5 @@ flowchart TD
 - **IaC-gated subjects** (`review-disaster-recovery`, `review-monitoring`, `review-cost-sustainability`) are skipped entirely — no subagent call — when `compliance-inventory` reports `iacFound: false`. If you add a new subject that depends entirely on infrastructure-as-code, gate it the same way instead of running it against an empty file list.
 - Version the schemas (`finding-schema.md`, `transition-schema.md`) — bump `schemaVersion` on breaking changes and note the change.
 - Keep each `SKILL.md` short; put detail in `references/`.
+- **Cost levers** (credits scale with tokens read and written, not with call count): `maxFilesPerSubject` and the batching rules in `compliance-inventory`; the output size caps in `finding-schema.md`; workers writing their own files; the deterministic report script. Check these before adding anything that widens a subject's file list or makes the orchestrator re-emit worker output.
 - Test changes against a small sample repo (e.g. a small ASP.NET, Spring or FastAPI project) before relying on them for a real review.

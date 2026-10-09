@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1700-PilotUtilityApi",
+  "stepId": "00-init",
+  "status": "completed",
+  "startedAt": "2026-10-08T17:03:00-06:00",
+  "completedAt": "2026-10-08T17:03:00-06:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "da998a707579ccdd",
+  "subjects": [
+    "review-software-quality",
+    "review-software-lifecycle",
+    "review-twelve-factor",
+    "review-api-design",
+    "review-security-identity-access",
+    "review-security-input-injection",
+    "review-security-web-api",
+    "review-security-operational",
+    "review-testing",
+    "review-observability",
+    "review-dependency-management",
+    "review-reliability",
+    "review-performance",
+    "review-disaster-recovery",
+    "review-monitoring",
+    "review-cost-sustainability",
+    "review-maintainability"
+  ],
+  "analyzerApproval": "none"
+}

@@ -20,4 +20,4 @@ Shared reference material for the compliance review pipeline. This skill has no 
 ## When to Load What
 
 - The orchestrator loads all six references once at the start of a run.
-- The worker subagent loads `finding-schema.md` (for its output shape), `severity-and-scoring.md` (for severity assignment) and `languages.md` (to know which language files to load from its assigned skill), plus whichever entries of `approved-sources.md` apply to its subject.
+- The worker subagent loads `finding-schema.md` (for its transition-file shape and size caps), `severity-and-scoring.md` (for severity assignment) and `languages.md` (to know which language files to load from its assigned skill), plus whichever entries of `approved-sources.md` apply to its subject.
