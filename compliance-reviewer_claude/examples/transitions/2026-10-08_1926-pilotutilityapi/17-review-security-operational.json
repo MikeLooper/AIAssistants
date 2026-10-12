@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1926-pilotutilityapi",
+  "stepId": "17-review-security-operational",
+  "status": "completed",
+  "startedAt": "2026-10-09T01:26:05Z",
+  "completedAt": "2026-10-09T01:40:00Z",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "929741f5c04d8218a6852d5d6eb33cbeb2f1d20b",
+  "inputsHash": "sha256:0562d896a8fce07e",
+  "batchId": "batch-2",
+  "skill": "review-security-operational",
+  "subject": "Security",
+  "findings": [
+    {
+      "id": "SEC-OP-06#1",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-06",
+      "severity": "Error",
+      "title": "Database passwords are designed to be supplied via version-controlled appsettings files",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 11, "lineEnd": 13, "excerpt": "\"Password\": \"<DevUser password>\", \"Port\": 1433, \"UserName\": \"DevUser\"," },
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 23, "lineEnd": 25, "excerpt": "\"Password\": \"<DevUser password>\", \"Port\": 5432, \"UserName\": \"DevUser\"," },
+        { "file": "src/PilotUtiltyApi.Web/appsettings.Development.json", "lineStart": 10, "lineEnd": 12, "excerpt": "\"Password\": \"<DevUser password>\"," }
+      ],
+      "standard": "OWASP Secrets Management Cheat Sheet; OWASP .NET Security Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html",
+      "recommendation": "Remove the Password keys from the tracked appsettings files and supply them through dotnet user-secrets in Development and environment variables (e.g. Application__DataSources__0__Password) or a vault such as Azure Key Vault elsewhere. Add a startup check that fails if the password is still the placeholder.",
+      "confidence": "Medium",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "STR-SEC-OP-01",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-01",
+      "title": "Global exception middleware returns generic ProblemDetails with a correlation ID instead of exception details",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs", "lineStart": 73, "lineEnd": 87, "excerpt": "this.logger.LogError(exception, \"{UserMessage}\", loggingCorrelation.UserMessage); ... Detail = loggingCorrelation.UserMessage," }
+      ],
+      "standard": "OWASP Error Handling Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Error_Handling_Cheat_Sheet.html"
+    },
+    {
+      "id": "STR-SEC-OP-03",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-03",
+      "title": "Data source password is redacted in ToString and can be suppressed when copying configuration",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Configuration/Models/DataSourceConfiguration.cs", "lineStart": 89, "lineEnd": 89, "excerpt": "$\"{nameof(this.Password)}={(string.IsNullOrEmpty(this.Password) ? \"--Empty--\" : \"[Redacted]\")}, \"" },
+        { "file": "src/PilotUtiltyApi.Shared/Configuration/Models/DataSourceConfiguration.cs", "lineStart": 118, "lineEnd": 118, "excerpt": "this.Password = suppressSensitiveValues? \"[Redacted]\" : sourceConfiguration.Password;" }
+      ],
+      "standard": "OWASP Logging Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html"
+    },
+    {
+      "id": "STR-SEC-OP-04",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-04",
+      "title": "Structured Serilog logging with a compact JSON formatter encodes logged values",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 66, "lineEnd": 66, "excerpt": "\"formatter\": \"Serilog.Formatting.Compact.CompactJsonFormatter, Serilog.Formatting.Compact\"" }
+      ],
+      "standard": "OWASP Logging Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "SEC-OP-01", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-OP-02", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-OP-03", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-OP-04", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-OP-05", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-OP-06", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Error", "result": "fail", "reason": "Passwords are configured in tracked appsettings files with no evidence of user-secrets, environment injection or a vault.", "findingIds": ["SEC-OP-06#1"] },
+    { "checkId": "SEC-OP-07", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Information", "result": "pass", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "Committed Password values are only placeholders ('<DevUser password>'), so SEC-OP-05 passes. The committed runtime log (src/PilotUtiltyApi.Web/logs/log-20260902.json) holds no secrets but exposes the machine name (HOBBES) and local content-root paths; add logs/ to .gitignore. UserException returns its message to clients as a 500 response; this is safe only if callers follow the documented contract that the message is user-safe."
+}

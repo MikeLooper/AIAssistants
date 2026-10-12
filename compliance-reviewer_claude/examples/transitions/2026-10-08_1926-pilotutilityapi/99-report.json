@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1926-pilotutilityapi",
+  "stepId": "99-report",
+  "status": "completed",
+  "startedAt": "2026-10-08T19:31:26-06:00",
+  "completedAt": "2026-10-08T19:31:26-06:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "929741f5c04d8218a6852d5d6eb33cbeb2f1d20b",
+  "inputsHash": "sha256:0562d896a8fce07e",
+  "reportPath": "docs/reports/PilotUtilityApi-compliance-review-2026-10-08_1926.md"
+}

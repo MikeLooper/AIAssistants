@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1926-pilotutilityapi",
+  "stepId": "19-review-testing",
+  "status": "completed",
+  "startedAt": "2026-10-09T01:26:05Z",
+  "completedAt": "2026-10-09T01:45:00Z",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "929741f5c04d8218a6852d5d6eb33cbeb2f1d20b",
+  "inputsHash": "sha256:0562d896a8fce07e",
+  "batchId": "batch-4",
+  "skill": "review-testing",
+  "subject": "Implementation",
+  "findings": [
+    {
+      "id": "TST-03#1",
+      "subject": "Implementation",
+      "subSubject": "Testing",
+      "checkId": "TST-03",
+      "severity": "Warning",
+      "title": "Placeholder and mis-arranged tests pass without asserting the behavior they name",
+      "evidence": [
+        { "file": "test/PilotUtiltyApi.Domain.Tests/ExampleTest.cs", "lineStart": 9, "lineEnd": 14, "excerpt": "public void ExampleClass_ExampleTest_Test() { ... Assert.Pass(\"Example Test\"); }" },
+        { "file": "test/PilotUtiltyApi.Web.Tests/Controllers/TestingControllerTests.cs", "lineStart": 117, "lineEnd": 121, "excerpt": "expectedResult.ErrorMessage = null; ... .ReturnsAsync(new RetrieveResponse<int>(0, \"test error\"));" },
+        { "file": "test/PilotUtiltyApi.Repositories.Tests/Repositories/TestingRepositoryTests.cs", "lineStart": 27, "lineEnd": 47, "excerpt": "Assert.DoesNotThrow(() => new TestingRepository(loggerFactory, mockConfig.Object));" }
+      ],
+      "standard": "The Practical Test Pyramid (Martin Fowler)",
+      "url": "https://martinfowler.com/articles/practical-test-pyramid.html#WritingYourFirstUnitTest",
+      "recommendation": "Remove the Assert.Pass placeholder or replace it with real Domain model tests, fix the null-message controller test to actually return a null ErrorMessage and assert the default Warning header value, and replace 'DoesNotThrow' constructor tests with assertions on observable behavior.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "TST-06#1",
+      "subject": "Implementation",
+      "subSubject": "Testing",
+      "checkId": "TST-06",
+      "severity": "Error",
+      "title": "No CI pipeline runs the test suite on each change",
+      "evidence": [
+        { "file": ".github/instructions/unit-tests.instructions.md", "lineStart": 78, "lineEnd": 84, "excerpt": "After creating or updating tests, verify all unit tests can run successfully. - Run the relevant test projects." }
+      ],
+      "standard": "The Practical Test Pyramid (Martin Fowler)",
+      "url": "https://martinfowler.com/articles/practical-test-pyramid.html#TheImportanceOfTestAutomation",
+      "recommendation": "Add a CI workflow (e.g. GitHub Actions) that runs 'dotnet test' with coverage collection on every push and pull request, and require it to pass before merge.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "S-TST-01",
+      "subject": "Implementation",
+      "subSubject": "Testing",
+      "checkId": "TST-01",
+      "title": "Healthy pyramid: fast NUnit unit tests per layer with a single Bruno API smoke test",
+      "evidence": [
+        { "file": "test/PilotUtiltyApi.Services.Tests/Services/TestingServiceTests.cs", "lineStart": 34, "lineEnd": 49, "excerpt": "mockRepository.Setup(r => r.ResetTestingAsync()).ReturnsAsync(expectedResult);" },
+        { "file": "test/Bruno/PilotUtilityApi/System/HealthCheck.yml", "lineStart": 15, "lineEnd": 17, "excerpt": "expect(res.getStatus()).to.equal(200);" }
+      ],
+      "standard": "The Practical Test Pyramid (Martin Fowler)",
+      "url": "https://martinfowler.com/articles/practical-test-pyramid.html"
+    },
+    {
+      "id": "S-TST-02",
+      "subject": "Implementation",
+      "subSubject": "Testing",
+      "title": "Controller and configuration tests assert concrete status codes, headers and validation messages across edge cases",
+      "evidence": [
+        { "file": "test/PilotUtiltyApi.Web.Tests/Controllers/TestingControllerTests.cs", "lineStart": 105, "lineEnd": 110, "excerpt": "Assert.That(controller.Response.Headers[\"Warning\"].ToString(), Is.EqualTo(errorMessage));" },
+        { "file": "test/PilotUtiltyApi.Shared.Tests/Configuration/ApplicationConfigurationTests.cs", "lineStart": 88, "lineEnd": 91, "excerpt": "Assert.That(exception.Message, Does.Contain(\"Multiple active data sources configured\"));" }
+      ]
+    },
+    {
+      "id": "S-TST-03",
+      "subject": "Implementation",
+      "subSubject": "Testing",
+      "title": "Documented test standards (AAA, naming, mirrored structure, determinism, avoid unnecessary mocking)",
+      "evidence": [
+        { "file": ".github/instructions/unit-tests.instructions.md", "lineStart": 95, "lineEnd": 102, "excerpt": "Avoid reliance on current time, random values, external state ... Avoid unnecessary mocking" }
+      ]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "TST-01", "subject": "Implementation", "subSubject": "Testing", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TST-02", "subject": "Implementation", "subSubject": "Testing", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TST-03", "subject": "Implementation", "subSubject": "Testing", "severityIfFailed": "Warning", "result": "fail", "reason": "A placeholder Assert.Pass test, a test whose arrange does not match its named scenario, and DoesNotThrow-only constructor tests do not assert real behavior.", "findingIds": ["TST-03#1"] },
+    { "checkId": "TST-04", "subject": "Implementation", "subSubject": "Testing", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TST-05", "subject": "Implementation", "subSubject": "Testing", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TST-06", "subject": "Implementation", "subSubject": "Testing", "severityIfFailed": "Error", "result": "fail", "reason": "No CI/CD pipeline files exist, so tests are never run automatically on change.", "findingIds": ["TST-06#1"] }
+  ],
+  "urlsFetched": [],
+  "notes": "TST-02 passed on coverlet.collector in the Web test csproj (local collection via dotnet test); there is no coverage threshold or report configuration. No integration tests against a real database exist for TestingRepository SQL paths. TST-06 overlaps review-software-lifecycle's missing-CI finding."
+}

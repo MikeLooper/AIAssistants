@@ -1,0 +1,225 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1926-pilotutilityapi",
+  "stepId": "10-review-software-quality",
+  "status": "completed",
+  "startedAt": "2026-10-09T01:26:05Z",
+  "completedAt": "2026-10-09T01:42:00Z",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "929741f5c04d8218a6852d5d6eb33cbeb2f1d20b",
+  "inputsHash": "sha256:0562d896a8fce07e",
+  "batchId": "batch-1",
+  "skill": "review-software-quality",
+  "subject": "Software Quality",
+  "findings": [
+    {
+      "id": "SQ-03#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-03",
+      "severity": "Warning",
+      "title": "Maintainability: provider switch on DataSourceType repeated three times and error-logging block duplicated",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 146, "lineEnd": 148, "excerpt": "return dataSource.DataSourceType.ToLowerInvariant() switch { \"sqlserver\" => ..." },
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 181, "lineEnd": 184, "excerpt": "return dataSourceType.ToLowerInvariant() switch { \"sqlserver\" => new SqlConnection(connectionString), ..." },
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 104, "lineEnd": 131, "excerpt": "this.Logger.LogError(exInner, \"Error occurred in {ClassName}.{MethodName}...\" (repeated at 125-131)" }
+      ],
+      "standard": "ISO/IEC 25010 - Maintainability",
+      "url": "https://iso25000.com/index.php/en/iso-25000-standards/iso-25010#maintainability",
+      "recommendation": "Introduce a per-provider strategy (e.g. IDbProvider with BuildConnectionString/CreateConnection/ResetScript) resolved once, and collapse the two identical LogError/throw blocks into a single outer catch.",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "SQ-06#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-06",
+      "severity": "Error",
+      "title": "Functional suitability: reset commits only when 0 rows deleted and rolls back otherwise, yet reports success",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 89, "lineEnd": 98, "excerpt": "if (result == 0) { transaction.Commit(); } else { transaction.Rollback(); }" }
+      ],
+      "standard": "ISO/IEC 25010 - Functional suitability / Reliability",
+      "url": "https://iso25000.com/index.php/en/iso-25000-standards/iso-25010#reliability",
+      "recommendation": "Commit the transaction on successful execution regardless of the deleted-row count (roll back only on exception), and add a test asserting deletes persist.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SQ-06#2",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-06",
+      "severity": "Warning",
+      "title": "Reliability: fatal startup exception is logged but the process exits with code 0",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Program.cs", "lineStart": 34, "lineEnd": 37, "excerpt": "catch (Exception ex) { Log.Fatal(ex, \"Server terminated unexpectedly.\"); }" }
+      ],
+      "standard": "ISO/IEC 25010 - Reliability",
+      "url": "https://iso25000.com/index.php/en/iso-25000-standards/iso-25010#reliability",
+      "recommendation": "Return a non-zero exit code (e.g. Environment.ExitCode = 1 or rethrow) after logging so hosts/orchestrators detect the failed start.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SQ-08#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-08",
+      "severity": "Information",
+      "title": "Unused Logger property created in TestingService",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Services/Services/TestingService.cs", "lineStart": 30, "lineEnd": 37, "excerpt": "this.Logger = loggerFactory.CreateLogger(GetType()); ... protected ILogger Logger { get; }" }
+      ],
+      "standard": "ISO/IEC 25010 - Maintainability",
+      "url": "https://iso25000.com/index.php/en/iso-25000-standards/iso-25010#maintainability",
+      "recommendation": "Remove the unused logger dependency or use it to log service-level outcomes.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "AP-05#1",
+      "subject": "Software Quality",
+      "subSubject": "Architecture Patterns",
+      "checkId": "AP-05",
+      "severity": "Information",
+      "title": "No retry/circuit-breaker pattern around database access",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 73, "lineEnd": 89, "excerpt": "var connection = CreateConnection(...); ... result = await connection.QueryFirstOrDefaultAsync<int>(command);" }
+      ],
+      "standard": "Azure Architecture Center - Cloud Design Patterns",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/",
+      "recommendation": "Wrap transient DB failures with a retry (exponential backoff) and circuit breaker, e.g. Polly resilience pipeline or SqlClient retry logic.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    },
+    {
+      "id": "CS-01#1",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-01",
+      "severity": "Information",
+      "title": "Project folders misspelled 'PilotUtiltyApi' while namespaces/projects use 'PilotUtilityApi'",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Services/Services/TestingService.cs", "lineStart": 8, "lineEnd": 8, "excerpt": "namespace PilotUtilityApi.Services.Services" },
+        { "file": "src/PilotUtiltyApi.Shared/Configuration/ApplicationConfiguration.cs", "lineStart": 16, "lineEnd": 16, "excerpt": "/// Instatiate a <see cref=\"ApplicationConfiguration\"/> object." }
+      ],
+      "standard": "C# coding conventions",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions",
+      "recommendation": "Rename the src/test folders to PilotUtilityApi.* to match namespaces and project names, and fix the 'Instatiate' typos.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "CS-03#1",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-03",
+      "severity": "Information",
+      "title": "Several XML doc comments are inaccurate (copy-paste returns text, wrong usage examples)",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 40, "lineEnd": 42, "excerpt": "/// A read only list of all DTO objects from the category table, or null if no objects exist." },
+        { "file": "src/PilotUtiltyApi.Services/Extensions/ServicesInjectionExtensions.cs", "lineStart": 27, "lineEnd": 27, "excerpt": "/// webAppBuilder.Services.ServicesConfiguration();" },
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 59, "lineEnd": 59, "excerpt": "/// var webApp = webAppBuilder.ApiWebApplication();" }
+      ],
+      "standard": "C# coding conventions",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions",
+      "recommendation": "Correct the HealthCheck <returns> text and the <example> snippets so they match the real extension targets (WebApplicationBuilder/WebApplication).",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "CS-05#1",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-05",
+      "severity": "Warning",
+      "title": "IDisposable connection and transaction are not wrapped in using (CS-CS-04)",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 73, "lineEnd": 79, "excerpt": "var connection = CreateConnection(...); ... var transaction = connection.BeginTransaction();" }
+      ],
+      "standard": "C# coding conventions",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions",
+      "recommendation": "Use 'await using' declarations for the DbConnection and DbTransaction (and OpenAsync/BeginTransactionAsync) so they are disposed even if an exception occurs before the inner try.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "CS-05#2",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-05",
+      "severity": "Warning",
+      "title": "BuildServiceProvider called during service registration (ASP0000), creating a second container",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 124, "lineEnd": 126, "excerpt": "var serviceProvider = builder.Services.BuildServiceProvider();" }
+      ],
+      "standard": "C# coding conventions / ASP.NET Core analyzers",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions",
+      "recommendation": "Read IApplicationConfiguration from builder.Configuration (or use IOptions/IConfigureOptions) instead of building an intermediate service provider.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "S-AP-01",
+      "subject": "Software Quality",
+      "subSubject": "Architecture Patterns",
+      "checkId": "AP-01",
+      "title": "Clean controller -> service -> repository layering via interfaces and DI",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Services/Extensions/ServicesInjectionExtensions.cs", "lineStart": 71, "lineEnd": 73, "excerpt": "AddTransient<ITestingRepository, TestingRepository>(); AddTransient<ITestingService, TestingService>();" }
+      ]
+    },
+    {
+      "id": "S-SQ-06",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-06",
+      "title": "Configuration is validated fail-fast at startup with explicit messages",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Configuration/ApplicationConfiguration.cs", "lineStart": 69, "lineEnd": 86, "excerpt": "if (activeDataSources.Length > 1) { throw new ConfigurationException(...) }" }
+      ]
+    },
+    {
+      "id": "S-CS-04",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-04",
+      "title": "Public types and members consistently carry XML documentation comments",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Domain/Models/Responses/RetrieveResponse.cs", "lineStart": 15, "lineEnd": 31, "excerpt": "/// Instantiate a <see cref=\"RetrieveResponse{TReturn}\"/> object." }
+      ]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "SQ-01", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SQ-02", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SQ-03", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "fail", "reason": "Provider switch repeated three times and LogError block duplicated in TestingRepository.", "findingIds": ["SQ-03#1"] },
+    { "checkId": "SQ-04", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SQ-05", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "SQ-06", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Error", "result": "fail", "reason": "Reset rolls back successful deletes while reporting success; fatal startup exits with code 0.", "findingIds": ["SQ-06#1", "SQ-06#2"] },
+    { "checkId": "SQ-07", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "SQ-08", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Information", "result": "fail", "reason": "Unused Logger in TestingService.", "findingIds": ["SQ-08#1"] },
+    { "checkId": "DP-01", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "DP-02", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "DP-04", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "DP-05", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "DP-06", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Warning", "result": "N/A", "reason": "No observer/event subscriptions in the reviewed files.", "findingIds": [] },
+    { "checkId": "AP-01", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "AP-02", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "AP-03", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "AP-04", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "AP-05", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Information", "result": "fail", "reason": "No retry or circuit breaker around database calls.", "findingIds": ["AP-05#1"] },
+    { "checkId": "AP-06", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "CS-01", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "fail", "reason": "Folder names misspelled 'PilotUtiltyApi' vs 'PilotUtilityApi' namespaces; 'Instatiate' typos.", "findingIds": ["CS-01#1"] },
+    { "checkId": "CS-02", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "CS-03", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "fail", "reason": "Inaccurate copy-paste doc comments and usage examples.", "findingIds": ["CS-03#1"] },
+    { "checkId": "CS-04", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "CS-05", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Warning", "result": "fail", "reason": "Undisposed IDisposable DB resources and BuildServiceProvider during registration.", "findingIds": ["CS-05#1", "CS-05#2"] }
+  ],
+  "urlsFetched": [],
+  "notes": "Sampled 12 of 35 matched files. Synchronous connection.Open()/BeginTransaction() in the async path (CS-CS-03) is reported under review-performance PERF-02."
+}

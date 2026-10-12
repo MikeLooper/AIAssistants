@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Edit(/transitions/**)",
+      "Edit(/docs/reports/**)",
+      "Bash(python .claude/skills/compliance-report/scripts/compliance_report.py:*)",
+      "Bash(python3 .claude/skills/compliance-report/scripts/compliance_report.py:*)"
+    ]
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1926-pilotutilityapi",
+  "stepId": "15-review-security-input-injection",
+  "status": "completed",
+  "startedAt": "2026-10-09T01:26:05Z",
+  "completedAt": "2026-10-09T01:44:00Z",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "929741f5c04d8218a6852d5d6eb33cbeb2f1d20b",
+  "inputsHash": "sha256:0562d896a8fce07e",
+  "batchId": "batch-1",
+  "skill": "review-security-input-injection",
+  "subject": "Security",
+  "findings": [],
+  "strengths": [
+    {
+      "id": "S-SEC-II-02",
+      "subject": "Security",
+      "subSubject": "Input & Injection",
+      "checkId": "SEC-II-02",
+      "title": "SQL is fixed compile-time constants selected by configured provider; no request input reaches SQL",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 200, "lineEnd": 204, "excerpt": "\"sqlserver\" => SqlConstants.SqlServerResetTestingScript, \"postgresql\" => SqlConstants.PostgreSqlResetTestingScript," }
+      ],
+      "standard": "OWASP SQL Injection Prevention Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html"
+    },
+    {
+      "id": "S-SEC-II-01",
+      "subject": "Security",
+      "subSubject": "Input & Injection",
+      "checkId": "SEC-II-01",
+      "title": "Only strongly typed input is accepted ([ApiController] model binding of a bool query parameter)",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 63, "lineEnd": 64, "excerpt": "[FromQuery(Name = \"show-details\"), BindRequired] bool showDetails = false" }
+      ],
+      "standard": "OWASP Input Validation Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "SEC-II-01", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-II-02", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-II-03", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-II-04", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "No shell/OS process execution in the reviewed files.", "findingIds": [] },
+    { "checkId": "SEC-II-05", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-II-06", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "No file upload endpoints found.", "findingIds": [] },
+    { "checkId": "SEC-II-07", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "No file upload storage found.", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "SEC-II-05: XDocument.Load(xmlPath) in ManualXmlCommentsOperationTransformer loads the build-generated XML docs file; on .NET Core the default XmlReaderSettings prohibit DTDs and use a null resolver, and the path is not user-controlled. Connection strings are built by interpolation from configuration only (not request input)."
+}

@@ -1,0 +1,267 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1700-PilotUtilityApi",
+  "stepId": "10-review-software-quality",
+  "status": "completed",
+  "startedAt": "2026-10-08T17:03:00-06:00",
+  "completedAt": "2026-10-08T17:07:00-06:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "da998a707579ccdd",
+  "batchId": "batch-1",
+  "skill": "review-software-quality",
+  "subject": "Software Quality",
+  "findings": [
+    {
+      "id": "SQ-01#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-01",
+      "severity": "Warning",
+      "title": "TestingRepository.ResetTestingAsync is a ~75-line method mixing config lookup, connection, transaction and error handling (maintainability)",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 57, "lineEnd": 133, "excerpt": "public async Task<RetrieveResponse<int>> ResetTestingAsync(CancellationToken cancellationToken = default)" }
+      ],
+      "standard": "ISO/IEC 25010 - Maintainability",
+      "url": "https://iso25000.com/index.php/en/iso-25000-standards/iso-25010#maintainability",
+      "recommendation": "Extract data-source resolution, connection/transaction execution and error logging into small private methods (or a shared unit-of-work helper) so the method has one purpose.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "SQ-02#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-02",
+      "severity": "Warning",
+      "title": "Nested ternaries and nested try/catch/finally blocks raise complexity (maintainability)",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 71, "lineEnd": 77, "excerpt": "var databaseIndicator = string.Equals(databaseName, \"SqlServer\", ...) ? \"SQL Server\" : string.Equals(...) ? \"PostgreSQL\" : databaseName;" },
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 61, "lineEnd": 115, "excerpt": "try { ... try { result = await connection.QueryFirstOrDefaultAsync<int>(command); if (result == 0) ..." }
+      ],
+      "standard": "ISO/IEC 25010 - Maintainability",
+      "url": "https://iso25000.com/index.php/en/iso-25000-standards/iso-25010#maintainability",
+      "recommendation": "Replace the nested ternary with a small mapping helper/dictionary and flatten the nested try blocks by extracting the transactional step into its own method.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "SQ-03#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-03",
+      "severity": "Warning",
+      "title": "Duplicated blocks: same data-source-type switch repeated 3x and duplicated ProblemDetails/response blocks in middleware (maintainability)",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 146, "lineEnd": 205, "excerpt": "return dataSourceType.ToLowerInvariant() switch { \"sqlserver\" => ..., \"postgresql\" => ..., _ => throw new ConfigurationException(...) }" },
+        { "file": "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs", "lineStart": 49, "lineEnd": 92, "excerpt": "var problemDetails = new ProblemDetails { Status = StatusCodes.Status500InternalServerError, Title = \"Internal Server Error\", ..." }
+      ],
+      "standard": "ISO/IEC 25010 - Maintainability",
+      "url": "https://iso25000.com/index.php/en/iso-25000-standards/iso-25010#maintainability",
+      "recommendation": "Introduce a per-provider strategy/factory (connection string, connection, reset script) and a private WriteProblemAsync helper in the middleware.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "AP-02#1",
+      "subject": "Software Quality",
+      "subSubject": "Architecture Patterns",
+      "checkId": "AP-02",
+      "severity": "Warning",
+      "title": "SystemController.About embeds application-metadata and display-name logic instead of delegating to a service",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 64, "lineEnd": 96, "excerpt": "var activeDataSource = this.ApplicationConfiguration.DataSources?.Find(ds => ds.Active);" }
+      ],
+      "standard": "Azure Architecture Center - Cloud Design Patterns",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/",
+      "recommendation": "Move the construction of AboutResponse into a service in the Services layer (like TestingController does) and keep the controller to HTTP mapping.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "AP-04#1",
+      "subject": "Software Quality",
+      "subSubject": "Architecture Patterns",
+      "checkId": "AP-04",
+      "severity": "Information",
+      "title": "Shared project is a grab-bag (API middleware, logging, OpenTelemetry, OpenAPI, Swagger, configuration, exceptions) with low cohesion",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 6, "lineEnd": 11, "excerpt": "using PilotUtilityApi.Shared.Logging.Extensions; using PilotUtilityApi.Shared.OpenApi.Extensions; using PilotUtilityApi.Shared.OpenTelemetry.Extensions;" }
+      ],
+      "standard": "fallback rubric",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/",
+      "recommendation": "Split Shared into cohesive projects (e.g. Web infrastructure vs. core configuration/exceptions) so the Domain/Repositories layers don't depend on ASP.NET-heavy code.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    },
+    {
+      "id": "AP-05#1",
+      "subject": "Software Quality",
+      "subSubject": "Architecture Patterns",
+      "checkId": "AP-05",
+      "severity": "Information",
+      "title": "No retry/circuit-breaker pattern around database access in a service that depends on an external database",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 73, "lineEnd": 79, "excerpt": "var connection = CreateConnection(activeDataSource.DataSourceType, connectionString);" }
+      ],
+      "standard": "Azure Architecture Center - Cloud Design Patterns",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/",
+      "recommendation": "Add a transient-fault retry policy (e.g. Polly/Microsoft.Extensions.Resilience) around idempotent data access. Overlaps with review-reliability.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    },
+    {
+      "id": "CS-01#1",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-01",
+      "severity": "Information",
+      "title": "Inconsistent naming: folders/projects spelled 'PilotUtiltyApi' vs namespaces 'PilotUtilityApi'; AboutResponse sits in Models/Responses but uses the Models.Dto namespace",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Domain/Models/Responses/AboutResponse.cs", "lineStart": 4, "lineEnd": 4, "excerpt": "namespace PilotUtilityApi.Domain.Models.Dto" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 6, "lineEnd": 6, "excerpt": "using PilotUtilityApi.Domain.Models.Dto;" }
+      ],
+      "standard": "fallback rubric",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions",
+      "recommendation": "Fix the 'Utilty' typo in folder/project paths and align namespaces with folder structure (Responses vs Dto).",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "CS-03#1",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-03",
+      "severity": "Information",
+      "title": "Copy-pasted, incorrect XML doc on HealthCheck (describes a category table DTO list)",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 41, "lineEnd": 43, "excerpt": "A read only list of all DTO objects from the category table, or null if no objects exist." }
+      ],
+      "standard": "fallback rubric",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions",
+      "recommendation": "Correct the <returns> text to state it returns 200 OK with \"OK\"; review other docs for copy/paste drift (e.g. ApiWebApplication example).",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "CS-05#1",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-05",
+      "severity": "Warning",
+      "title": "BuildServiceProvider() called during service registration creates a second container (ASP.NET Core analyzer ASP0000)",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 125, "lineEnd": 128, "excerpt": "var serviceProvider = builder.Services.BuildServiceProvider();" }
+      ],
+      "standard": "ASP.NET Core analyzer ASP0000",
+      "url": "https://learn.microsoft.com/aspnet/core/diagnostics/asp0000",
+      "recommendation": "Pass the already-bound configuration or use AddOptions/IConfigureOptions (or the app-level instance) instead of building a provider mid-registration, which duplicates singletons.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "CS-CS-04#1",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-CS-04",
+      "severity": "Warning",
+      "title": "IDbConnection/IDbTransaction are not wrapped in using; connection leaks if BeginTransaction or Open throws",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 73, "lineEnd": 79, "excerpt": "var connection = CreateConnection(...); ... var transaction = connection.BeginTransaction();" },
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 112, "lineEnd": 115, "excerpt": "finally { connection.Close(); }" }
+      ],
+      "standard": "C# coding conventions",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions",
+      "recommendation": "Use 'using var connection' and 'using var transaction' (and OpenAsync) so disposal occurs on every path.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "CS-CS-05#1",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-CS-05",
+      "severity": "Information",
+      "title": "Nullable warnings suppressed with #pragma instead of addressed (non-nullable properties left uninitialized)",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Configuration/Models/DataSourceConfiguration.cs", "lineStart": 11, "lineEnd": 13, "excerpt": "#pragma warning disable CS8618 // Non-nullable field must contain a non-null value" }
+      ],
+      "standard": "C# coding conventions",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions",
+      "recommendation": "Mark the properties 'required' or give them defaults/nullable types, and remove the pragma.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "SQ-S1",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-04",
+      "title": "Consistent XML documentation on public types, constructors and members across layers",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Services/Services/TestingService.cs", "lineStart": 9, "lineEnd": 12, "excerpt": "/// Service for testing management operations." }
+      ],
+      "standard": "C# coding conventions",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions"
+    },
+    {
+      "id": "SQ-S2",
+      "subject": "Software Quality",
+      "subSubject": "Architecture Patterns",
+      "checkId": "AP-01",
+      "title": "Clean Controller -> Service -> Repository layering with interface-based DI; controllers do not touch the database",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 29, "lineEnd": 32, "excerpt": "this.testingService = testingService ?? throw new ArgumentNullException(nameof(testingService));" }
+      ],
+      "standard": "Azure Architecture Center - Cloud Design Patterns",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/"
+    },
+    {
+      "id": "SQ-S3",
+      "subject": "Software Quality",
+      "subSubject": "Architecture Patterns",
+      "checkId": "AP-06",
+      "title": "Centralized exception handling middleware with correlation ids and user-safe messages",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs", "lineStart": 45, "lineEnd": 92, "excerpt": "this.logger.LogError(exception, \"{UserMessage}\", loggingCorrelation.UserMessage);" }
+      ],
+      "standard": "Azure Architecture Center - Cloud Design Patterns",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "SQ-01", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "fail", "reason": "ResetTestingAsync is ~75 lines with several responsibilities.", "findingIds": ["SQ-01#1"] },
+    { "checkId": "SQ-02", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "fail", "reason": "Nested ternary and nested try blocks.", "findingIds": ["SQ-02#1"] },
+    { "checkId": "SQ-03", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "fail", "reason": "Repeated provider switch and duplicated response blocks.", "findingIds": ["SQ-03#1"] },
+    { "checkId": "SQ-04", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SQ-05", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "SQ-06", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "SQ-07", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "SQ-08", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "DP-01", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "DP-02", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "DP-04", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "DP-05", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "DP-06", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Warning", "result": "N/A", "reason": "No event/observer subscriptions in the reviewed files.", "findingIds": [] },
+    { "checkId": "AP-01", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "AP-02", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "fail", "reason": "About action contains metadata/display logic.", "findingIds": ["AP-02#1"] },
+    { "checkId": "AP-03", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "AP-04", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Information", "result": "fail", "reason": "Shared project mixes unrelated concerns.", "findingIds": ["AP-04#1"] },
+    { "checkId": "AP-05", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Information", "result": "fail", "reason": "No retry/circuit-breaker around DB access.", "findingIds": ["AP-05#1"] },
+    { "checkId": "AP-06", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "CS-01", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "fail", "reason": "Folder/namespace typo and namespace/folder mismatch.", "findingIds": ["CS-01#1"] },
+    { "checkId": "CS-02", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "CS-03", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "fail", "reason": "Incorrect copy-pasted doc comment on HealthCheck.", "findingIds": ["CS-03#1"] },
+    { "checkId": "CS-04", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "CS-05", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Warning", "result": "fail", "reason": "BuildServiceProvider() used during registration (ASP0000).", "findingIds": ["CS-05#1"] },
+    { "checkId": "CS-CS-01", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "CS-CS-02", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "CS-CS-03", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "CS-CS-04", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Warning", "result": "fail", "reason": "Connection/transaction not in using blocks.", "findingIds": ["CS-CS-04#1"] },
+    { "checkId": "CS-CS-05", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "fail", "reason": "CS8618 suppressed with pragma rather than addressed.", "findingIds": ["CS-CS-05#1"] }
+  ],
+  "urlsFetched": [],
+  "notes": "Review limited to the 12 sampled files (35 matched). Line numbers are approximate. Language checks CS-CS-01..05 recorded as separate check results; CS-05 failure is an ASP.NET Core guideline, not a duplicate of CS-CS-*."
+}

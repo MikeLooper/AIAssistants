@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1700-PilotUtilityApi",
+  "stepId": "12-review-twelve-factor",
+  "status": "completed",
+  "startedAt": "2026-10-08T17:03:00-06:00",
+  "completedAt": "2026-10-08T17:05:00-06:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "da998a707579ccdd",
+  "batchId": "batch-2",
+  "skill": "review-twelve-factor",
+  "subject": "Twelve-Factor App",
+  "findings": [
+    {
+      "id": "TF-11#1",
+      "subject": "Twelve-Factor App",
+      "subSubject": "Logs",
+      "checkId": "TF-11",
+      "severity": "Warning",
+      "title": "App manages its own rolling log files in addition to writing to stdout",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/appsettings.json",
+          "lineStart": 56,
+          "lineEnd": 69,
+          "excerpt": "\"Name\": \"File\", \"Args\": { \"path\": \"logs/log-.json\", \"rollingInterval\": \"Day\", \"fileSizeLimitBytes\": 104857600, \"retainedFileCountLimit\": 14 ..."
+        },
+        {
+          "file": ".gitignore",
+          "lineStart": 4,
+          "lineEnd": 4,
+          "excerpt": "logs/"
+        }
+      ],
+      "standard": "The Twelve-Factor App, XI. Logs",
+      "url": "https://12factor.net/logs",
+      "recommendation": "Make stdout (Console sink, ideally CompactJsonFormatter) the only default sink and leave routing/retention to the execution environment or the OTLP pipeline. Keep the File sink only as a Development-only override.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "TF-02-S1",
+      "subject": "Twelve-Factor App",
+      "subSubject": "Dependencies",
+      "checkId": "TF-02",
+      "title": "Dependencies explicitly declared with central package management and pinned versions",
+      "evidence": [
+        {
+          "file": "Directory.Packages.props",
+          "lineStart": 3,
+          "lineEnd": 6,
+          "excerpt": "<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally> ... <PackageVersion Include=\"Asp.Versioning.Mvc.ApiExplorer\" Version=\"10.2.1\" />"
+        }
+      ],
+      "standard": "The Twelve-Factor App, II. Dependencies",
+      "url": "https://12factor.net/dependencies"
+    },
+    {
+      "id": "TF-03-S1",
+      "subject": "Twelve-Factor App",
+      "subSubject": "Config",
+      "checkId": "TF-03",
+      "title": "Configuration is bound from IConfiguration (env-overridable) and validated at startup",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Shared/Configuration/ApplicationConfiguration.cs",
+          "lineStart": 66,
+          "lineEnd": 80,
+          "excerpt": "public void Validate() { if (DataSources == null || DataSources.Count == 0) throw new ConfigurationException(...)"
+        }
+      ],
+      "standard": "The Twelve-Factor App, III. Config",
+      "url": "https://12factor.net/config"
+    },
+    {
+      "id": "TF-09-S1",
+      "subject": "Twelve-Factor App",
+      "subSubject": "Disposability",
+      "checkId": "TF-09",
+      "title": "Fail-fast startup and logs flushed on shutdown via host lifetime",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/Program.cs",
+          "lineStart": 31,
+          "lineEnd": 38,
+          "excerpt": "catch (Exception ex) { Log.Fatal(ex, \"Server terminated unexpectedly.\"); } finally { Log.CloseAndFlush(); }"
+        }
+      ],
+      "standard": "The Twelve-Factor App, IX. Disposability",
+      "url": "https://12factor.net/disposability"
+    }
+  ],
+  "checkResults": [
+    {
+      "checkId": "TF-01",
+      "subject": "Twelve-Factor App",
+      "subSubject": "Codebase",
+      "severityIfFailed": "Warning",
+      "result": "pass",
+      "findingIds": []
+    },
+    {
+      "checkId": "TF-02",
+      "subject": "Twelve-Factor App",
+      "subSubject": "Dependencies",
+      "severityIfFailed": "Error",
+      "result": "pass",
+      "findingIds": []
+    },
+    {
+      "checkId": "TF-03",
+      "subject": "Twelve-Factor App",
+      "subSubject": "Config",
+      "severityIfFailed": "Error",
+      "result": "pass",
+      "findingIds": []
+    },
+    {
+      "checkId": "TF-04",
+      "subject": "Twelve-Factor App",
+      "subSubject": "Backing services",
+      "severityIfFailed": "Warning",
+      "result": "pass",
+      "findingIds": []
+    },
+    {
+      "checkId": "TF-05",
+      "subject": "Twelve-Factor App",
+      "subSubject": "Build, release, run",
+      "severityIfFailed": "Warning",
+      "result": "N/A",
+      "reason": "No Dockerfile, CI/CD or release definition in the files in scope to evaluate stage separation.",
+      "findingIds": []
+    },
+    {
+      "checkId": "TF-06",
+      "subject": "Twelve-Factor App",
+      "subSubject": "Processes",
+      "severityIfFailed": "Warning",
+      "result": "pass",
+      "findingIds": []
+    },
+    {
+      "checkId": "TF-07",
+      "subject": "Twelve-Factor App",
+      "subSubject": "Port binding",
+      "severityIfFailed": "Information",
+      "result": "pass",
+      "findingIds": []
+    },
+    {
+      "checkId": "TF-08",
+      "subject": "Twelve-Factor App",
+      "subSubject": "Concurrency",
+      "severityIfFailed": "Information",
+      "result": "pass",
+      "findingIds": []
+    },
+    {
+      "checkId": "TF-09",
+      "subject": "Twelve-Factor App",
+      "subSubject": "Disposability",
+      "severityIfFailed": "Warning",
+      "result": "pass",
+      "findingIds": []
+    },
+    {
+      "checkId": "TF-10",
+      "subject": "Twelve-Factor App",
+      "subSubject": "Dev/prod parity",
+      "severityIfFailed": "Warning",
+      "result": "N/A",
+      "reason": "Parity depends on deployment/container artifacts that are not in the files in scope.",
+      "findingIds": []
+    },
+    {
+      "checkId": "TF-11",
+      "subject": "Twelve-Factor App",
+      "subSubject": "Logs",
+      "severityIfFailed": "Warning",
+      "result": "fail",
+      "reason": "Serilog File sink with rolling/retention settings makes the app manage its own log files besides stdout.",
+      "findingIds": ["TF-11#1"]
+    },
+    {
+      "checkId": "TF-12",
+      "subject": "Twelve-Factor App",
+      "subSubject": "Admin processes",
+      "severityIfFailed": "Information",
+      "result": "N/A",
+      "reason": "No admin/migration tasks or scripts in the files in scope.",
+      "findingIds": []
+    }
+  ],
+  "urlsFetched": [],
+  "notes": "No csharp language file exists for this skill. TF-02 judged on central pinned versions; no NuGet lock file was in scope. Base appsettings.json contains placeholder DB passwords (\"<DevUser password>\"), not real secrets; recommend documenting env-var overrides (e.g. Application__DataSources__0__Password)."
+}

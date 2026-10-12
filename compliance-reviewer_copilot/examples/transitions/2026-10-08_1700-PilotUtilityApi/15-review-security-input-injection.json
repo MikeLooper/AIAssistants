@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1700-PilotUtilityApi",
+  "stepId": "15-review-security-input-injection",
+  "status": "completed",
+  "startedAt": "2026-10-08T17:03:00-06:00",
+  "completedAt": "2026-10-08T17:03:40-06:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "da998a707579ccdd",
+  "batchId": "batch-8",
+  "skill": "review-security-input-injection",
+  "subject": "Security",
+  "findings": [],
+  "strengths": [
+    {
+      "id": "SEC-II-03#S1",
+      "subject": "Security",
+      "subSubject": "Input & Injection",
+      "checkId": "SEC-II-03",
+      "title": "SQL is a compile-time constant executed through Dapper CommandDefinition; no user input reaches SQL text",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+          "lineStart": 82,
+          "lineEnd": 85,
+          "excerpt": "var command = new CommandDefinition(sqlScript, transaction: transaction, cancellationToken: cancellationToken);"
+        }
+      ],
+      "standard": "OWASP Query Parameterization Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html"
+    },
+    {
+      "id": "SEC-II-01#S1",
+      "subject": "Security",
+      "subSubject": "Input & Injection",
+      "checkId": "SEC-II-01",
+      "title": "Only external input is a strongly typed, required bool query parameter; the data-changing endpoint takes no input",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs",
+          "lineStart": 62,
+          "lineEnd": 63,
+          "excerpt": "[FromQuery(Name = \"show-details\"), BindRequired] bool showDetails = false"
+        }
+      ],
+      "standard": "OWASP Input Validation Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html"
+    }
+  ],
+  "checkResults": [
+    {
+      "checkId": "SEC-II-01",
+      "subject": "Security",
+      "subSubject": "Input & Injection",
+      "severityIfFailed": "Error",
+      "result": "pass",
+      "findingIds": []
+    },
+    {
+      "checkId": "SEC-II-02",
+      "subject": "Security",
+      "subSubject": "Input & Injection",
+      "severityIfFailed": "Error",
+      "result": "pass",
+      "findingIds": []
+    },
+    {
+      "checkId": "SEC-II-03",
+      "subject": "Security",
+      "subSubject": "Input & Injection",
+      "severityIfFailed": "Error",
+      "result": "pass",
+      "findingIds": []
+    },
+    {
+      "checkId": "SEC-II-04",
+      "subject": "Security",
+      "subSubject": "Input & Injection",
+      "severityIfFailed": "Error",
+      "result": "N/A",
+      "reason": "No shell or OS process execution found in the reviewed files.",
+      "findingIds": []
+    },
+    {
+      "checkId": "SEC-II-05",
+      "subject": "Security",
+      "subSubject": "Input & Injection",
+      "severityIfFailed": "Error",
+      "result": "N/A",
+      "reason": "No XML parsing found in the reviewed files.",
+      "findingIds": []
+    },
+    {
+      "checkId": "SEC-II-06",
+      "subject": "Security",
+      "subSubject": "Input & Injection",
+      "severityIfFailed": "Error",
+      "result": "N/A",
+      "reason": "No file upload handling (IFormFile or similar) exists.",
+      "findingIds": []
+    },
+    {
+      "checkId": "SEC-II-07",
+      "subject": "Security",
+      "subSubject": "Input & Injection",
+      "severityIfFailed": "Error",
+      "result": "N/A",
+      "reason": "No file uploads are stored, so there is nothing executable to assess.",
+      "findingIds": []
+    }
+  ],
+  "urlsFetched": [],
+  "notes": "Connection strings are built by string interpolation from trusted configuration values (TestingRepository.BuildConnectionString); not user input, but SqlConnectionStringBuilder/NpgsqlConnectionStringBuilder would be more robust against values containing ';'. Unauthenticated destructive POST /reset is out of scope here (identity-access subject)."
+}

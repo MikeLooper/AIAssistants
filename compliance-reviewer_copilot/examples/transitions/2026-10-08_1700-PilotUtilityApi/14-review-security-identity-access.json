@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1700-PilotUtilityApi",
+  "stepId": "14-review-security-identity-access",
+  "status": "completed",
+  "startedAt": "2026-10-08T17:03:00-06:00",
+  "completedAt": "2026-10-08T17:07:00-06:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "da998a707579ccdd",
+  "batchId": "batch-1",
+  "skill": "review-security-identity-access",
+  "subject": "Security",
+  "findings": [
+    {
+      "id": "SEC-IA-01#1",
+      "subject": "Security",
+      "subSubject": "Identity & Access",
+      "checkId": "SEC-IA-01",
+      "severity": "Error",
+      "title": "No server-side authentication: pipeline has no UseAuthentication/AddAuthentication and the destructive reset endpoint is explicitly [AllowAnonymous]",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 15, "lineEnd": 18, "excerpt": "[ApiController] [ApiVersion(\"1.0\")] [Route(\"v{version:apiVersion}/[controller]\")] [AllowAnonymous]" },
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 65, "lineEnd": 87, "excerpt": "webApp.UseMiddleware<UnhandledExceptionMiddleware>(); ... webApp.MapControllers();" }
+      ],
+      "standard": "OWASP Authentication Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html",
+      "recommendation": "Register authentication (e.g. JWT bearer/OIDC via a vetted IdP), call UseAuthentication/UseAuthorization, and apply a fallback policy requiring authenticated users; allow anonymous only on healthcheck.",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "SEC-IA-02#1",
+      "subject": "Security",
+      "subSubject": "Identity & Access",
+      "checkId": "SEC-IA-02",
+      "severity": "Error",
+      "title": "No authorization on sensitive actions: anonymous POST /reset deletes data and anonymous /about?show-details=true returns configuration",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 46, "lineEnd": 51, "excerpt": "[HttpPost] [Route(\"reset\")] ... public async Task<IActionResult> ResetTesting(CancellationToken cancellationToken)" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 16, "lineEnd": 18, "excerpt": "[ApiController] [ApiVersionNeutral] [AllowAnonymous]" }
+      ],
+      "standard": "OWASP Authorization Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html",
+      "recommendation": "Protect reset with [Authorize] using a role/policy (and disable it outside test environments); require authorization for /about show-details, keeping only /healthcheck anonymous.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-IA-08#1",
+      "subject": "Security",
+      "subSubject": "Identity & Access",
+      "checkId": "SEC-IA-08",
+      "severity": "Warning",
+      "title": "Implicit network trust: all endpoints anonymous and AllowedHosts is wildcard; no explicit verification of callers",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 78, "lineEnd": 78, "excerpt": "\"AllowedHosts\": \"*\"" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 18, "lineEnd": 18, "excerpt": "[AllowAnonymous]" }
+      ],
+      "standard": "OWASP Zero Trust Architecture Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+      "recommendation": "Verify every caller explicitly (token + scoped policies), restrict AllowedHosts to known hostnames, and use least-privilege database credentials.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    }
+  ],
+  "strengths": [],
+  "checkResults": [
+    { "checkId": "SEC-IA-01", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "fail", "reason": "No authentication configured; endpoints are anonymous.", "findingIds": ["SEC-IA-01#1"] },
+    { "checkId": "SEC-IA-02", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "fail", "reason": "No authorization on destructive/config-disclosing actions.", "findingIds": ["SEC-IA-02#1"] },
+    { "checkId": "SEC-IA-03", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No JWT handling found in the reviewed files.", "findingIds": [] },
+    { "checkId": "SEC-IA-04", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No OAuth2 flows found.", "findingIds": [] },
+    { "checkId": "SEC-IA-05", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No cookie/session usage found.", "findingIds": [] },
+    { "checkId": "SEC-IA-06", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No user password storage in the API.", "findingIds": [] },
+    { "checkId": "SEC-IA-07", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No credential hashing or custom cryptography found.", "findingIds": [] },
+    { "checkId": "SEC-IA-08", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Warning", "result": "fail", "reason": "Implicit trust: anonymous endpoints and wildcard AllowedHosts.", "findingIds": ["SEC-IA-08#1"] }
+  ],
+  "urlsFetched": [],
+  "notes": "OpenApi/Swagger/Logging extension files were outside this skill's list; absence of UseAuthentication/UseAuthorization judged from ApiExtensions.ApiWebApplication. Line numbers approximate. Per-language guidance for C# loaded ([Authorize] policies, vetted IdP)."
+}

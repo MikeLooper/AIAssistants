@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1700-PilotUtilityApi",
+  "stepId": "19-review-testing",
+  "status": "completed",
+  "startedAt": "2026-10-08T17:03:00-06:00",
+  "completedAt": "2026-10-08T17:05:00-06:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "da998a707579ccdd",
+  "batchId": "batch-5",
+  "skill": "review-testing",
+  "subject": "Testing",
+  "findings": [
+    {
+      "id": "TST-03#1",
+      "subject": "Testing",
+      "subSubject": "Test Quality",
+      "checkId": "TST-03",
+      "severity": "Warning",
+      "title": "Placeholder and weak-assertion tests do not verify real behavior",
+      "evidence": [
+        {
+          "file": "test/PilotUtiltyApi.Domain.Tests/ExampleTest.cs",
+          "lineStart": 14,
+          "lineEnd": 14,
+          "excerpt": "Assert.Pass(\"Example Test\");"
+        },
+        {
+          "file": "test/PilotUtiltyApi.Web.Tests/Controllers/TestingControllerTests.cs",
+          "lineStart": 114,
+          "lineEnd": 131,
+          "excerpt": "WithErrorAndNullMessage_ReturnsBadRequestWithDefaultWarning ... Assert.That(controller.Response.Headers.ContainsKey(\"Warning\"), Is.True);"
+        }
+      ],
+      "standard": "The Practical Test Pyramid (Martin Fowler)",
+      "url": "https://martinfowler.com/articles/practical-test-pyramid.html#whattotest",
+      "recommendation": "Replace the Assert.Pass placeholder with real Domain tests or remove it. In the 'default warning' controller test, set up the scenario its name describes and assert the Warning header value.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "TST-06#1",
+      "subject": "Testing",
+      "subSubject": "Test Automation",
+      "checkId": "TST-06",
+      "severity": "Error",
+      "title": "No CI workflow runs the test suite on every change",
+      "evidence": [
+        {
+          "file": ".github/instructions/unit-tests.instructions.md",
+          "lineStart": 1,
+          "lineEnd": 1,
+          "excerpt": "Tests are run manually (\"Run the relevant test projects\"); no .github/workflows CI files exist in the target."
+        }
+      ],
+      "standard": "The Practical Test Pyramid (Martin Fowler)",
+      "url": "https://martinfowler.com/articles/practical-test-pyramid.html#the-deployment-pipeline",
+      "recommendation": "Add a CI workflow that runs 'dotnet test' (with coverlet collection) on every push and pull request, and make it a required check.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "TST-01-S1",
+      "subject": "Testing",
+      "subSubject": "Test Pyramid",
+      "checkId": "TST-01",
+      "title": "Per-project fast unit test suites mirror the source layout, with a single lightweight Bruno E2E smoke test",
+      "evidence": [
+        {
+          "file": "test/PilotUtiltyApi.Services.Tests/Services/TestingServiceTests.cs",
+          "lineStart": 12,
+          "lineEnd": 15,
+          "excerpt": "public class TestingServiceTests : TestBase"
+        },
+        {
+          "file": "test/Bruno/PilotUtilityApi/System/HealthCheck.yml",
+          "lineStart": 12,
+          "lineEnd": 19,
+          "excerpt": "expect(res.getStatus()).to.equal(200);"
+        }
+      ],
+      "standard": "The Practical Test Pyramid (Martin Fowler)",
+      "url": "https://martinfowler.com/articles/practical-test-pyramid.html"
+    },
+    {
+      "id": "TST-02-S1",
+      "subject": "Testing",
+      "subSubject": "Coverage",
+      "checkId": "TST-02",
+      "title": "coverlet.collector is configured in the test project",
+      "evidence": [
+        {
+          "file": "test/PilotUtiltyApi.Web.Tests/PilotUtilityApi.Web.Tests.csproj",
+          "lineStart": 8,
+          "lineEnd": 9,
+          "excerpt": "<PackageReference Include=\"coverlet.collector\">"
+        }
+      ],
+      "standard": "The Practical Test Pyramid (Martin Fowler)",
+      "url": "https://martinfowler.com/articles/practical-test-pyramid.html"
+    },
+    {
+      "id": "TST-03-S1",
+      "subject": "Testing",
+      "subSubject": "Test Quality",
+      "checkId": "TST-03",
+      "title": "Configuration validation tests assert specific exception types and messages across edge cases",
+      "evidence": [
+        {
+          "file": "test/PilotUtiltyApi.Shared.Tests/Configuration/ApplicationConfigurationTests.cs",
+          "lineStart": 12,
+          "lineEnd": 25,
+          "excerpt": "Assert.Throws<ConfigurationException>(() => config.Validate()); ... Does.Contain(\"No data sources configured\")"
+        }
+      ],
+      "standard": "The Practical Test Pyramid (Martin Fowler)",
+      "url": "https://martinfowler.com/articles/practical-test-pyramid.html"
+    }
+  ],
+  "checkResults": [
+    {
+      "checkId": "TST-01",
+      "subject": "Testing",
+      "subSubject": "Test Pyramid",
+      "severityIfFailed": "Warning",
+      "result": "pass",
+      "findingIds": []
+    },
+    {
+      "checkId": "TST-02",
+      "subject": "Testing",
+      "subSubject": "Coverage",
+      "severityIfFailed": "Warning",
+      "result": "pass",
+      "findingIds": []
+    },
+    {
+      "checkId": "TST-03",
+      "subject": "Testing",
+      "subSubject": "Test Quality",
+      "severityIfFailed": "Warning",
+      "result": "fail",
+      "reason": "A placeholder Assert.Pass test exists and one controller test asserts less than its name claims.",
+      "findingIds": ["TST-03#1"]
+    },
+    {
+      "checkId": "TST-04",
+      "subject": "Testing",
+      "subSubject": "Test Quality",
+      "severityIfFailed": "Warning",
+      "result": "pass",
+      "findingIds": []
+    },
+    {
+      "checkId": "TST-05",
+      "subject": "Testing",
+      "subSubject": "Test Quality",
+      "severityIfFailed": "Warning",
+      "result": "pass",
+      "findingIds": []
+    },
+    {
+      "checkId": "TST-06",
+      "subject": "Testing",
+      "subSubject": "Test Automation",
+      "severityIfFailed": "Error",
+      "result": "fail",
+      "reason": "No CI workflows exist in the target, so tests are never run automatically on changes.",
+      "findingIds": ["TST-06#1"]
+    }
+  ],
+  "urlsFetched": [],
+  "notes": "Sample of ~12 test files reviewed; no csharp language file exists for this skill. No CI coverage threshold is enforced (no CI present). TST-06 evidence cites the manual-run guidance because the finding is based on absence of workflows."
+}

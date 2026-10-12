@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1700-PilotUtilityApi",
+  "stepId": "16-review-security-web-api",
+  "status": "completed",
+  "startedAt": "2026-10-08T17:03:00-06:00",
+  "completedAt": "2026-10-08T17:06:00-06:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "da998a707579ccdd",
+  "batchId": "batch-9",
+  "skill": "review-security-web-api",
+  "subject": "Security",
+  "findings": [
+    {
+      "id": "SEC-WA-01#1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-01",
+      "severity": "Warning",
+      "title": "No Content-Security-Policy header is set",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 71, "lineEnd": 85, "excerpt": "Pipeline registers OpenApi, Logging, Swagger, UnhandledExceptionMiddleware, MapControllers; no security-header middleware" }
+      ],
+      "standard": "OWASP Content Security Policy Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html",
+      "recommendation": "Add a small middleware that sets a restrictive Content-Security-Policy (e.g. default-src 'none'; frame-ancestors 'none' for the JSON API), with a relaxed policy scoped only to the Swagger/Scalar UI paths.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-WA-02#1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-02",
+      "severity": "Warning",
+      "title": "Strict-Transport-Security is not configured",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 71, "lineEnd": 74, "excerpt": "if (webApp.Environment.IsDevelopment()) { webApp.UseHttpsRedirection(); }  // no UseHsts() anywhere" }
+      ],
+      "standard": "OWASP HTTP Headers Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#strict-transport-security-hsts",
+      "recommendation": "Call app.UseHsts() for non-Development environments (or set the Strict-Transport-Security header with max-age >= 31536000) once HTTPS is enforced.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-WA-03#1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-03",
+      "severity": "Warning",
+      "title": "X-Content-Type-Options: nosniff is not set",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 71, "lineEnd": 85, "excerpt": "No middleware or header configuration for X-Content-Type-Options" }
+      ],
+      "standard": "OWASP HTTP Headers Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-content-type-options",
+      "recommendation": "Add 'X-Content-Type-Options: nosniff' to all responses via the same security-headers middleware.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-WA-04#1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-04",
+      "severity": "Warning",
+      "title": "No clickjacking protection (X-Frame-Options / frame-ancestors)",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 71, "lineEnd": 85, "excerpt": "No X-Frame-Options header or CSP frame-ancestors directive configured" }
+      ],
+      "standard": "OWASP HTTP Headers Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-frame-options",
+      "recommendation": "Set 'X-Frame-Options: DENY' and/or CSP 'frame-ancestors none' on all responses, including the Swagger/Scalar UI.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-WA-06#1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-06",
+      "severity": "Error",
+      "title": "HTTPS redirection is enabled only in Development; no HSTS; HTTP-only launch URL",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 71, "lineEnd": 74, "excerpt": "if (webApp.Environment.IsDevelopment()) { webApp.UseHttpsRedirection(); }" },
+        { "file": "src/PilotUtiltyApi.Web/Properties/launchSettings.json", "lineStart": 12, "lineEnd": 12, "excerpt": "\"applicationUrl\": \"http://localhost:58401\"" }
+      ],
+      "standard": "OWASP REST Security Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html#https",
+      "recommendation": "Call UseHttpsRedirection() (and UseHsts()) in all environments, or document and verify that TLS is terminated and HTTP is rejected at the ingress; add an https:// applicationUrl to launchSettings.",
+      "confidence": "Medium",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "SEC-WA-07-S1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-07",
+      "title": "Global exception middleware returns generic ProblemDetails and logs details server-side",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs", "lineStart": 62, "lineEnd": 80, "excerpt": "this.logger.LogError(exception, ...); Detail = loggingCorrelation.UserMessage" }
+      ],
+      "standard": "OWASP REST Security Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html"
+    },
+    {
+      "id": "SEC-WA-05-S1",
+      "subject": "Security",
+      "subSubject": "Web & API",
+      "checkId": "SEC-WA-05",
+      "title": "No CORS policy is registered, so no wildcard-with-credentials exposure exists",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 105, "lineEnd": 125, "excerpt": "Service registration has no AddCors/UseCors" }
+      ],
+      "standard": "OWASP REST Security Cheat Sheet",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "SEC-WA-01", "subject": "Security", "subSubject": "Web & API", "severityIfFailed": "Warning", "result": "fail", "reason": "No Content-Security-Policy header is set anywhere in the pipeline.", "findingIds": ["SEC-WA-01#1"] },
+    { "checkId": "SEC-WA-02", "subject": "Security", "subSubject": "Web & API", "severityIfFailed": "Warning", "result": "fail", "reason": "No UseHsts() or Strict-Transport-Security header configured.", "findingIds": ["SEC-WA-02#1"] },
+    { "checkId": "SEC-WA-03", "subject": "Security", "subSubject": "Web & API", "severityIfFailed": "Warning", "result": "fail", "reason": "X-Content-Type-Options is never set.", "findingIds": ["SEC-WA-03#1"] },
+    { "checkId": "SEC-WA-04", "subject": "Security", "subSubject": "Web & API", "severityIfFailed": "Warning", "result": "fail", "reason": "Neither X-Frame-Options nor frame-ancestors is configured.", "findingIds": ["SEC-WA-04#1"] },
+    { "checkId": "SEC-WA-05", "subject": "Security", "subSubject": "Web & API", "severityIfFailed": "Error", "result": "pass" },
+    { "checkId": "SEC-WA-06", "subject": "Security", "subSubject": "Web & API", "severityIfFailed": "Error", "result": "fail", "reason": "HTTPS redirection runs only in Development and HSTS is absent, so non-Development HTTP is not redirected or rejected in code.", "findingIds": ["SEC-WA-06#1"] },
+    { "checkId": "SEC-WA-07", "subject": "Security", "subSubject": "Web & API", "severityIfFailed": "Warning", "result": "pass" }
+  ],
+  "urlsFetched": [],
+  "notes": "Extra observations outside the checklist: OpenAPI/Scalar/Swagger UI are mapped in all environments (the Development guard in OpenApiExtensions.cs is commented out); the anonymous GET /about?show-details=true returns configuration details (hosts, usernames; passwords suppressed) and build/deploy info; TestingController.ResetTesting is [AllowAnonymous] and destructive; AllowedHosts is '*'; ResetTesting echoes response.ErrorMessage in a Warning header (repository messages seen were generic). Consider covering these under identity-access/operational subjects."
+}

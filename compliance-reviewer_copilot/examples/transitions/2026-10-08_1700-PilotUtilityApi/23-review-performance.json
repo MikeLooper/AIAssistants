@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1700-PilotUtilityApi",
+  "stepId": "23-review-performance",
+  "status": "completed",
+  "startedAt": "2026-10-08T17:03:00-06:00",
+  "completedAt": "2026-10-08T17:03:40-06:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "da998a707579ccdd",
+  "batchId": "batch-8",
+  "skill": "review-performance",
+  "subject": "Operations",
+  "findings": [
+    {
+      "id": "PERF-02#1",
+      "subject": "Operations",
+      "subSubject": "Performance",
+      "checkId": "PERF-02",
+      "severity": "Warning",
+      "title": "Database connection open, begin-transaction, commit/rollback and close are synchronous in an async request path",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+          "lineStart": 74,
+          "lineEnd": 80,
+          "excerpt": "var connection = CreateConnection(...); if (connection.State != ConnectionState.Open) { connection.Open(); } var transaction = connection.BeginTransaction();"
+        },
+        {
+          "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+          "lineStart": 90,
+          "lineEnd": 93,
+          "excerpt": "result = await connection.QueryFirstOrDefaultAsync<int>(command); ... transaction.Commit();"
+        }
+      ],
+      "standard": "Azure Well-Architected Framework - Performance Efficiency",
+      "url": "https://learn.microsoft.com/azure/well-architected/performance-efficiency/",
+      "recommendation": "Create the connection as DbConnection, use await OpenAsync(cancellationToken), await BeginTransactionAsync, CommitAsync/RollbackAsync and dispose with await using, so no thread-pool thread blocks on network I/O.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "PERF-STR#1",
+      "subject": "Operations",
+      "subSubject": "Performance",
+      "title": "Async/await and CancellationToken propagated from controller through service to Dapper command",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs",
+          "lineStart": 48,
+          "lineEnd": 50,
+          "excerpt": "public async Task<IActionResult> ResetTesting(CancellationToken cancellationToken) { var response = await testingService.ResetTestingAsync(cancellationToken);"
+        }
+      ]
+    },
+    {
+      "id": "PERF-STR#2",
+      "subject": "Operations",
+      "subSubject": "Performance",
+      "checkId": "PERF-04",
+      "title": "Entire reset is a single batched SQL script per call, avoiding per-table round trips",
+      "evidence": [
+        {
+          "file": "src/PilotUtiltyApi.Repositories/Constants/SqlConstants.cs",
+          "lineStart": 9,
+          "lineEnd": 12,
+          "excerpt": "public const string SqlServerResetTestingScript = @\"DECLARE @DeletedCount INT = 0; ..."
+        }
+      ]
+    }
+  ],
+  "checkResults": [
+    {
+      "checkId": "PERF-01",
+      "subject": "Operations",
+      "subSubject": "Performance",
+      "severityIfFailed": "Warning",
+      "result": "N/A",
+      "reason": "No expensive or repeated read operations exist; the only data operation is a destructive reset and the other endpoints return static/config values.",
+      "findingIds": []
+    },
+    {
+      "checkId": "PERF-02",
+      "subject": "Operations",
+      "subSubject": "Performance",
+      "severityIfFailed": "Warning",
+      "result": "fail",
+      "reason": "Connection Open, BeginTransaction, Commit/Rollback and Close are blocking synchronous calls inside an async method.",
+      "findingIds": ["PERF-02#1"]
+    },
+    {
+      "checkId": "PERF-03",
+      "subject": "Operations",
+      "subSubject": "Performance",
+      "severityIfFailed": "Warning",
+      "result": "pass",
+      "findingIds": []
+    },
+    {
+      "checkId": "PERF-04",
+      "subject": "Operations",
+      "subSubject": "Performance",
+      "severityIfFailed": "Warning",
+      "result": "pass",
+      "findingIds": []
+    },
+    {
+      "checkId": "PERF-05",
+      "subject": "Operations",
+      "subSubject": "Performance",
+      "severityIfFailed": "Information",
+      "result": "pass",
+      "findingIds": []
+    }
+  ],
+  "urlsFetched": [],
+  "notes": "PERF-03 passes because ADO.NET pooling is on by default (connection strings do not disable it). Minor related hygiene: the connection/transaction are not disposed via using, so an exception between Open and the inner try would leave the connection unreturned to the pool; ApiExtensions calls BuildServiceProvider() at startup (extra container, startup-only)."
+}

@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1926-pilotutilityapi",
+  "stepId": "13-review-api-design",
+  "status": "completed",
+  "startedAt": "2026-10-09T01:26:05Z",
+  "completedAt": "2026-10-09T01:36:00Z",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "929741f5c04d8218a6852d5d6eb33cbeb2f1d20b",
+  "inputsHash": "sha256:0562d896a8fce07e",
+  "batchId": "batch-6",
+  "skill": "review-api-design",
+  "subject": "API Design",
+  "findings": [
+    {
+      "id": "API-03#1",
+      "subject": "API Design",
+      "subSubject": "OpenAPI Specification",
+      "checkId": "API-03",
+      "severity": "Error",
+      "title": "Committed OpenAPI spec does not match implemented routes and DTOs",
+      "evidence": [
+        { "file": "docs/PilotUtilityApi_v1.json", "lineStart": 81, "lineEnd": 82, "excerpt": "\"/testing/reset\": { \"post\": {" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 16, "lineEnd": 17, "excerpt": "[ApiVersion(\"1.0\")] [Route(\"v{version:apiVersion}/[controller]\")]" },
+        { "file": "src/PilotUtiltyApi.Domain/Models/Responses/AboutResponse.cs", "lineStart": 20, "lineEnd": 21, "excerpt": "[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] public IApplicationConfiguration? ApplicationConfiguration" }
+      ],
+      "standard": "OpenAPI Specification 3.1",
+      "url": "https://spec.openapis.org/oas/latest.html#paths-object",
+      "recommendation": "Regenerate docs/PilotUtilityApi_v1.json from the running app (or at build time) so the path is /v1/testing/reset, the show-details parameter reflects [BindRequired], and AboutResponse includes the optional applicationConfiguration property; add a CI diff check to keep it in sync.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "API-04#1",
+      "subject": "API Design",
+      "subSubject": "Azure API Guidelines",
+      "checkId": "API-04",
+      "severity": "Error",
+      "title": "Inconsistent URL structure: URL-segment versioning mixed with unversioned routes and a verb-style action path",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 46, "lineEnd": 47, "excerpt": "[HttpPost] [Route(\"reset\")]" },
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 31, "lineEnd": 34, "excerpt": "ApiVersionReader.Combine(new HeaderApiVersionReader(\"api-version\"), new QueryStringApiVersionReader(), new UrlSegmentApiVersionReader());" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 43, "lineEnd": 44, "excerpt": "[HttpGet] [Route(\"healthcheck\")]" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines - URL structure (DO)",
+      "url": "https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#url-structure",
+      "recommendation": "Pick one versioning mechanism (Azure guidelines use the api-version query parameter rather than a path segment) and model actions as resource operations (e.g. POST /testing:reset or a resource noun) instead of a verb path segment.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    },
+    {
+      "id": "API-05#1",
+      "subject": "API Design",
+      "subSubject": "Azure API Guidelines",
+      "checkId": "API-05",
+      "severity": "Error",
+      "title": "Server-side failures returned as 400 with error text in deprecated Warning header instead of a structured error body",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 55, "lineEnd": 59, "excerpt": "Response.Headers.Append(\"Warning\", response.ErrorMessage ?? \"An error occurred\"); return BadRequest();" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines - HTTP status codes / error handling (DO)",
+      "url": "https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#http-status-codes",
+      "recommendation": "Return 5xx for service/data-store failures (4xx only for client errors) and put a consistent error object (code + message, e.g. ProblemDetails) in the body with an error-code header, rather than using the deprecated Warning header.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "API-01#S1",
+      "subject": "API Design",
+      "subSubject": "OpenAPI Specification",
+      "checkId": "API-01",
+      "title": "OpenAPI 3.1 spec is generated and a copy is committed under docs/",
+      "evidence": [
+        { "file": "docs/PilotUtilityApi_v1.json", "lineStart": 1, "lineEnd": 5, "excerpt": "\"openapi\": \"3.1.1\", \"info\": { \"title\": \"PilotUtilityApi.Web | v1\"" },
+        { "file": "src/PilotUtiltyApi.Shared/OpenApi/Extensions/OpenApiExtensions.cs", "lineStart": 90, "lineEnd": 93, "excerpt": "options.OpenApiVersion = Microsoft.OpenApi.OpenApiSpecVersion.OpenApi3_1;" }
+      ],
+      "standard": "OpenAPI Specification 3.1",
+      "url": "https://spec.openapis.org/oas/latest.html"
+    },
+    {
+      "id": "API-07#S1",
+      "subject": "API Design",
+      "subSubject": "Azure API Guidelines",
+      "checkId": "API-07",
+      "title": "Explicit API versioning via Asp.Versioning with supported versions reported",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 35, "lineEnd": 37, "excerpt": "options.DefaultApiVersion = new ApiVersion(1, 0); options.ReportApiVersions = true;" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 16, "lineEnd": 16, "excerpt": "[ApiVersion(\"1.0\")]" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines - Versioning",
+      "url": "https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#versioning"
+    },
+    {
+      "id": "API-04#S1",
+      "subject": "API Design",
+      "subSubject": "Azure API Guidelines",
+      "checkId": "API-04",
+      "title": "Route tokens forced to lowercase for consistent URL casing",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 119, "lineEnd": 120, "excerpt": "options.Conventions.Add(new RouteTokenTransformerConvention(new LowercaseParameterTransformer()));" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines - URL structure",
+      "url": "https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#url-structure"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "API-01", "subject": "API Design", "subSubject": "OpenAPI Specification", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "API-02", "subject": "API Design", "subSubject": "OpenAPI Specification", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "API-03", "subject": "API Design", "subSubject": "OpenAPI Specification", "severityIfFailed": "Error", "result": "fail", "reason": "Spec lists /testing/reset while code serves /v1/testing/reset, omits required flag on show-details and the applicationConfiguration property.", "findingIds": ["API-03#1"] },
+    { "checkId": "API-04", "subject": "API Design", "subSubject": "Azure API Guidelines", "severityIfFailed": "Error", "result": "fail", "reason": "Mixed URL-segment/header/query versioning, unversioned system routes and a verb-style /reset path.", "findingIds": ["API-04#1"] },
+    { "checkId": "API-05", "subject": "API Design", "subSubject": "Azure API Guidelines", "severityIfFailed": "Error", "result": "fail", "reason": "Service errors return 400 with no error body and a deprecated Warning header.", "findingIds": ["API-05#1"] },
+    { "checkId": "API-06", "subject": "API Design", "subSubject": "Azure API Guidelines", "severityIfFailed": "Warning", "result": "N/A", "reason": "No collection endpoints exist in the reviewed controllers.", "findingIds": [] },
+    { "checkId": "API-07", "subject": "API Design", "subSubject": "Azure API Guidelines", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "API-08", "subject": "API Design", "subSubject": "Azure API Guidelines", "severityIfFailed": "Information", "result": "N/A", "reason": "No collection endpoints exist in the reviewed controllers.", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "No languages/csharp.md reference exists for this skill; checklist used alone. API-02 judged by structural inspection (OAS 3.1.1 document with valid paths/components/$refs); no validator run."
+}

@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1700-PilotUtilityApi",
+  "stepId": "21-review-dependency-management",
+  "status": "completed",
+  "startedAt": "2026-10-08T17:03:00-06:00",
+  "completedAt": "2026-10-08T17:04:00-06:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "da998a707579ccdd",
+  "batchId": "batch-7",
+  "skill": "review-dependency-management",
+  "subject": "Implementation",
+  "findings": [
+    {
+      "id": "DEP-02#1",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "checkId": "DEP-02",
+      "severity": "Warning",
+      "title": "No NuGet lock file; restore is not locked to exact transitive versions",
+      "evidence": [
+        { "file": "Directory.Packages.props", "lineStart": 2, "lineEnd": 4, "excerpt": "<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally> (no RestorePackagesWithLockFile; no packages.lock.json at repo root)" },
+        { "file": "Directory.Build.props", "lineStart": 2, "lineEnd": 8, "excerpt": "PropertyGroup sets Version/TargetFramework/Nullable only; RestorePackagesWithLockFile not set" }
+      ],
+      "standard": "NuGet package restore with lock file (fallback rubric: best-practice gap)",
+      "url": "https://learn.microsoft.com/nuget/consume-packages/package-references-in-project-files#locking-dependencies",
+      "recommendation": "Set <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile> in Directory.Build.props, commit the generated packages.lock.json files, and use --locked-mode in CI.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "DEP-05#1",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "checkId": "DEP-05",
+      "severity": "Information",
+      "title": "No SBOM or license inventory present",
+      "evidence": [
+        { "file": "Directory.Packages.props", "lineStart": 5, "lineEnd": 6, "excerpt": "<ItemGroup> of PackageVersion entries; no sbom.json / *.cdx.json / *.spdx.json found at repo root" }
+      ],
+      "standard": "Fallback rubric (optional point)",
+      "url": "https://learn.microsoft.com/dotnet/core/additional-tools/sbom",
+      "recommendation": "Generate a CycloneDX or SPDX SBOM in CI (e.g. CycloneDX for .NET) and publish it as a build artifact or commit it.",
+      "confidence": "Medium",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "DEP-01-S1",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "checkId": "DEP-01",
+      "title": "Central package management with exact pinned versions; no floating versions",
+      "evidence": [
+        { "file": "Directory.Packages.props", "lineStart": 3, "lineEnd": 6, "excerpt": "<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally> ... Version=\"10.2.1\"" }
+      ]
+    },
+    {
+      "id": "DEP-04-S1",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "checkId": "DEP-04",
+      "title": "All projects target net10.0 (LTS) from a single shared setting",
+      "evidence": [
+        { "file": "Directory.Build.props", "lineStart": 4, "lineEnd": 4, "excerpt": "<TargetFramework>net10.0</TargetFramework>" }
+      ]
+    }
+  ],
+  "checkResults": [
+    {
+      "checkId": "DEP-01",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "severityIfFailed": "Warning",
+      "result": "pass"
+    },
+    {
+      "checkId": "DEP-02",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "severityIfFailed": "Warning",
+      "result": "fail",
+      "reason": "No packages.lock.json and RestorePackagesWithLockFile is not enabled.",
+      "findingIds": ["DEP-02#1"]
+    },
+    {
+      "checkId": "DEP-03",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "severityIfFailed": "Error",
+      "result": "N/A",
+      "reason": "No analyzers were approved (no vulnerability scan results) and manifest inspection alone showed no known-vulnerable pinned versions."
+    },
+    {
+      "checkId": "DEP-04",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "severityIfFailed": "Error",
+      "result": "pass"
+    },
+    {
+      "checkId": "DEP-05",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "severityIfFailed": "Information",
+      "result": "fail",
+      "reason": "No sbom.json, *.cdx.json, *.spdx.json or license inventory found.",
+      "findingIds": ["DEP-05#1"]
+    },
+    {
+      "checkId": "DEP-06",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "severityIfFailed": "Warning",
+      "result": "pass"
+    }
+  ],
+  "urlsFetched": [],
+  "notes": "Project is MIT-licensed (LICENSE); declared packages are known to be permissively licensed (MIT/Apache-2.0/BSD/PostgreSQL), judged from package knowledge, not fetched. Minor: Microsoft.Extensions.Configuration.Binder is 10.0.1 while sibling Microsoft.Extensions.* packages are 10.0.10. No analyzer vulnerability scan was run."
+}

@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-10-08_1700-PilotUtilityApi",
+  "stepId": "13-review-api-design",
+  "status": "completed",
+  "startedAt": "2026-10-08T17:03:00-06:00",
+  "completedAt": "2026-10-08T17:05:00-06:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": null,
+  "inputsHash": "da998a707579ccdd",
+  "batchId": "batch-3",
+  "skill": "review-api-design",
+  "subject": "API Design",
+  "findings": [
+    {
+      "id": "API-03#1",
+      "subject": "API Design",
+      "subSubject": "OpenAPI Spec",
+      "checkId": "API-03",
+      "severity": "Error",
+      "title": "Checked-in OpenAPI spec is out of sync with the implemented routes and DTOs",
+      "evidence": [
+        { "file": "docs/PilotUtilityApi_v1.json", "lineStart": 83, "lineEnd": 85, "excerpt": "\"/testing/reset\": { \"post\": {" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 17, "lineEnd": 17, "excerpt": "[Route(\"v{version:apiVersion}/[controller]\")]" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 62, "lineEnd": 64, "excerpt": "[FromQuery(Name = \"show-details\"), BindRequired] bool showDetails = false" }
+      ],
+      "standard": "OpenAPI Specification",
+      "url": "https://spec.openapis.org/oas/latest.html",
+      "recommendation": "Regenerate docs/PilotUtilityApi_v1.json from the running app (or in CI) and fail the build on drift. The current file omits the v1 path prefix, the required flag on show-details, the AboutResponse.applicationConfiguration property, and the configured info title, version and contact.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "API-04#1",
+      "subject": "API Design",
+      "subSubject": "URL Structure & Versioning",
+      "checkId": "API-04",
+      "severity": "Error",
+      "title": "Inconsistent URL versioning and an RPC-style action route",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 31, "lineEnd": 34, "excerpt": "ApiVersionReader.Combine(new HeaderApiVersionReader(\"api-version\"), new QueryStringApiVersionReader(), new UrlSegmentApiVersionReader())" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 17, "lineEnd": 17, "excerpt": "[ApiVersionNeutral]" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 46, "lineEnd": 47, "excerpt": "[HttpPost] [Route(\"reset\")]" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines - URL structure / versioning",
+      "url": "https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#url-structure",
+      "recommendation": "Choose one versioning mechanism, and a single URL convention for all endpoints. Model reset as a resource or a documented custom action (e.g. POST /v1/testing:reset) instead of an ad-hoc verb route. Alternatively, document the system endpoints as deliberately unversioned.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    },
+    {
+      "id": "API-05#1",
+      "subject": "API Design",
+      "subSubject": "Status Codes & Errors",
+      "checkId": "API-05",
+      "severity": "Error",
+      "title": "Reset endpoint returns an empty 400 with the error in a Warning header, and has an inconsistent success shape",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 55, "lineEnd": 58, "excerpt": "Response.Headers.Append(\"Warning\", response.ErrorMessage ?? \"An error occurred\"); return BadRequest();" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 61, "lineEnd": 66, "excerpt": "if (response.Result == null || response.Result == 0) { return NoContent(); } ... return Ok(response.Result);" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines - HTTP status codes / error response",
+      "url": "https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#http-status-codes",
+      "recommendation": "Return a structured error body (ProblemDetails or the Azure error object) with a status that matches the failure, such as 500 for service or database faults and 4xx only for client errors. Do not put the error message in the Warning header. Use one consistent success shape, e.g. 200 with a JSON object holding the count.",
+      "confidence": "Medium",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "API-01-S1",
+      "subject": "API Design",
+      "subSubject": "OpenAPI Spec",
+      "checkId": "API-01",
+      "title": "OpenAPI 3.1 spec is generated, checked in and served with a UI",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/OpenApi/Extensions/OpenApiExtensions.cs", "lineStart": 83, "lineEnd": 87, "excerpt": "options.OpenApiVersion = Microsoft.OpenApi.OpenApiSpecVersion.OpenApi3_1;" }
+      ],
+      "standard": "OpenAPI Specification",
+      "url": "https://spec.openapis.org/oas/latest.html"
+    },
+    {
+      "id": "API-07-S1",
+      "subject": "API Design",
+      "subSubject": "Versioning",
+      "checkId": "API-07",
+      "title": "Explicit API versioning with a default version and a per-version OpenAPI document",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 35, "lineEnd": 38, "excerpt": "AssumeDefaultVersionWhenUnspecified = true; DefaultApiVersion = new ApiVersion(1, 0); ReportApiVersions = true;" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines - Versioning",
+      "url": "https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md#versioning"
+    },
+    {
+      "id": "API-05-S1",
+      "subject": "API Design",
+      "subSubject": "Status Codes & Errors",
+      "checkId": "API-05",
+      "title": "Actions declare their response types and status codes with ProducesResponseType",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 48, "lineEnd": 50, "excerpt": "[ProducesResponseType<int>(200)] [ProducesResponseType(204)] [ProducesResponseType(400)]" }
+      ]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "API-01", "subject": "API Design", "subSubject": "OpenAPI Spec", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "API-02", "subject": "API Design", "subSubject": "OpenAPI Spec", "severityIfFailed": "Error", "result": "pass" },
+    { "checkId": "API-03", "subject": "API Design", "subSubject": "OpenAPI Spec", "severityIfFailed": "Error", "result": "fail", "reason": "The spec paths, parameter requirements, schemas and info block differ from the controllers, DTOs and OpenAPI transformers.", "findingIds": ["API-03#1"] },
+    { "checkId": "API-04", "subject": "API Design", "subSubject": "URL Structure & Versioning", "severityIfFailed": "Error", "result": "fail", "reason": "Versioning is mixed (header, query and path readers; the system endpoints are version-neutral) and the reset route is verb-style.", "findingIds": ["API-04#1"] },
+    { "checkId": "API-05", "subject": "API Design", "subSubject": "Status Codes & Errors", "severityIfFailed": "Error", "result": "fail", "reason": "Errors return an empty 400 with the message in a Warning header, and the success responses differ in shape (200 integer vs 204).", "findingIds": ["API-05#1"] },
+    { "checkId": "API-06", "subject": "API Design", "subSubject": "Collections", "severityIfFailed": "Warning", "result": "N/A", "reason": "No collection endpoints exist." },
+    { "checkId": "API-07", "subject": "API Design", "subSubject": "Versioning", "severityIfFailed": "Warning", "result": "pass" },
+    { "checkId": "API-08", "subject": "API Design", "subSubject": "Collections", "severityIfFailed": "Information", "result": "N/A", "reason": "No collection endpoints exist." }
+  ],
+  "urlsFetched": [],
+  "notes": "OpenAPI spec and C# sources reviewed. No language-specific guidance exists for csharp in this skill. Spec line numbers are approximate. SystemController.HealthCheck's XML doc <returns> is a copy-paste of a category-table description (SystemController.cs lines 40-42)."
+}
