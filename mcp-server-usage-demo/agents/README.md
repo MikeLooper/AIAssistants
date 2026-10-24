@@ -23,7 +23,7 @@ MCP server, and writes one timestamped Markdown report per exercise part into
    `C:\Working\Storage\Dev\GitHub\PilotMcpServer` (with its
    `shared/PilotSharedSource` submodule initialized) and the .NET 10 SDK on PATH.
 2. At least one Pilot API deployment running, such as
-   `pilot-api-dotnet-mssql` (localhost:55101). Check with `docker ps`.
+   `pilot-api-dotnet-mssql` (localhost:11001). Check with `docker ps`.
 3. The server registered for this workspace in `.vscode/mcp.json`:
 - Pointing to the source code to be built as-needed:
    ```json
