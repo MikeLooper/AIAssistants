@@ -54,7 +54,7 @@
 
 **Goal:** Employee and customer name for orders shipped by 'Speedy Express' to customers in Brussels.  
 **Data used:** `get_all_shippers`, `get_all_orders`, `get_all_employees`, `get_all_customers`  
-**Logic:** X  
+**Logic:** Joined orders to shippers, customers, and employees; kept orders shipped by Speedy Express to the Brussels customer (stored as Bruxelles); selected the order, employee, and customer names and ordered by order id.
 **Result (2 rows):**
 
 | OrderID | EmployeeName | CustomerName |
