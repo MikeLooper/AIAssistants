@@ -1,0 +1,13 @@
+{
+ "servers": {
+    "pilot": {
+      "type": "stdio",
+      "command": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "${workspaceFolder}/../PilotMcpServer/src/PilotMcpServer"
+      ]
+    }
+  }
+}
