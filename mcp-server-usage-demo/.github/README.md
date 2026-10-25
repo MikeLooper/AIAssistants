@@ -106,7 +106,7 @@ Start the server from VS Code Command Palette using `MCP: List Servers`, then st
    - `Run parts 2 and 3 only`
    - `Run part 1 using Python with PostgreSQL`
 
-The agent will generate report files in `docs/`, write a run summary report (`northwind-exercise-cost-summary-<timestamp>.md`), and then return a short completion summary with created files and write verification.
+The agent will generate report files in `docs/`, write a run summary report (`northwind-exercise-summary-<timestamp>.md`), and then return a short completion summary with created files and write verification.
 
 ## Related documentation
 
