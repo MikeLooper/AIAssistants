@@ -4,7 +4,7 @@ This directory contains a repository custom agent, `northwind-reporting`, that d
 
 ## Agent included in this demo
 
-- Agent file: `agents/northwind-reporting.agent.md`
+- Agent file: `.github/agents/northwind-reporting.agent.md`
 - Purpose: run Northwind exercises (parts 1-4) against a live Northwind API exposed through the `pilot` MCP server.
 - Output:
   - Per-part reports in `docs/northwind-part-<N>-report-<yyyyMMdd>-<HHmmss>.md`
@@ -19,13 +19,18 @@ This directory contains a repository custom agent, `northwind-reporting`, that d
 
 The agent depends on these skill definitions:
 
-- `skills/northwind-data-access/SKILL.md`
-- `skills/northwind-report-writing/SKILL.md`
-- `skills/northwind-exercises/SKILL.md`
-- `skills/northwind-exercises/references/part-1.md`
-- `skills/northwind-exercises/references/part-2.md`
-- `skills/northwind-exercises/references/part-3.md`
-- `skills/northwind-exercises/references/part-4.md`
+- `.github/skills/northwind-data-access/SKILL.md`
+- `.github/skills/northwind-report-writing/SKILL.md`
+- `.github/skills/northwind-exercises/SKILL.md`
+- `.github/skills/northwind-exercises/references/part-1.md`
+- `.github/skills/northwind-exercises/references/part-2.md`
+- `.github/skills/northwind-exercises/references/part-3.md`
+- `.github/skills/northwind-exercises/references/part-4.md`
+- `.github/skills/northwind-validation/SKILL.md`
+- `.github/skills/northwind-validation/baseline/part-1.md`
+- `.github/skills/northwind-validation/baseline/part-2.md`
+- `.github/skills/northwind-validation/baseline/part-3.md`
+- `.github/skills/northwind-validation/baseline/part-4.md`
 
 ## Install in another repository
 
@@ -49,6 +54,13 @@ Target structure in the destination repository:
         part-2.md
         part-3.md
         part-4.md
+    northwind-validation/
+	  SKILL.md
+	  baseline/
+	    part-1.md
+	    part-2.md
+	    part-3.md
+	    part-4.md
 ```
 
 Optional but recommended:
@@ -81,7 +93,27 @@ Example configuration (adjust paths for your machine):
 }
 ```
 
+Replace the path listed above, with the path to the correct location, such as: `C:/Working/Storage/Dev/GitHub/PilotMcpServer/src/PilotMcpServer`.
+
+Note that the slashes are changed to Linux-style pathing.
+
 Start the server from VS Code Command Palette using `MCP: List Servers`, then start `pilot`.
+
+If the MCP server will not start, it may be a Chat session timing issue.  Try starting a Chat session first by sending a random message from the Chat screen.
+If you want to start it without waiting for a chat message, point `command` at the built PilotMcpServer.exe instead of `dotnet run`.
+
+A mcp.json using the pre-built code directly would look like the following:
+```
+{
+  "servers": {
+    "pilot": {
+      "type": "stdio",
+      "command": "C:/Working/Storage/Dev/GitHub/PilotMcpServer/src/PilotMcpServer/bin/Debug/net10.0/PilotMcpServer.exe",
+      "args": []
+    }
+  }
+}
+```
 
 ## Execute the agent
 
@@ -98,5 +130,5 @@ The agent will generate report files in `docs/` and then return a short completi
 
 ## Related documentation
 
-- Agent details: `agents/README.md`
-- Agent definition: `agents/northwind-reporting.agent.md`
+- Agent details: `.github/agents/README.md`
+- Agent definition: `.github/agents/northwind-reporting.agent.md`

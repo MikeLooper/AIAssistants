@@ -27,6 +27,7 @@ Rules for the Markdown reports produced by the Northwind reporting exercises.
 - **Generated:** <yyyy-MM-dd HH:mm:ss> local
 - **Pilot API:** <deployment description> (<host:port>)
 - **Data snapshot:** categories <n> · customers <n> · employees <n> · orders <n> · order details <n> · products <n> · shippers <n> · suppliers <n>
+- **Data validation:** <pp.pp>% (<matched> of <checks> checks matched baseline · <x> of <y> exercises exact)
 
 ## Exercise <N>.<M> — <short title>
 
@@ -40,12 +41,47 @@ Rules for the Markdown reports produced by the Northwind reporting exercises.
 | value | value |
 
 **Notes:** assumptions, interpretation choices, null handling, edge cases (omit if none)
+
+## Data validation — Part <N>
+
+**Validation score:** <pp.pp>% (<matched> of <checks> checks matched the baseline)
+
+**Snapshot check:**
+
+| Table | Baseline | Current | Result |
+| --- | --- | --- | --- |
+| categories | <n> | <n> | Match |
+
+**Exercise check:**
+
+| Exercise | Baseline rows | Current rows | Matched | Score | Status |
+| --- | --- | --- | --- | --- | --- |
+| <N>.<M> | <n> | <n> | <n> | <pp.pp>% | Match |
+
+**Differences:** bullet per difference (missing, unexpected, or changed row), or `None`
 ```
 
 - Title the section with the part and exercise number (e.g. `## Exercise 2.4 — ...`).
 - For **write** exercises (add/rename shipper), replace the result table with:
   - `**Action taken:**` the tool called and the payload sent, and
   - `**Verification:**` the re-fetched after-state quoted from tool output.
+
+## Data validation section
+
+- Every part report ends with a `## Data validation — Part <N>` section, after the
+  last exercise, and repeats the score in the `Data validation` header line.
+- The results come from the [northwind-validation](../northwind-validation/SKILL.md)
+  skill, which is run **before** the report is written. The percentage is that
+  skill's part score; do not compute it any other way.
+- The score is a percentage with 2 decimal places (for example `98.75%`).
+- The `Status` column is `Match` (100%), `Partial` (above 0% and below 100%), or
+  `Mismatch` (0%). The snapshot `Result` column is `Match` or `Mismatch`.
+- List up to 5 differences per exercise under **Differences**, then state how many
+  more exist. Write `None` when every exercise matches.
+- If the baseline could not be read, write `Unavailable` for the score and explain
+  why under **Differences**. Never estimate a score.
+- A score below 100% is informational only; it does not change or replace the
+  results reported for the exercises.
 
 ## Formatting rules
 
@@ -60,6 +96,43 @@ Rules for the Markdown reports produced by the Northwind reporting exercises.
 - Never fabricate rows or values: every reported value must trace back to tool
   output from the current run.
 
+## Run summary report
+
+Every completed run also produces **one** summary report, written **after** all
+requested part reports exist. It is a required deliverable, not optional.
+
+- File name: `docs/northwind-exercise-summary-<yyyyMMdd>-<HHmmss>.md`, using a
+  timestamp captured with `Get-Date -Format "yyyyMMdd-HHmmss"` when the summary is
+  written. Never overwrite an earlier summary.
+- Cover only the parts in scope for the run.
+- Structure:
+
+```markdown
+# Northwind Exercises
+
+- **Generated:** <yyyy-MM-dd HH:mm:ss> local
+- **Requested parts:** <e.g. 1, 2, 3, 4>
+- **Pilot API:** <deployment description> (<host:port>)
+
+## Part reports
+
+| Part | Report file | Data validation |
+| --- | --- | --- |
+| 1 | [<file name>](<file name>) | <pp.pp>% |
+
+## Validations per exercise
+
+| Part/Exercise | Status | Validation |
+| --- | --- | --- | --- |
+| 1.1 | <number or Unavailable> | Completed | <pp.pp>% |
+```
+
+- One row per exercise in scope, in numerical order. `Status` is `Completed`, plus a
+  short parenthetical for the write exercises (for example `Completed (shipper
+  added as shipperId 11038, verified)` or `Skipped (shipper already existed)`).  `Validation` is the percent correct from the data validation on the exercise.
+- Link the part reports with paths relative to the summary file (same `docs/`
+  folder, so just the file name).
+
 ## Failure reports
 
 - A non-success API status code, API error message, MCP tool error, timeout, or
@@ -70,16 +143,7 @@ Rules for the Markdown reports produced by the Northwind reporting exercises.
   endpoint/operation, safe request parameters, status code, status/description,
   complete error message or response body, request/correlation id and response
   headers when available, plus the exercise and step in progress.
-- Include what completed, what was not attempted, files already written, and
-  recorded credits/usage. Redact secrets and credentials, and never invent
+- Include what completed, what was not attempted, and files already written.
+  Redact secrets and credentials, and never invent
   missing response details; write `Unavailable` when a diagnostic field is not
   exposed.
-
-## Credit summary
-
-- Write a separate cost summary after all requested parts finish:
-  `docs/northwind-exercise-cost-summary-<yyyyMMdd>-<HHmmss>.md`.
-- Include one row per exercise with its part/exercise number, credits used, and
-  status, followed by an overall credits total.
-- Use the actual tool or run usage data. If credits are unavailable, write
-  `Unavailable`; never estimate or treat unavailable values as zero.

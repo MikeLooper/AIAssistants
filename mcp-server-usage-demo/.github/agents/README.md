@@ -12,10 +12,13 @@ MCP server, and writes one timestamped Markdown report per exercise part into
 - Executes the exercises in Parts 1-4: 30 read-only reports plus 2 small writes
   (add shipper `Amazon`, then rename it to `Amazon Prime Shipping`).
 - Writes `docs/northwind-part-<N>-report-<yyyyMMdd>-<HHmmss>.md` for each part.
-- Writes a separate `docs/northwind-exercise-cost-summary-<yyyyMMdd>-<HHmmss>.md`
-  containing credits per exercise and the overall credits total.
-- Ends with a chat summary: report files created, empty result sets, and write
-  verification.
+- Validates each part's snapshot counts and exercise results against a static
+  baseline and reports a validation percentage per part.
+- Writes a run summary report,
+  `docs/northwind-exercise-cost-summary-<yyyyMMdd>-<HHmmss>.md`, with links to the
+  part reports and validation percentages.
+- Ends with a chat summary: report files created (including the summary report),
+  validation percentages, empty result sets, and write verification.
 
 ## Prerequisites
 
@@ -66,9 +69,11 @@ only` or `use Python with PostgreSQL`.
 
 One file per part per run, for example
 `docs/northwind-part-2-report-20260906-143210.md`. Each report contains a header
-(timestamp, deployment, table row counts) and one section per exercise with goal,
-data used, logic, a result table with row count, and notes. The exact format is
-defined by the `northwind-report-writing` skill.
+(timestamp, deployment, table row counts, validation percentage) and one section per exercise with goal,
+data used, logic, a result table with row count, and notes, followed by a
+`Data validation` section. Each completed run also writes one
+`docs/northwind-exercise-cost-summary-<yyyyMMdd>-<HHmmss>.md` summary. The exact
+formats are defined by the `northwind-report-writing` skill.
 
 ## Supporting skills
 
@@ -78,9 +83,12 @@ The agent uses these workspace skills:
   inventory, record fields, join keys, revenue math, snapshot strategy, and
   write-safety rules.
 - [northwind-report-writing](../skills/northwind-report-writing/SKILL.md) -
-  report file naming, section structure, formatting rules, and credit summaries.
+  report file naming, section structure, formatting rules, and the validation section.
 - [northwind-exercises](../skills/northwind-exercises/SKILL.md) - the four
-  exercise reference files and credit-summary workflow.
+  exercise reference files and execution scope.
+- [northwind-validation](../skills/northwind-validation/SKILL.md) - static baseline
+  copies of the reference run's data and the procedure that scores a run against
+  them.
 
 ## Caveats
 
@@ -90,6 +98,9 @@ The agent uses these workspace skills:
   numbers between runs.
 - The agent never deletes data. If test shippers pile up, remove them manually;
   `delete_shipper` exists in the MCP server but is not used by the agent.
+- The validation baseline is a static copy of a 2026-10-24 reference run. A score
+  below 100% can simply mean the shared data changed; it is reported, not treated
+  as a failure.
 
 ## Troubleshooting
 

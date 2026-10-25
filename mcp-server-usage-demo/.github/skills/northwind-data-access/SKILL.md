@@ -96,8 +96,8 @@ Each resource has five tools: `get_all_*`, `get_*`, `add_*`, `update_*`, `delete
   available; status and description; complete API/MCP error message or response
   body; request/correlation id and response headers when available; and the
   exercise and workflow step in progress. Redact secrets and credentials only.
-- Also state the completed work, unattempted work, files already written, and
-  credits or usage recorded before the failure. Provide a repair hint only when
+- Also state the completed work, unattempted work, and files already written
+  before the failure. Provide a repair hint only when
   supported by the observed response.
 
 ## Write operations
