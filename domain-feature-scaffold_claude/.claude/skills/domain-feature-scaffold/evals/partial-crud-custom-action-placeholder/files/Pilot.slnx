@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Pilot.Api/Pilot.Api.csproj" />
+    <Project Path="src/Pilot.Domain/Pilot.Domain.csproj" />
+    <Project Path="src/Pilot.Repositories/Pilot.Repositories.csproj" />
+    <Project Path="src/Pilot.Services/Pilot.Services.csproj" />
+  </Folder>
+</Solution>

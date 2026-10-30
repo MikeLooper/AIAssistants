@@ -1,0 +1,12 @@
+schema_version: "1.1"
+name: partial-crud-custom-action-placeholder
+context:
+  scaffold_script: place-files.sh
+expected_outcome: |
+  The domain name is normalized to CustomerNote. Only Create, Read and a custom Archive action are
+  generated (no Update or Delete). The entity is mapped to the placeholder table CustomerNotes_TBD
+  with an Id key and a visible TODO for the real columns. The new actions are added to the existing
+  CustomersController, which keeps ICustomerService and gains ICustomerNoteService. The registration
+  chain is completed and the solution builds. Best-guess unit tests cover the new code and their
+  result is reported honestly; Bruno requests exist for the new endpoints; and a README lists the new
+  endpoints and the placeholder-table TODOs.
