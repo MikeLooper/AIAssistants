@@ -1,0 +1,9 @@
+schema_version: "1.1"
+name: interviews-before-writing
+context:
+  scaffold_script: place-files.sh
+expected_outcome: |
+  Only the domain name (Shipment) is given, so the run inspects the solution and then asks the user
+  which actions to implement (CRUD subset and/or custom actions), which table to target, and which
+  controller to use, offering the existing CustomersController and a new ShipmentController as
+  choices. It does not create or modify any source files before getting answers.

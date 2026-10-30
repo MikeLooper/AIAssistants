@@ -12,6 +12,15 @@ When the task is unit-test related, follow that scoped file-instructions documen
 - Coverage, naming, and class conventions.
 - Validation workflow and supporting test assets.
 
+## Coding Instructions
+Source code creation standards are defined in `.github/instructions/coding.instructions.md` (one per language: `coding-dotnet`, `coding-java`, `coding-python`).
+
+When the task creates or changes application source code, follow that scoped file-instructions document for:
+- Project structure, architecture, and naming.
+- Documentation, API (including 12-Factor), and UI design.
+- Security, observability (OpenTelemetry with `CorrelationId` in all logging), and reliability.
+- Dependency management and performance.
+
 ## Global Guardrails
 - Keep instructions scoped to the task at hand.
 - Avoid changing unrelated files.

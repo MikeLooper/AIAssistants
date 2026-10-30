@@ -1,0 +1,13 @@
+schema_version: "1.1"
+name: full-crud-new-controller
+context:
+  scaffold_script: place-files.sh
+expected_outcome: |
+  All four interview answers are in the prompt, so no questions are needed. The run adds SupplierDto
+  (Domain), SupplierEntity mapped to the Suppliers table with the columns from db/schema.sql,
+  ISupplierRepository/SupplierRepository and ISupplierService/SupplierService with Create, Read, Update
+  and Delete, ToEntity/ToDto mapping in the service, and a new controller. AddPilotServices calls
+  AddPilotRepositories, Program.cs calls only AddPilotServices, and dotnet build succeeds. A test project with best-guess
+  unit tests covers the new repository, service, mapping, controller and registration, and the run reports its
+  dotnet test result honestly; a Bruno collection has one request with status-code tests per new endpoint;
+  and a README describes the feature, its endpoints and how to run the tests.

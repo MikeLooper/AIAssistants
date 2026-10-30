@@ -10,6 +10,10 @@ AI Assistants to accomplish a multitude of tasks.
 `compliance-reviewer_agent-plus-python` - An agent for determining how well application source code is complying with standards and best-practices.  This assistant uses agents, skills, and related AI tooling along with some Python scripting to cut back on some of the credits spend.
 - [README](compliance-reviewer_agent-plus-python/README.md)
 
+`domain-feature-scaffold_claude` / `domain-feature-scaffold_copilot` - A skill (one version for Claude Code, one for GitHub Copilot) that interviews you, then adds a new domain feature through every layer of a layered application: DTO, entity, repository, service, controller actions and chained dependency-injection registration.
+- [README (Claude)](domain-feature-scaffold_claude/README.md)
+- [README (Copilot)](domain-feature-scaffold_copilot/README.md)
+
 `job-search-agent` - A Job Search tool will read job boards and present a display of how well listed jobs match some specified search criteria.
 - [README](job-search-agent/README.md)
 
