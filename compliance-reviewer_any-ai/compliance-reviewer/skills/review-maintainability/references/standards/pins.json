@@ -1,0 +1,8 @@
+{
+  "$comment": "Source pins for check_source_drift.py (maintainers only; never used during a review). Pins copied from the standards file headers must match them; 'baseline' marks values recorded by the script.",
+  "skill": "review-maintainability",
+  "checks": [],
+  "unpinned": {
+    "maintainability-rubric.md": "Local rubric written in this repo; no external source. Review on the MAINTENANCE.md cadence."
+  }
+}

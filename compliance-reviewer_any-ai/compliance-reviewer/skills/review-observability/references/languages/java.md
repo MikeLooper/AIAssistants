@@ -1,0 +1,17 @@
+# Language Signals — Java (Observability)
+
+Local lookup table, not a standard. Use it to classify code and configuration for OBS-01 … OBS-10; cite the standards elements, never this file. If a library isn't listed and you can't classify it, add `localized-standard-gap: unrecognized library <name>` to `notes`.
+
+| Area | Pass signals | Anti-patterns / fail signals |
+|---|---|---|
+| Structured logging (OBS-01) | SLF4J `{}` placeholders and SLF4J 2 fluent API (`log.atInfo().addKeyValue("orderId", id).log(...)`), MDC, Logback JSON encoder / logstash-logback-encoder, Log4j2 `JsonTemplateLayout`, Spring Boot structured logging (`logging.structured.format.*`) | string concatenation in `log.info("..." + x)`; `System.out.println` / `System.err`; `e.printStackTrace()` |
+| Log levels (OBS-01, OBS-10) | `logging.level.*` in `application*.yml/properties` per profile; `logback-spring.xml` with `<springProfile>` | errors logged at `info`; levels only changeable by code |
+| OpenTelemetry setup, code-based (OBS-03, OBS-05) | OpenTelemetry SDK autoconfigure (`AutoConfiguredOpenTelemetrySdk`), `opentelemetry-spring-boot-starter`, Micrometer Observation + `micrometer-tracing-bridge-otel`, `OtlpGrpcSpanExporter`/`OtlpHttpSpanExporter` configured from properties | `LoggingSpanExporter` as the only exporter in production; `SdkTracerProvider` built per request; endpoint hard-coded |
+| Zero-code (instrumentation mode) | `-javaagent:…/opentelemetry-javaagent.jar` in Dockerfile/entrypoint/`JAVA_TOOL_OPTIONS`, `OTEL_*` env vars in manifests; Operator annotation `instrumentation.opentelemetry.io/inject-java` | — |
+| Instrumentation libraries (OBS-03) | covered by the Java agent; otherwise library instrumentations for Spring Web/WebFlux, JDBC, Kafka clients, gRPC | hand-rolled spans around every HTTP call while an agent is also active (duplicates) |
+| Context propagation (OBS-02) | `Context.current()`, `Context.taskWrapping(executor)` / `Context.current().wrap(runnable)`, propagators API `inject`/`extract` for message headers | raw `ExecutorService`/`CompletableFuture.supplyAsync` without context wrapping in code-based mode; custom correlation header not forwarded |
+| Metrics (OBS-04) | Micrometer `Timer`/`Counter`/`DistributionSummary` with percentile histograms, OpenTelemetry `LongCounter`/`DoubleHistogram`; Spring Boot `http.server.requests` | tags from user IDs or raw URIs (`uri` tag not templated) |
+| Identity (OBS-08) | `OTEL_SERVICE_NAME` / `otel.service.name`, `spring.application.name` mapped to service name, `otel.resource.attributes` with version and environment | no service name; version constant |
+| Health checks (OBS-06) | Spring Boot Actuator `/actuator/health`, `management.endpoint.health.probes.enabled=true` → `/actuator/health/liveness` and `/readiness`, health groups (`management.endpoint.health.group.*.include`), custom `HealthIndicator` | liveness group including DB/broker indicators; `management.endpoint.health.show-details=always` on an unauthenticated endpoint (WAFO-37) |
+| Exception logging (OBS-09) | `log.error("...", e)` (throwable as last argument), `span.recordException(e)` + `span.setStatus(StatusCode.ERROR)`, `@ControllerAdvice` logging unhandled exceptions at error | `log.error(e.getMessage())` without the throwable; log-and-rethrow at every layer; `ResponseStatusException` recorded as an error exception |
+| Vendor SDK (equivalent) | Application Insights Java agent, Azure Monitor OpenTelemetry distro, Datadog / New Relic / Elastic APM agents | — |

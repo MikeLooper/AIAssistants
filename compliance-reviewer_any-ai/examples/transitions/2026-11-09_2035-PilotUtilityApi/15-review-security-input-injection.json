@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2035-PilotUtilityApi",
+  "stepId": "15-review-security-input-injection",
+  "status": "completed",
+  "startedAt": "2026-11-09T20:35:41-07:00",
+  "completedAt": "2026-11-09T20:52:00-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "batchId": "batch-1",
+  "skill": "review-security-input-injection",
+  "subject": "Security",
+  "findings": [],
+  "strengths": [
+    {
+      "id": "SEC-II-02#S1",
+      "subject": "Security",
+      "subSubject": "Input & Injection",
+      "checkId": "SEC-II-02",
+      "title": "Reset SQL is fixed constant text with no interpolated values, executed via Dapper",
+      "evidence": [ { "file": "src/PilotUtiltyApi.Repositories/Constants/SqlConstants.cs", "lineStart": 12, "lineEnd": 18, "excerpt": "public const string SqlServerResetTestingScript = @\" ... DELETE FROM Categories WHERE categoryName = 'Test Cat'" } ],
+      "standard": "OWASP SQL Injection Prevention Cheat Sheet — SQL-01",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html#introduction"
+    },
+    {
+      "id": "SEC-II-01#S1",
+      "subject": "Security",
+      "subSubject": "Input & Injection",
+      "checkId": "SEC-II-01",
+      "title": "Controllers use [ApiController] and the only input is a typed, required boolean query parameter",
+      "evidence": [ { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 63, "lineEnd": 64, "excerpt": "[FromQuery(Name = \"show-details\"), BindRequired] bool showDetails = false" } ],
+      "standard": "Microsoft Learn — Model validation in ASP.NET Core — NET-14",
+      "url": "https://learn.microsoft.com/aspnet/core/mvc/models/validation?view=aspnetcore-10.0#model-state"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "SEC-II-01", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-II-02", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-II-03", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-II-04", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "No OS command or other interpreter invocation in the reviewed files.", "findingIds": [] },
+    { "checkId": "SEC-II-05", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "No XML is parsed.", "findingIds": [] },
+    { "checkId": "SEC-II-06", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "No file uploads.", "findingIds": [] },
+    { "checkId": "SEC-II-07", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "No file uploads.", "findingIds": [] },
+    { "checkId": "SEC-II-08", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "Nothing is rendered to HTML; JSON API only.", "findingIds": [] },
+    { "checkId": "SEC-II-09", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "Nothing deserialized beyond plain JSON/query binding into typed values.", "findingIds": [] },
+    { "checkId": "SEC-II-10", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "No outbound request uses a URL or host derived from untrusted data.", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "Connection strings are built from server configuration, not request data; TrustServerCertificate=True is a transport concern outside this skill."
+}

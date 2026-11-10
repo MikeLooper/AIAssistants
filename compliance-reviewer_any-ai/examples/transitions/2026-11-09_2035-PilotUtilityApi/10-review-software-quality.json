@@ -1,0 +1,229 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2035-PilotUtilityApi",
+  "stepId": "10-review-software-quality",
+  "status": "completed",
+  "startedAt": "2026-11-09T20:35:41-07:00",
+  "completedAt": "2026-11-09T20:52:00-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "batchId": "batch-1",
+  "skill": "review-software-quality",
+  "subject": "Software Quality",
+  "findings": [
+    {
+      "id": "SQ-01#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-01",
+      "severity": "Warning",
+      "title": "ResetTestingAsync mixes configuration lookup, connection construction, transaction handling, execution and error mapping in one body [ISO 25010:2023 Maintainability › Modifiability, ISO-30]",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 57, "lineEnd": 125, "excerpt": "~55 logical lines: public async Task<RetrieveResponse<int>> ResetTestingAsync(CancellationToken cancellationToken = default)" }
+      ],
+      "standard": "Compliance Reviewer Software Quality Rubric — SQR-02",
+      "url": "../../compliance-reviewer/skills/review-software-quality/references/standards/software-quality-rubric.md#sqr-02",
+      "recommendation": "Apply Split Phase (FRC-02, https://refactoring.com/catalog/splitPhase.html): move connection creation/opening into a connection factory and keep the method to executing the script inside a transaction.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    },
+    {
+      "id": "SQ-03#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-03",
+      "severity": "Warning",
+      "title": "The same switch on DataSourceType.ToLowerInvariant() is repeated in three methods [ISO 25010:2023 Maintainability › Modifiability, ISO-30]",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 138, "lineEnd": 156, "excerpt": "return dataSource.DataSourceType.ToLowerInvariant() switch" },
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 173, "lineEnd": 178, "excerpt": "return dataSourceType.ToLowerInvariant() switch" },
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 192, "lineEnd": 197, "excerpt": "return dataSourceType.ToLowerInvariant() switch" }
+      ],
+      "standard": "Compliance Reviewer Software Quality Rubric — SQR-07",
+      "url": "../../compliance-reviewer/skills/review-software-quality/references/standards/software-quality-rubric.md#sqr-07",
+      "recommendation": "Apply Replace Conditional with Polymorphism (FRC-06, https://refactoring.com/catalog/replaceConditionalWithPolymorphism.html): introduce a per-provider type (SQL Server, PostgreSQL) that supplies the connection string, connection and reset script, so adding a provider touches one class.",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "SQ-05#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-05",
+      "severity": "Information",
+      "title": "Boolean flag argument suppressSensitiveValues selects copy behaviour and is passed as a bare 'true' [ISO 25010:2023 Maintainability › Analysability, ISO-29]",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Configuration/ApplicationConfiguration.cs", "lineStart": 34, "lineEnd": 36, "excerpt": "public ApplicationConfiguration(IApplicationConfiguration sourceConfiguration, bool suppressSensitiveValues = false)" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 87, "lineEnd": 87, "excerpt": "new ApplicationConfiguration(this.ApplicationConfiguration, true)" }
+      ],
+      "standard": "Compliance Reviewer Software Quality Rubric — SQR-13",
+      "url": "../../compliance-reviewer/skills/review-software-quality/references/standards/software-quality-rubric.md#sqr-13",
+      "recommendation": "Apply Remove Flag Argument (FRC-13, https://refactoring.com/catalog/removeFlagArgument.html), e.g. a named factory such as ApplicationConfiguration.CreateRedactedCopy(source).",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "SQ-06#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-06",
+      "severity": "Warning",
+      "title": "Nested catch (Exception) blocks without filters inside the repository [ISO 25010:2023 Reliability › Fault tolerance, ISO-19]",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 92, "lineEnd": 103, "excerpt": "catch (Exception exInner) { transaction.Rollback(); ... throw new UserException(loggingCorrelation.UserMessage);" },
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 111, "lineEnd": 124, "excerpt": "catch (UserException) { throw; } catch (Exception ex) {" }
+      ],
+      "standard": "Microsoft C# conventions — MSC-09",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions#language-guidelines",
+      "recommendation": "Catch the provider exceptions you can handle (DbException, OperationCanceledException) or use an exception filter, and let the existing UnhandledExceptionMiddleware handle the rest; use ArgumentNullException for null arguments.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "DP-04#1",
+      "subject": "Software Quality",
+      "subSubject": "Design Patterns",
+      "checkId": "DP-04",
+      "severity": "Information",
+      "title": "TestingService is a pass-through tier that only forwards to the repository [ISO 25010:2023 Maintainability › Analysability, ISO-29]",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Services/Services/TestingService.cs", "lineStart": 49, "lineEnd": 52, "excerpt": "return await testingRepository.ResetTestingAsync(cancellationToken);" }
+      ],
+      "standard": "Compliance Reviewer Software Quality Rubric — SQR-23",
+      "url": "../../compliance-reviewer/skills/review-software-quality/references/standards/software-quality-rubric.md#sqr-23",
+      "recommendation": "Either give the service real responsibility (e.g. environment guard, auditing of the reset) or apply Remove Middle Man (FRC-19, https://refactoring.com/catalog/removeMiddleMan.html); its injected logger is also unused.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "CS-01#1",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-01",
+      "severity": "Information",
+      "title": "Inconsistent names: 'PilotUtiltyApi' project folders vs 'PilotUtilityApi' projects/namespaces, and a Dto namespace in a Responses folder",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/PilotUtilityApi.Web.csproj", "lineStart": 12, "lineEnd": 14, "excerpt": "<ProjectReference Include=\"..\\PilotUtiltyApi.Domain\\PilotUtilityApi.Domain.csproj\" />" },
+        { "file": "src/PilotUtiltyApi.Domain/Models/Responses/AboutResponse.cs", "lineStart": 4, "lineEnd": 4, "excerpt": "namespace PilotUtilityApi.Domain.Models.Dto" }
+      ],
+      "standard": "Compliance Reviewer Software Quality Rubric — SQR-32",
+      "url": "../../compliance-reviewer/skills/review-software-quality/references/standards/software-quality-rubric.md#sqr-32",
+      "recommendation": "Apply Rename (FRC-22, https://refactoring.com/catalog/renameField.html): rename the 'PilotUtilty' folders to match the project names, and align AboutResponse's namespace with its folder (the .editorconfig already sets dotnet_style_namespace_match_folder = true).",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "CS-03#1",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-03",
+      "severity": "Information",
+      "title": "Stale documentation comments and examples that contradict the code",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 40, "lineEnd": 48, "excerpt": "A read only list of all DTO objects from the category table ... return this.Ok(\"OK\");" },
+        { "file": "src/PilotUtiltyApi.Services/Extensions/ServicesInjectionExtensions.cs", "lineStart": 27, "lineEnd": 30, "excerpt": "webAppBuilder.Services.ServicesConfiguration(); ... ServicesConfiguration(this WebApplicationBuilder builder)" },
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 59, "lineEnd": 65, "excerpt": "var webApp = webAppBuilder.ApiWebApplication(); ... ApiWebApplication(this WebApplication webApp)" }
+      ],
+      "standard": "Compliance Reviewer Software Quality Rubric — SQR-34",
+      "url": "../../compliance-reviewer/skills/review-software-quality/references/standards/software-quality-rubric.md#sqr-34",
+      "recommendation": "Correct the HealthCheck <returns> text and the <example> blocks so they match the actual return value and extension-method receivers.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "CS-05#1",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-05",
+      "severity": "Warning",
+      "title": "Nullable reference types enabled but key nullable warnings downgraded to suggestions",
+      "evidence": [
+        { "file": "Directory.Build.props", "lineStart": 5, "lineEnd": 5, "excerpt": "<Nullable>enable</Nullable>" },
+        { "file": ".editorconfig", "lineStart": 256, "lineEnd": 260, "excerpt": "dotnet_diagnostic.CS8602.severity = suggestion ... dotnet_diagnostic.CS8604.severity = suggestion" }
+      ],
+      "standard": "Compliance Reviewer Software Quality Rubric — SQR-36",
+      "url": "../../compliance-reviewer/skills/review-software-quality/references/standards/software-quality-rubric.md#sqr-36",
+      "recommendation": "Restore CS8602/CS8604 to warning (or error) and fix the flagged dereferences, e.g. DataSources.FirstOrDefault in TestingRepository.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "CS-05#2",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-05",
+      "severity": "Warning",
+      "title": "var used where the type isn't apparent, contrary to the documented explicit-type convention",
+      "evidence": [
+        { "file": ".editorconfig", "lineStart": 92, "lineEnd": 94, "excerpt": "csharp_style_var_elsewhere = false ... csharp_style_var_when_type_is_apparent = false" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 53, "lineEnd": 53, "excerpt": "var response = await testingService.ResetTestingAsync(cancellationToken);" },
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 73, "lineEnd": 79, "excerpt": "var connection = CreateConnection(...); ... var transaction = connection.BeginTransaction();" }
+      ],
+      "standard": "Microsoft C# conventions — MSC-12",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions#implicitly-typed-local-variables",
+      "recommendation": "Use explicit types where the right side doesn't show the type (or change the .editorconfig preference to match practice), and stop silencing IDE0008 so the chosen rule is enforced.",
+      "confidence": "Medium",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "AP-01#S1",
+      "subject": "Software Quality",
+      "subSubject": "Architecture Patterns",
+      "checkId": "AP-01",
+      "title": "Web project references Domain, Services and Shared only; data access stays behind the services layer",
+      "evidence": [ { "file": "src/PilotUtiltyApi.Web/PilotUtilityApi.Web.csproj", "lineStart": 11, "lineEnd": 15, "excerpt": "<ProjectReference Include=\"..\\PilotUtiltyApi.Services\\PilotUtilityApi.Services.csproj\" />" } ],
+      "standard": "Compliance Reviewer Software Quality Rubric — SQR-27",
+      "url": "../../compliance-reviewer/skills/review-software-quality/references/standards/software-quality-rubric.md#sqr-27"
+    },
+    {
+      "id": "CS-02#S1",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-02",
+      "title": "Comprehensive root .editorconfig defines formatting, style and naming rules",
+      "evidence": [ { "file": ".editorconfig", "lineStart": 1, "lineEnd": 16, "excerpt": "root = true ... indent_style = tab" } ],
+      "standard": "Microsoft C# conventions — MSC-24",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions#tools-and-analyzers"
+    },
+    {
+      "id": "CS-04#S1",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-04",
+      "title": "XML documentation file generation enabled and public members consistently documented",
+      "evidence": [ { "file": "src/PilotUtiltyApi.Web/PilotUtilityApi.Web.csproj", "lineStart": 4, "lineEnd": 4, "excerpt": "<GenerateDocumentationFile>true</GenerateDocumentationFile>" } ],
+      "standard": "Microsoft C# conventions — MSC-23",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions#comment-style"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "SQ-01", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "fail", "reason": "ResetTestingAsync (~55 logical lines) interleaves connection setup, transaction control and error mapping.", "findingIds": ["SQ-01#1"] },
+    { "checkId": "SQ-02", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SQ-03", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "fail", "reason": "Same data-source-type switch repeated in three methods.", "findingIds": ["SQ-03#1"] },
+    { "checkId": "SQ-04", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SQ-05", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Information", "result": "fail", "reason": "Boolean flag argument selects constructor behaviour.", "findingIds": ["SQ-05#1"] },
+    { "checkId": "SQ-06", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "fail", "reason": "Unfiltered catch (Exception) blocks nested inside the repository.", "findingIds": ["SQ-06#1"] },
+    { "checkId": "SQ-08", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "DP-01", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "DP-02", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Information", "result": "N/A", "reason": "No project-defined class hierarchies in the reviewed files (only framework base classes).", "findingIds": [] },
+    { "checkId": "DP-04", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Information", "result": "fail", "reason": "TestingService only forwards calls to the repository.", "findingIds": ["DP-04#1"] },
+    { "checkId": "DP-05", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "DP-06", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Warning", "result": "N/A", "reason": "No event or observer subscriptions in the reviewed files.", "findingIds": [] },
+    { "checkId": "AP-01", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "AP-02", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "AP-03", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "AP-04", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "AP-06", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "AP-07", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "N/A", "reason": "Only one deployable unit (the Web project) in the reviewed files.", "findingIds": [] },
+    { "checkId": "CS-01", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "fail", "reason": "Project folder names and a namespace are inconsistent with the projects and folders they belong to.", "findingIds": ["CS-01#1"] },
+    { "checkId": "CS-02", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "CS-03", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "fail", "reason": "Several documentation comments contradict the code they describe.", "findingIds": ["CS-03#1"] },
+    { "checkId": "CS-04", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "CS-05", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Warning", "result": "fail", "reason": "Nullable warnings downgraded and var used against the documented convention.", "findingIds": ["CS-05#1", "CS-05#2"] }
+  ],
+  "urlsFetched": [],
+  "notes": "Team .editorconfig (tabs, block-scoped namespaces) judged as the prevailing convention over MSC-20/MSC-21 defaults."
+}

@@ -1,0 +1,130 @@
+{
+  "$comment": "Source pins for check_source_drift.py (maintainers only; never used during a review). Pins copied from the standards file headers must match them; 'baseline' marks values recorded by the script.",
+  "skill": "review-security-identity-access",
+  "checks": [
+    {
+      "id": "owasp-dnet",
+      "file": "aspnetcore-identity.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/DotNet_Security_Cheat_Sheet.md",
+      "pinned": "3cfa49de48236c667ddf1d0f9dc79e13e672b56d",
+      "pinnedDate": "2026-10-18"
+    },
+    {
+      "id": "owasp-atn",
+      "file": "owasp-identity-access.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Authentication_Cheat_Sheet.md",
+      "pinned": "684d6d9d",
+      "pinnedDate": "2026-10-04"
+    },
+    {
+      "id": "owasp-atz",
+      "file": "owasp-identity-access.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Authorization_Cheat_Sheet.md",
+      "pinned": "cfd69aab",
+      "pinnedDate": "2026-10-09"
+    },
+    {
+      "id": "owasp-jwt",
+      "file": "owasp-identity-access.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/JSON_Web_Token_Cheat_Sheet.md",
+      "pinned": "25d263ce",
+      "pinnedDate": "2026-10-04"
+    },
+    {
+      "id": "owasp-oau",
+      "file": "owasp-identity-access.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/OAuth2_Cheat_Sheet.md",
+      "pinned": "995524d4",
+      "pinnedDate": "2026-10-03"
+    },
+    {
+      "id": "owasp-ses",
+      "file": "owasp-identity-access.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Session_Management_Cheat_Sheet.md",
+      "pinned": "757270a2",
+      "pinnedDate": "2026-11-05"
+    },
+    {
+      "id": "owasp-pws",
+      "file": "owasp-identity-access.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Password_Storage_Cheat_Sheet.md",
+      "pinned": "87a1faf1",
+      "pinnedDate": "2026-10-30"
+    },
+    {
+      "id": "owasp-zta",
+      "file": "owasp-identity-access.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.md",
+      "pinned": "67663b74",
+      "pinnedDate": "2026-10-04"
+    },
+    {
+      "id": "top10-a01",
+      "file": "owasp-identity-access.md",
+      "method": "github-commit",
+      "repo": "OWASP/Top10",
+      "path": "2025/docs/en/A01_2025-Broken_Access_Control.md",
+      "pinned": "d4d000ec",
+      "pinnedDate": "2025-12-24"
+    },
+    {
+      "id": "top10-a07",
+      "file": "owasp-identity-access.md",
+      "method": "github-commit",
+      "repo": "OWASP/Top10",
+      "path": "2025/docs/en/A07_2025-Authentication_Failures.md",
+      "pinned": "d4d000ec",
+      "pinnedDate": "2025-12-24"
+    },
+    {
+      "id": "owasp-njs",
+      "file": "node-identity-access.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Nodejs_Security_Cheat_Sheet.md",
+      "pinned": "eeaa1e47",
+      "pinnedDate": "2026-11-05"
+    },
+    {
+      "id": "spring-security-current-release",
+      "file": "spring-security.md",
+      "method": "json",
+      "url": "https://api.spring.io/projects/spring-security/releases",
+      "select": "_embedded.releases[current=true].version",
+      "pinned": "7.1.2",
+      "note": "A new spring-security minor release means re-reading the pinned pages and defaults."
+    },
+    {
+      "id": "django-current-version",
+      "method": "redirect",
+      "url": "https://docs.djangoproject.com/en/stable/",
+      "expect": "/en/6.1/",
+      "note": "A new Django feature release means re-pinning the /en/6.1/ paths.",
+      "file": "django-auth.md"
+    },
+    {
+      "id": "express-security-page",
+      "method": "text-hash",
+      "url": "https://expressjs.com/en/advanced/best-practice-security.html",
+      "pinned": "0ae2ce811c4c1637",
+      "file": "node-identity-access.md",
+      "baseline": "2026-11-09"
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "$comment": "Source pins for check_source_drift.py (maintainers only; never used during a review). Pins copied from the standards file headers must match them; 'baseline' marks values recorded by the script.",
+  "skill": "review-performance",
+  "checks": [
+    {
+      "id": "learn-pe-check",
+      "file": "azure-performance-efficiency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/performance-efficiency/checklist",
+      "msDate": "2026-04-20",
+      "gitCommit": "ce3921ce25f1"
+    },
+    {
+      "id": "learn-pe-svc",
+      "file": "azure-performance-efficiency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/performance-efficiency/select-services",
+      "msDate": "2023-11-15",
+      "gitCommit": "0007a4d4697c"
+    },
+    {
+      "id": "learn-pe-scale",
+      "file": "azure-performance-efficiency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/performance-efficiency/scale-partition",
+      "msDate": "2023-11-15",
+      "gitCommit": "28a78d225235"
+    },
+    {
+      "id": "learn-pe-code",
+      "file": "azure-performance-efficiency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/performance-efficiency/optimize-code-infrastructure",
+      "msDate": "2023-11-15",
+      "gitCommit": "28a78d225235"
+    },
+    {
+      "id": "learn-pe-data",
+      "file": "azure-performance-efficiency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/performance-efficiency/optimize-data-performance",
+      "msDate": "2026-05-13",
+      "gitCommit": "3ff81f3a01b0"
+    },
+    {
+      "id": "learn-pe-crit",
+      "file": "azure-performance-efficiency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/performance-efficiency/prioritize-critical-flows",
+      "msDate": "2023-11-15",
+      "gitCommit": "28a78d225235"
+    },
+    {
+      "id": "learn-pe-ops",
+      "file": "azure-performance-efficiency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/performance-efficiency/optimize-operational-tasks",
+      "msDate": "2023-11-15",
+      "gitCommit": "ee7c014e94f1"
+    },
+    {
+      "id": "learn-ap",
+      "file": "azure-performance-efficiency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/antipatterns/",
+      "msDate": "2023-12-13",
+      "gitCommit": "d8f79749034a"
+    },
+    {
+      "id": "learn-ap-bdb",
+      "file": "azure-performance-efficiency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/antipatterns/busy-database/",
+      "msDate": "2017-06-05",
+      "gitCommit": "52bf91783e87"
+    },
+    {
+      "id": "learn-ap-bfe",
+      "file": "azure-performance-efficiency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/antipatterns/busy-front-end/",
+      "msDate": "2017-06-05",
+      "gitCommit": "dcf29659535a"
+    },
+    {
+      "id": "learn-ap-cio",
+      "file": "azure-performance-efficiency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/antipatterns/chatty-io/",
+      "msDate": "2017-06-05",
+      "gitCommit": "dcf29659535a"
+    },
+    {
+      "id": "learn-ap-ef",
+      "file": "azure-performance-efficiency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/antipatterns/extraneous-fetching/",
+      "msDate": "2022-07-25",
+      "gitCommit": "dcf29659535a"
+    },
+    {
+      "id": "learn-ap-ii",
+      "file": "azure-performance-efficiency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/antipatterns/improper-instantiation/",
+      "msDate": "2017-06-05",
+      "gitCommit": "d16b276a2d92"
+    },
+    {
+      "id": "learn-ap-mp",
+      "file": "azure-performance-efficiency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/antipatterns/monolithic-persistence/",
+      "msDate": "2017-06-05",
+      "gitCommit": "ac27d8de066b"
+    },
+    {
+      "id": "learn-ap-nc",
+      "file": "azure-performance-efficiency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/antipatterns/no-caching/",
+      "msDate": "2017-06-05",
+      "gitCommit": "dcf29659535a"
+    },
+    {
+      "id": "learn-ap-nn",
+      "file": "azure-performance-efficiency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/antipatterns/noisy-neighbor/noisy-neighbor",
+      "msDate": "2025-06-11",
+      "gitCommit": "853fa39cce09"
+    },
+    {
+      "id": "learn-ap-sio",
+      "file": "azure-performance-efficiency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/antipatterns/synchronous-io/",
+      "msDate": "2017-06-05",
+      "gitCommit": "a5a1441ee207"
+    },
+    {
+      "id": "learn-bp-cache",
+      "file": "azure-performance-efficiency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/best-practices/caching",
+      "msDate": "2026-03-25",
+      "gitCommit": "5ebacc7a6045"
+    },
+    {
+      "id": "learn-pat-ca",
+      "file": "azure-performance-efficiency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/cache-aside",
+      "msDate": "2025-09-11",
+      "gitCommit": "cb69919fc6c9"
+    }
+  ]
+}

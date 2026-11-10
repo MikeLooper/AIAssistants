@@ -1,0 +1,150 @@
+{
+  "$comment": "Source pins for check_source_drift.py (maintainers only; never used during a review). Pins copied from the standards file headers must match them; 'baseline' marks values recorded by the script.",
+  "skill": "review-reliability",
+  "checks": [
+    {
+      "id": "learn-re-check",
+      "file": "azure-reliability-resiliency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/checklist",
+      "msDate": "2023-11-15",
+      "gitCommit": "687e8febe6dd"
+    },
+    {
+      "id": "learn-re-prin",
+      "file": "azure-reliability-resiliency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/principles",
+      "msDate": "2025-09-30",
+      "gitCommit": "e565e8c63950"
+    },
+    {
+      "id": "learn-re-red",
+      "file": "azure-reliability-resiliency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/redundancy",
+      "msDate": "2025-08-13",
+      "gitCommit": "84b9446eb8fc"
+    },
+    {
+      "id": "learn-re-scale",
+      "file": "azure-reliability-resiliency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/scaling",
+      "msDate": "2025-05-29",
+      "gitCommit": "28a78d225235"
+    },
+    {
+      "id": "learn-re-sp",
+      "file": "azure-reliability-resiliency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/self-preservation",
+      "msDate": "2026-06-20",
+      "gitCommit": "ced3ebc11c89"
+    },
+    {
+      "id": "learn-re-fma",
+      "file": "azure-reliability-resiliency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/failure-mode-analysis",
+      "msDate": "2026-07-14",
+      "gitCommit": "ddb1377836ee"
+    },
+    {
+      "id": "learn-bp-tf",
+      "file": "azure-reliability-resiliency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/best-practices/transient-faults",
+      "msDate": "2026-02-26",
+      "gitCommit": "d6ef15167b11"
+    },
+    {
+      "id": "learn-bp-bg",
+      "file": "azure-reliability-resiliency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/best-practices/background-jobs",
+      "msDate": "2026-03-30",
+      "gitCommit": "03e41c0834ab"
+    },
+    {
+      "id": "learn-pat-retry",
+      "file": "azure-reliability-resiliency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/retry",
+      "msDate": "2024-07-18",
+      "gitCommit": "cb69919fc6c9"
+    },
+    {
+      "id": "learn-pat-cb",
+      "file": "azure-reliability-resiliency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/circuit-breaker",
+      "msDate": "2025-02-05",
+      "gitCommit": "9fdb775034a2"
+    },
+    {
+      "id": "learn-pat-bh",
+      "file": "azure-reliability-resiliency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/bulkhead",
+      "msDate": "2026-03-19",
+      "gitCommit": "02e4881cd2c9"
+    },
+    {
+      "id": "learn-pat-thr",
+      "file": "azure-reliability-resiliency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/throttling",
+      "msDate": "2026-05-29",
+      "gitCommit": "8ba9a37b0455"
+    },
+    {
+      "id": "learn-pat-rl",
+      "file": "azure-reliability-resiliency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/rate-limiting-pattern",
+      "msDate": "2026-06-08",
+      "gitCommit": "15cfa4cb8710"
+    },
+    {
+      "id": "learn-pat-qbll",
+      "file": "azure-reliability-resiliency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/queue-based-load-leveling",
+      "msDate": "2026-06-09",
+      "gitCommit": "d73cd1632ffa"
+    },
+    {
+      "id": "learn-pat-cc",
+      "file": "azure-reliability-resiliency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/competing-consumers",
+      "msDate": "2026-04-02",
+      "gitCommit": "282a7f99b9f7"
+    },
+    {
+      "id": "learn-pat-ic",
+      "file": "azure-reliability-resiliency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/idempotent-consumer",
+      "msDate": "2026-08-13",
+      "gitCommit": "dcf29659535a"
+    },
+    {
+      "id": "learn-pat-ct",
+      "file": "azure-reliability-resiliency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/compensating-transaction",
+      "msDate": "2026-04-16",
+      "gitCommit": "0244238b6c53"
+    },
+    {
+      "id": "learn-ap-rs",
+      "file": "azure-reliability-resiliency.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/antipatterns/retry-storm/",
+      "msDate": "2025-07-16",
+      "gitCommit": "91bbd0ff1799"
+    }
+  ]
+}

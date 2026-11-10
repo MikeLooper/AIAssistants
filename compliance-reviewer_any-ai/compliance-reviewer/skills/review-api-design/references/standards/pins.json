@@ -1,0 +1,34 @@
+{
+  "$comment": "Source pins for check_source_drift.py (maintainers only; never used during a review). Pins copied from the standards file headers must match them; 'baseline' marks values recorded by the script.",
+  "skill": "review-api-design",
+  "checks": [
+    {
+      "id": "azure-api-guidelines",
+      "file": "azure-rest-api-guidelines.md",
+      "method": "github-commit",
+      "repo": "microsoft/api-guidelines",
+      "path": "azure/Guidelines.md",
+      "ref": "vNext",
+      "pinned": "15c12663c363250bea4d60aa054e81466a1f0106",
+      "pinnedDate": "2026-10-22"
+    },
+    {
+      "id": "azure-sdk-azurecore",
+      "file": "azure-sdk-telemetry.md",
+      "method": "github-commit",
+      "repo": "Azure/azure-sdk",
+      "path": "docs/general/azurecore.md",
+      "pinned": "ce65374d0d4ea008fc607312daa53e503adbeb78",
+      "pinnedDate": "2025-07-30"
+    },
+    {
+      "id": "oas-latest-version",
+      "file": "openapi-specification.md",
+      "method": "regex",
+      "url": "https://spec.openapis.org/oas/latest.html",
+      "pattern": "<title>OpenAPI Specification v(\\d+\\.\\d+\\.\\d+)",
+      "pinned": "3.2.1",
+      "note": "Also check for new patch pages on the 3.0 and 3.1 lines (v3.0.5, v3.1.3)."
+    }
+  ]
+}

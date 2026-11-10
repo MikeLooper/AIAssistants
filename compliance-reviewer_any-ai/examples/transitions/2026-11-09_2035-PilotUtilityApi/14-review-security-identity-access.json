@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2035-PilotUtilityApi",
+  "stepId": "14-review-security-identity-access",
+  "status": "completed",
+  "startedAt": "2026-11-09T20:35:41-07:00",
+  "completedAt": "2026-11-09T20:52:00-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "batchId": "batch-1",
+  "skill": "review-security-identity-access",
+  "subject": "Security",
+  "findings": [
+    {
+      "id": "SEC-IA-01#1",
+      "subject": "Security",
+      "subSubject": "Identity & Access",
+      "checkId": "SEC-IA-01",
+      "severity": "Error",
+      "title": "No authentication or authorization is configured; there is no deny-by-default policy",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 112, "lineEnd": 126, "excerpt": "builder.Services.AddVersioning(); ... builder.Services.AddControllers(...) (no AddAuthentication/AddAuthorization)" },
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 78, "lineEnd": 85, "excerpt": "webApp.UseMiddleware<UnhandledExceptionMiddleware>(); ... webApp.MapControllers();" }
+      ],
+      "standard": "OWASP Authorization Cheat Sheet — ATZ-02",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html#deny-by-default",
+      "recommendation": "Add authentication plus AddAuthorization with a FallbackPolicy requiring an authenticated user, call UseAuthentication/UseAuthorization, and keep [AllowAnonymous] only on truly public endpoints such as healthcheck (ASP-09, T10-01).",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "SEC-IA-02#1",
+      "subject": "Security",
+      "subSubject": "Identity & Access",
+      "checkId": "SEC-IA-02",
+      "severity": "Error",
+      "title": "Anonymous POST /v1/testing/reset deletes rows across eight database tables",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 15, "lineEnd": 19, "excerpt": "[ApiController] ... [AllowAnonymous] public class TestingController : ControllerBase" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 46, "lineEnd": 53, "excerpt": "[HttpPost] [Route(\"reset\")] ... await testingService.ResetTestingAsync(cancellationToken);" }
+      ],
+      "standard": "OWASP .NET Security Cheat Sheet — ASP-10",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html#authorization",
+      "recommendation": "Remove [AllowAnonymous] and require a named admin/test policy ([Authorize(Policy = \"...\")]) on the reset action, or exclude the controller from non-test environments (T10-04).",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-IA-02#2",
+      "subject": "Security",
+      "subSubject": "Identity & Access",
+      "checkId": "SEC-IA-02",
+      "severity": "Error",
+      "title": "Anonymous GET /about?show-details=true returns the application configuration, including data-source details",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 60, "lineEnd": 64, "excerpt": "[HttpGet] [Route(\"about\")] ... About([FromQuery(Name = \"show-details\"), BindRequired] bool showDetails = false)" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 87, "lineEnd": 87, "excerpt": "ApplicationConfiguration = showDetails ? new ApplicationConfiguration(this.ApplicationConfiguration, true) : null" }
+      ],
+      "standard": "OWASP .NET Security Cheat Sheet — ASP-10",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html#authorization",
+      "recommendation": "Require an administrative policy for the show-details variant (or move it to a separate protected endpoint) and keep the anonymous response to name and version only.",
+      "confidence": "Medium",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [],
+  "checkResults": [
+    { "checkId": "SEC-IA-01", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "fail", "reason": "No authentication/authorization services, middleware or fallback policy.", "findingIds": ["SEC-IA-01#1"] },
+    { "checkId": "SEC-IA-02", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "fail", "reason": "Destructive reset and configuration-disclosure functions are anonymous.", "findingIds": ["SEC-IA-02#1", "SEC-IA-02#2"] },
+    { "checkId": "SEC-IA-03", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No JWTs are handled.", "findingIds": [] },
+    { "checkId": "SEC-IA-04", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No OAuth 2.0/OIDC is used.", "findingIds": [] },
+    { "checkId": "SEC-IA-05", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No sessions or authentication cookies.", "findingIds": [] },
+    { "checkId": "SEC-IA-06", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "The target stores no user passwords.", "findingIds": [] },
+    { "checkId": "SEC-IA-07", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No authentication, session or credential scheme is implemented.", "findingIds": [] },
+    { "checkId": "SEC-IA-08", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Warning", "result": "N/A", "reason": "No service-to-service calls, roles, scopes or tokens in the reviewed files.", "findingIds": [] },
+    { "checkId": "SEC-IA-09", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Warning", "result": "N/A", "reason": "No login or access-control failure paths exist.", "findingIds": [] },
+    { "checkId": "SEC-IA-10", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Warning", "result": "N/A", "reason": "No user credential management; appsettings.json holds only a placeholder database password.", "findingIds": [] },
+    { "checkId": "SEC-IA-11", "subject": "Security", "subSubject": "Identity & Access", "severityIfFailed": "Warning", "result": "N/A", "reason": "No client-side tokens or credential paths.", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "Cross-reference: UseHttpsRedirection is enabled only in Development (ApiExtensions.cs 73-76); site-wide HTTPS is owned by review-security-web-api."
+}

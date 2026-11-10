@@ -1,0 +1,170 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2035-PilotUtilityApi",
+  "stepId": "20-review-observability",
+  "status": "completed",
+  "startedAt": "2026-11-09T20:35:41-07:00",
+  "completedAt": "2026-11-09T20:52:00-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "batchId": "batch-3",
+  "skill": "review-observability",
+  "subject": "Observability",
+  "findings": [
+    {
+      "id": "OBS-02#1",
+      "subject": "Observability",
+      "subSubject": "Correlation & Context Propagation",
+      "checkId": "OBS-02",
+      "severity": "Warning",
+      "title": "Error correlation ID is a fresh random GUID created at exception time, not the request's trace/correlation ID",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Logging/Models/LoggingCorrelation.cs", "lineStart": 13, "lineEnd": 16, "excerpt": "this.CorrelationId = Guid.NewGuid().ToString();" },
+        { "file": "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs", "lineStart": 73, "lineEnd": 74, "excerpt": "var loggingCorrelation = LoggingUtilities.GetLoggingCorrelation();\nthis.logger.LogError(exception, \"{UserMessage}\", loggingCorrelation.UserMessage);" }
+      ],
+      "standard": "Azure Well-Architected Framework — WAFO-04",
+      "url": "https://learn.microsoft.com/azure/well-architected/design-guides/monitoring#best-practices-for-instrumentation",
+      "recommendation": "Use the active request identifier (Activity.Current?.TraceId, falling back to HttpContext.TraceIdentifier) as the correlation ID so the ID returned to callers matches traces and all request logs, and log it as its own structured property rather than inside the free-text user message.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "OBS-05#1",
+      "subject": "Observability",
+      "subSubject": "Telemetry Export",
+      "checkId": "OBS-05",
+      "severity": "Information",
+      "title": "OTLP exporter scheme and protocol are hard-coded in code rather than taken from configuration",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/OpenTelemetry/Extensions/OpenTelemetryExtensions.cs", "lineStart": 52, "lineEnd": 52, "excerpt": "var otelBaseUrl = $\"http://{applicationConfiguration.OpenTelemetry.Server}:{applicationConfiguration.OpenTelemetry.Port}\";" },
+        { "file": "src/PilotUtiltyApi.Shared/OpenTelemetry/Extensions/OpenTelemetryExtensions.cs", "lineStart": 58, "lineEnd": 62, "excerpt": "options.Endpoint = new Uri($\"{otelBaseUrl}/{signalPath}\");\noptions.Protocol = OtlpExportProtocol.HttpProtobuf;" }
+      ],
+      "standard": "OpenTelemetry — OTO-29",
+      "url": "https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/#endpoint-configuration",
+      "recommendation": "Make the full endpoint (including scheme), protocol and timeout configurable (e.g. an Endpoint/Protocol setting or the standard OTEL_EXPORTER_OTLP_* variables) so environments can switch to TLS or gRPC without a code change.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "OBS-06#1",
+      "subject": "Observability",
+      "subSubject": "Health Endpoints",
+      "checkId": "OBS-06",
+      "severity": "Warning",
+      "title": "Health check returns a constant 200 \"OK\" and does not reflect the required database dependency",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 43, "lineEnd": 49, "excerpt": "[Route(\"healthcheck\")] ... public IActionResult HealthCheck() { return this.Ok(\"OK\"); }" }
+      ],
+      "standard": "Azure Well-Architected Framework — WAFO-16",
+      "url": "https://learn.microsoft.com/azure/well-architected/design-guides/health-modeling#use-health-probes",
+      "recommendation": "Use ASP.NET Core health checks (AddHealthChecks with a SQL Server/PostgreSQL check, tagged and time-bounded) and map separate shallow liveness and dependency-aware readiness endpoints that return 503 on failure.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "OBS-06#2",
+      "subject": "Observability",
+      "subSubject": "Health Endpoints",
+      "checkId": "OBS-06",
+      "severity": "Warning",
+      "title": "Anonymous status endpoint /about returns versions, database type and, on request, application configuration",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 18, "lineEnd": 18, "excerpt": "[AllowAnonymous]" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 81, "lineEnd": 88, "excerpt": "ApplicationConfiguration = showDetails ? new ApplicationConfiguration(this.ApplicationConfiguration, true) : null" }
+      ],
+      "standard": "Azure Well-Architected Framework — WAFO-37",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/health-endpoint-monitoring#problems-and-considerations",
+      "recommendation": "Require authorization for the /about endpoint (at least for show-details=true) and keep anonymous system responses limited to the status a probe needs.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "OBS-07#1",
+      "subject": "Observability",
+      "subSubject": "SLOs & SLIs",
+      "checkId": "OBS-07",
+      "severity": "Information",
+      "title": "No SLOs or SLIs are documented for the service",
+      "evidence": [
+        { "file": "README.md", "lineStart": 266, "lineEnd": 272, "excerpt": "#### Health Check\nReturns the health status of the API." }
+      ],
+      "standard": "Azure Well-Architected Framework — WAFO-19",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/metrics#define-composite-slo-targets",
+      "recommendation": "Document availability, success-rate and p95/p99 latency targets for the API and its reset flow, with the SLIs (e.g. http.server.request.duration) and measurement window used to evaluate them.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "OBS-08#1",
+      "subject": "Observability",
+      "subSubject": "Telemetry Identity & Naming",
+      "checkId": "OBS-08",
+      "severity": "Information",
+      "title": "service.version comes from a hand-maintained OpenAPI config value instead of the deployed build version",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/OpenTelemetry/Extensions/OpenTelemetryExtensions.cs", "lineStart": 65, "lineEnd": 69, "excerpt": "serviceName: applicationConfiguration.OpenApi.Title,\nserviceVersion: applicationConfiguration.OpenApi.Version," },
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 39, "lineEnd": 39, "excerpt": "\"Version\": \"1.0.1\"" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 68, "lineEnd": 68, "excerpt": "var buildVersion = FileUtilities.GetApplicationVersion();" }
+      ],
+      "standard": "OpenTelemetry — OTO-32",
+      "url": "https://opentelemetry.io/docs/specs/semconv/registry/attributes/service/#service-attributes",
+      "recommendation": "Set serviceVersion from the assembly/build version (e.g. FileUtilities.GetApplicationVersion(), already used by /about) so telemetry identifies the actual deployed artifact.",
+      "confidence": "Medium",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "OBS-01-S1",
+      "subject": "Observability",
+      "subSubject": "Structured Logging",
+      "checkId": "OBS-01",
+      "title": "Serilog configured from appsettings with compact JSON file sink, enrichers, request logging and message templates",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 59, "lineEnd": 66, "excerpt": "\"formatter\": \"Serilog.Formatting.Compact.CompactJsonFormatter, Serilog.Formatting.Compact\"" },
+        { "file": "src/PilotUtiltyApi.Shared/Logging/Extensions/LoggingExtensions.cs", "lineStart": 71, "lineEnd": 78, "excerpt": ".ReadFrom.Configuration(builder.Configuration) ... .Enrich.FromLogContext() ... writeToProviders: true" }
+      ],
+      "standard": "OpenTelemetry — OTO-02",
+      "url": "https://opentelemetry.io/docs/concepts/signals/logs/#unstructured-logs"
+    },
+    {
+      "id": "OBS-03-S1",
+      "subject": "Observability",
+      "subSubject": "Distributed Tracing",
+      "checkId": "OBS-03",
+      "title": "OpenTelemetry SDK instruments ASP.NET Core, HttpClient, Npgsql and SqlClient for traces and metrics, exported via OTLP to a collector",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/OpenTelemetry/Extensions/OpenTelemetryExtensions.cs", "lineStart": 98, "lineEnd": 105, "excerpt": ".AddAspNetCoreInstrumentation().AddHttpClientInstrumentation().AddNpgsql().AddSqlClientInstrumentation().AddOtlpExporter(...)" }
+      ],
+      "standard": "OpenTelemetry — OTO-14",
+      "url": "https://opentelemetry.io/docs/concepts/instrumentation/code-based/#create-telemetry-data"
+    },
+    {
+      "id": "OBS-09-S1",
+      "subject": "Observability",
+      "subSubject": "Error Recording",
+      "checkId": "OBS-09",
+      "title": "Global middleware logs unhandled exceptions once, with the exception object, at Error level",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs", "lineStart": 70, "lineEnd": 74, "excerpt": "this.logger.LogError(exception, \"{UserMessage}\", loggingCorrelation.UserMessage);" }
+      ],
+      "standard": "OpenTelemetry — OTO-40",
+      "url": "https://opentelemetry.io/docs/specs/semconv/exceptions/exceptions-logs/#recording-an-exception"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "OBS-01", "subject": "Observability", "subSubject": "Structured Logging", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "OBS-02", "subject": "Observability", "subSubject": "Correlation & Context Propagation", "severityIfFailed": "Warning", "result": "fail", "reason": "The correlation ID is a random GUID generated per exception, unrelated to the request trace ID and embedded only in free text.", "findingIds": ["OBS-02#1"] },
+    { "checkId": "OBS-03", "subject": "Observability", "subSubject": "Distributed Tracing", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "OBS-04", "subject": "Observability", "subSubject": "Metrics", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "OBS-05", "subject": "Observability", "subSubject": "Telemetry Export", "severityIfFailed": "Information", "result": "fail", "reason": "OTLP scheme (http) and protocol are hard-coded; only host and port come from configuration.", "findingIds": ["OBS-05#1"] },
+    { "checkId": "OBS-06", "subject": "Observability", "subSubject": "Health Endpoints", "severityIfFailed": "Warning", "result": "fail", "reason": "Health check is a constant 200 despite a required database, and the anonymous /about endpoint exposes diagnostic detail.", "findingIds": ["OBS-06#1", "OBS-06#2"] },
+    { "checkId": "OBS-07", "subject": "Observability", "subSubject": "SLOs & SLIs", "severityIfFailed": "Information", "result": "fail", "reason": "README states no SLO targets or SLIs for the deployable API.", "findingIds": ["OBS-07#1"] },
+    { "checkId": "OBS-08", "subject": "Observability", "subSubject": "Telemetry Identity & Naming", "severityIfFailed": "Information", "result": "fail", "reason": "service.version is a hand-maintained config constant rather than the deployed artifact version.", "findingIds": ["OBS-08#1"] },
+    { "checkId": "OBS-09", "subject": "Observability", "subSubject": "Error Recording", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "OBS-10", "subject": "Observability", "subSubject": "Telemetry Volume & Safety", "severityIfFailed": "Information", "result": "pass", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "Web API service using code-based OpenTelemetry SDK plus Serilog. WAFO-15 not evaluated (deployment manifests/IaC not reviewed, advanced usage off). OTO-33 (deployment.environment.name, Development status) not set but not reported since the repo does not use that convention. AlwaysOnSampler is hard-coded in code; judged deliberate for a low-volume pilot under OTO-44. Tracing source name 'PilotApi.Web' differs from the service/meter name; no ActivitySource in the reviewed files to confirm usage."
+}

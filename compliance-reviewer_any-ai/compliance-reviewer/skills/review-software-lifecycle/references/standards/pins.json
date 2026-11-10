@@ -1,0 +1,54 @@
+{
+  "$comment": "Source pins for check_source_drift.py (maintainers only; never used during a review). Pins copied from the standards file headers must match them; 'baseline' marks values recorded by the script.",
+  "skill": "review-software-lifecycle",
+  "checks": [
+    {
+      "id": "ssdf-rev1-final",
+      "file": "nist-ssdf.md",
+      "method": "http-status",
+      "url": "https://csrc.nist.gov/pubs/sp/800/218/r1/final",
+      "pinned": 404,
+      "watch": true,
+      "note": "SSDF v1.2 (SP 800-218 Rev. 1) final: re-pin per MAINTENANCE.md when this page exists."
+    },
+    {
+      "id": "ssdf-record",
+      "file": "nist-ssdf.md",
+      "method": "text-hash",
+      "url": "https://csrc.nist.gov/pubs/sp/800/218/final",
+      "pinned": "d93f2c9be6e395b3",
+      "note": "Look for a supersession or withdrawal notice.",
+      "baseline": "2026-11-09"
+    },
+    {
+      "id": "slsa-current",
+      "file": "slsa.md",
+      "method": "redirect",
+      "url": "https://slsa.dev/spec/",
+      "expect": "/spec/v1.2/"
+    },
+    {
+      "id": "scorecard-release",
+      "file": "openssf-scorecard.md",
+      "method": "github-release",
+      "repo": "ossf/scorecard",
+      "pinned": "v5.6.0"
+    },
+    {
+      "id": "semver-repo",
+      "file": "semver.md",
+      "method": "github-commit",
+      "repo": "semver/semver",
+      "pinned": "f99d5485190a",
+      "pinnedDate": "2025-11-05"
+    },
+    {
+      "id": "learn-sdp",
+      "file": "azure-waf-safe-deployment.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/operational-excellence/safe-deployments",
+      "msDate": "2026-02-11",
+      "gitCommit": "a3fa10710fd98dabc8074a51d946c25b95c1a8bb"
+    }
+  ]
+}

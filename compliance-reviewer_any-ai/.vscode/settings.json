@@ -1,0 +1,18 @@
+{
+  "chat.tools.terminal.autoApprove": {
+    "Get-ChildItem": true,
+    "dir": true,
+    "ls": true,
+    "tree": true,
+    "Get-Item": true,
+    "gci": true,
+    "Get-Content": true,
+    "gc": true,
+    "cat": true,
+    "type": true,
+    "head": true,
+    "tail": true,
+    "Select-String": true,
+    "sls": true
+  }
+}

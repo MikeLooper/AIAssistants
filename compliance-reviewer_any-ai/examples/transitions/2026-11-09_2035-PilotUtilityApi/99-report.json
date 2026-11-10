@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2035-PilotUtilityApi",
+  "stepId": "99-report",
+  "status": "completed",
+  "startedAt": "2026-11-09T20:44:31-07:00",
+  "completedAt": "2026-11-09T20:44:31-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "reportPath": "docs/reports/PilotUtilityApi-compliance-review-2026-11-09_2044.md"
+}

@@ -1,0 +1,180 @@
+{
+  "$comment": "Source pins for check_source_drift.py (maintainers only; never used during a review). Pins copied from the standards file headers must match them; 'baseline' marks values recorded by the script.",
+  "skill": "review-security-operational",
+  "checks": [
+    {
+      "id": "owasp-err",
+      "file": "owasp-operational.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Error_Handling_Cheat_Sheet.md",
+      "pinned": "796eed7d",
+      "pinnedDate": "2026-10-04"
+    },
+    {
+      "id": "owasp-log",
+      "file": "owasp-operational.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Logging_Cheat_Sheet.md",
+      "pinned": "f1d0311a",
+      "pinnedDate": "2026-10-22"
+    },
+    {
+      "id": "owasp-smg",
+      "file": "owasp-operational.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Secrets_Management_Cheat_Sheet.md",
+      "pinned": "d6474de0",
+      "pinnedDate": "2026-11-08"
+    },
+    {
+      "id": "owasp-scr",
+      "file": "owasp-operational.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Secure_Code_Review_Cheat_Sheet.md",
+      "pinned": "a11444a5",
+      "pinnedDate": "2026-10-04"
+    },
+    {
+      "id": "owasp-rest",
+      "file": "owasp-operational.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/REST_Security_Cheat_Sheet.md",
+      "pinned": "97cb8a3c",
+      "pinnedDate": "2026-10-14"
+    },
+    {
+      "id": "top10-a09",
+      "file": "owasp-operational.md",
+      "method": "github-commit",
+      "repo": "OWASP/Top10",
+      "path": "2025/docs/en/A09_2025-Security_Logging_and_Alerting_Failures.md",
+      "pinned": "d4d000ec",
+      "pinnedDate": "2025-12-24"
+    },
+    {
+      "id": "top10-a10",
+      "file": "owasp-operational.md",
+      "method": "github-commit",
+      "repo": "OWASP/Top10",
+      "path": "2025/docs/en/A10_2025-Mishandling_of_Exceptional_Conditions.md",
+      "pinned": "494be56d",
+      "pinnedDate": "2026-01-06"
+    },
+    {
+      "id": "owasp-dnet",
+      "file": "dotnet-operational.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/DotNet_Security_Cheat_Sheet.md",
+      "pinned": "3cfa49de",
+      "pinnedDate": "2026-10-18"
+    },
+    {
+      "id": "owasp-njs",
+      "file": "node-operational.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Nodejs_Security_Cheat_Sheet.md",
+      "pinned": "eeaa1e47",
+      "pinnedDate": "2026-11-05"
+    },
+    {
+      "id": "learn-ms-err",
+      "file": "dotnet-operational.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/aspnet/core/fundamentals/error-handling?view=aspnetcore-10.0",
+      "msDate": "2026-10-27"
+    },
+    {
+      "id": "learn-ms-env",
+      "file": "dotnet-operational.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/aspnet/core/fundamentals/environments?view=aspnetcore-10.0",
+      "msDate": "2026-11-04"
+    },
+    {
+      "id": "learn-ms-sec",
+      "file": "dotnet-operational.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/aspnet/core/security/app-secrets?view=aspnetcore-10.0",
+      "msDate": "2026-05-13"
+    },
+    {
+      "id": "learn-ms-kv",
+      "file": "dotnet-operational.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/aspnet/core/security/key-vault-configuration?view=aspnetcore-10.0",
+      "msDate": "2026-05-13"
+    },
+    {
+      "id": "learn-ms-hlog",
+      "file": "dotnet-operational.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/aspnet/core/fundamentals/http-logging/?view=aspnetcore-10.0",
+      "msDate": "2025-04-25"
+    },
+    {
+      "id": "learn-ms-log",
+      "file": "dotnet-operational.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/dotnet/core/extensions/logging/overview",
+      "msDate": "2025-10-21"
+    },
+    {
+      "id": "learn-ms-red",
+      "file": "dotnet-operational.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/dotnet/core/extensions/data-redaction",
+      "msDate": "2025-03-21"
+    },
+    {
+      "id": "dotnet-current-major",
+      "method": "json",
+      "url": "https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json",
+      "select": "releases-index[support-phase=active].channel-version",
+      "first": true,
+      "pinned": "10.0",
+      "note": "A new active .NET major means re-pinning view=aspnetcore-NN.0 / net-NN.0 on the Learn pages.",
+      "file": "dotnet-operational.md"
+    },
+    {
+      "id": "spring-boot-current-release",
+      "file": "java-operational.md",
+      "method": "json",
+      "url": "https://api.spring.io/projects/spring-boot/releases",
+      "select": "_embedded.releases[current=true].version",
+      "pinned": "4.1.2",
+      "note": "A new spring-boot minor release means re-reading the pinned pages and defaults."
+    },
+    {
+      "id": "python-current-version",
+      "method": "regex",
+      "url": "https://docs.python.org/3/",
+      "pattern": "<title>Python (\\d+\\.\\d+)",
+      "pinned": "3.15",
+      "note": "A new Python feature release means re-pinning the /3.15/ paths.",
+      "file": "python-operational.md"
+    },
+    {
+      "id": "django-current-version",
+      "method": "redirect",
+      "url": "https://docs.djangoproject.com/en/stable/",
+      "expect": "/en/6.1/",
+      "note": "A new Django feature release means re-pinning the /en/6.1/ paths.",
+      "file": "python-operational.md"
+    },
+    {
+      "id": "express-security-page",
+      "method": "text-hash",
+      "url": "https://expressjs.com/en/advanced/best-practice-security.html",
+      "pinned": "0ae2ce811c4c1637",
+      "file": "node-operational.md",
+      "baseline": "2026-11-09"
+    }
+  ]
+}

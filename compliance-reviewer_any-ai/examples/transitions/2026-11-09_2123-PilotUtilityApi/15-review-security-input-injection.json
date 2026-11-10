@@ -1,0 +1,57 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2123-PilotUtilityApi",
+  "stepId": "15-review-security-input-injection",
+  "status": "completed",
+  "startedAt": "2026-11-09T21:23:03-07:00",
+  "completedAt": "2026-11-09T21:28:30-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "batchId": "batch-8",
+  "skill": "review-security-input-injection",
+  "subject": "Security",
+  "findings": [],
+  "strengths": [
+    {
+      "id": "SEC-II-02-S#1",
+      "subject": "Security",
+      "subSubject": "Input & Injection",
+      "checkId": "SEC-II-02",
+      "title": "Reset SQL is a compile-time constant selected by a fixed switch; no request data reaches SQL text",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 196, "lineEnd": 203, "excerpt": "\"sqlserver\" => SqlConstants.SqlServerResetTestingScript, \"postgresql\" => SqlConstants.PostgreSqlResetTestingScript," },
+        { "file": "src/PilotUtiltyApi.Repositories/Constants/SqlConstants.cs", "lineStart": 12, "lineEnd": 12, "excerpt": "public const string SqlServerResetTestingScript = @\"" }
+      ],
+      "standard": "OWASP SQL Injection Prevention Cheat Sheet — SQL-01",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html#introduction"
+    },
+    {
+      "id": "SEC-II-01-S#1",
+      "subject": "Security",
+      "subSubject": "Input & Injection",
+      "checkId": "SEC-II-01",
+      "title": "Only input is a strongly typed, required bool query parameter on an [ApiController] (automatic 400 on invalid model state)",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 16, "lineEnd": 16, "excerpt": "[ApiController]" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 64, "lineEnd": 65, "excerpt": "public IActionResult About([FromQuery(Name = \"show-details\"), BindRequired] bool showDetails = false)" }
+      ],
+      "standard": "Microsoft Learn — Model validation in ASP.NET Core — NET-14",
+      "url": "https://learn.microsoft.com/aspnet/core/mvc/models/validation?view=aspnetcore-10.0#model-state"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "SEC-II-01", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-II-02", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-II-03", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-II-04", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "No OS command, script engine, LDAP, XPath, NoSQL or other interpreter use in the subject files.", "findingIds": [] },
+    { "checkId": "SEC-II-05", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "No XML is parsed in the subject files.", "findingIds": [] },
+    { "checkId": "SEC-II-06", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "No file upload handling in the subject files.", "findingIds": [] },
+    { "checkId": "SEC-II-07", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "No file upload storage or serving in the subject files.", "findingIds": [] },
+    { "checkId": "SEC-II-08", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "JSON API only; nothing is rendered to HTML, JavaScript, CSS or URL contexts.", "findingIds": [] },
+    { "checkId": "SEC-II-09", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "Nothing is deserialized beyond plain JSON into DTOs; no native or polymorphic serializers.", "findingIds": [] },
+    { "checkId": "SEC-II-10", "subject": "Security", "subSubject": "Input & Injection", "severityIfFailed": "Error", "result": "N/A", "reason": "No outbound request uses a URL, host or IP derived from untrusted data.", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "SQL reset scripts are constants; connection strings are built from application configuration (not untrusted input). Configured DB account 'DevUser' is not an admin name; actual role grants not visible in files."
+}

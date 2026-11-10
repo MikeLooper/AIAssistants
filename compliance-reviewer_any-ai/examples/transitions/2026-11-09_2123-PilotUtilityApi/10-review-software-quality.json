@@ -1,0 +1,219 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2123-PilotUtilityApi",
+  "stepId": "10-review-software-quality",
+  "status": "completed",
+  "startedAt": "2026-11-09T21:23:03-07:00",
+  "completedAt": "2026-11-09T21:36:00-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "batchId": "batch-1",
+  "skill": "review-software-quality",
+  "subject": "Software Quality",
+  "findings": [
+    {
+      "id": "SQ-03#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-03",
+      "severity": "Warning",
+      "title": "Same switch on DataSourceType repeated in 3 repository methods (plus a 4th branch in SystemController) [ISO 25010:2023 Maintainability › Modifiability, ISO-30]",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 138, "lineEnd": 138, "excerpt": "return dataSource.DataSourceType.ToLowerInvariant() switch  (1 of 3: BuildConnectionString)" },
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 173, "lineEnd": 192, "excerpt": "return dataSourceType.ToLowerInvariant() switch  (2 and 3 of 3: CreateConnection, GetResetScript)" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 72, "lineEnd": 76, "excerpt": "var databaseIndicator = string.Equals(databaseName, \"SqlServer\", StringComparison.OrdinalIgnoreCase) ? \"SQL Server\" : ..." }
+      ],
+      "standard": "Compliance Reviewer Software Quality Rubric — SQR-07",
+      "url": "../../compliance-reviewer/skills/review-software-quality/references/standards/software-quality-rubric.md#sqr-07",
+      "recommendation": "Introduce one per-provider abstraction (e.g. an IDataSourceProvider with SqlServer/PostgreSQL implementations supplying connection string, connection and reset script) selected once. Apply Replace Conditional with Polymorphism (FRC-06, https://refactoring.com/catalog/replaceConditionalWithPolymorphism.html).",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "SQ-06#1",
+      "subject": "Software Quality",
+      "subSubject": "Software Quality",
+      "checkId": "SQ-06",
+      "severity": "Warning",
+      "title": "Repository catches System.Exception without a filter (twice) and drops the original exception [ISO 25010:2023 Maintainability › Analysability, ISO-29]",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 92, "lineEnd": 103, "excerpt": "catch (Exception exInner) { transaction.Rollback(); ... throw new UserException(loggingCorrelation.UserMessage); }" },
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 115, "lineEnd": 124, "excerpt": "catch (Exception ex) { this.Logger.LogError(ex, ...); throw new UserException(loggingCorrelation.UserMessage); }" }
+      ],
+      "standard": "Microsoft C# conventions — MSC-09",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions#language-guidelines",
+      "recommendation": "Catch the provider exceptions you can handle (DbException, ConfigurationException) or add an exception filter, and pass the caught exception as InnerException of UserException; let the UnhandledExceptionMiddleware boundary handle the rest.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "DP-04#1",
+      "subject": "Software Quality",
+      "subSubject": "Design Patterns",
+      "checkId": "DP-04",
+      "severity": "Information",
+      "title": "TestingService is a pass-through Middle Man that only forwards to the repository [ISO 25010:2023 Maintainability › Analysability, ISO-29]",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Services/Services/TestingService.cs", "lineStart": 49, "lineEnd": 52, "excerpt": "public async Task<RetrieveResponse<int>> ResetTestingAsync(...) { return await testingRepository.ResetTestingAsync(cancellationToken); }" }
+      ],
+      "standard": "Compliance Reviewer Software Quality Rubric — SQR-23",
+      "url": "../../compliance-reviewer/skills/review-software-quality/references/standards/software-quality-rubric.md#sqr-23",
+      "recommendation": "Either give the service real responsibility (e.g. environment guard for the reset, result mapping) or document the deliberate closed-layer choice; otherwise apply Remove Middle Man (FRC-19, https://refactoring.com/catalog/removeMiddleMan.html).",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "CS-01#1",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-01",
+      "severity": "Information",
+      "title": "Misleading names: a delete result typed as RetrieveResponse, and 'PilotUtilty' folder names inconsistent with 'PilotUtility' projects",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 57, "lineEnd": 57, "excerpt": "public async Task<RetrieveResponse<int>> ResetTestingAsync(CancellationToken cancellationToken = default)" },
+        { "file": "src/PilotUtiltyApi.Domain/Models/Responses/RetrieveResponse.cs", "lineStart": 4, "lineEnd": 6, "excerpt": "/// A result for a data source retrieve. ... public class RetrieveResponse<TReturn>" },
+        { "file": "src/PilotUtiltyApi.Web/PilotUtilityApi.Web.csproj", "lineStart": 12, "lineEnd": 12, "excerpt": "<ProjectReference Include=\"..\\PilotUtiltyApi.Domain\\PilotUtilityApi.Domain.csproj\" />" }
+      ],
+      "standard": "Compliance Reviewer Software Quality Rubric — SQR-32",
+      "url": "../../compliance-reviewer/skills/review-software-quality/references/standards/software-quality-rubric.md#sqr-32",
+      "recommendation": "Use an intention-revealing result type for write operations (e.g. OperationResponse<T>) and fix the 'PilotUtilty' spelling so folder and project names agree. Apply Rename (FRC-22, https://refactoring.com/catalog/changeFunctionDeclaration.html).",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "CS-03#1",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-03",
+      "severity": "Information",
+      "title": "Stale documentation comments contradict the code",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 40, "lineEnd": 48, "excerpt": "/// A read only list of all DTO objects from the category table ... public IActionResult HealthCheck() { return this.Ok(\"OK\"); }" },
+        { "file": "src/PilotUtiltyApi.Services/Extensions/ServicesInjectionExtensions.cs", "lineStart": 27, "lineEnd": 31, "excerpt": "/// webAppBuilder.Services.ServicesConfiguration();  (method extends WebApplicationBuilder, not IServiceCollection)" }
+      ],
+      "standard": "Compliance Reviewer Software Quality Rubric — SQR-34",
+      "url": "../../compliance-reviewer/skills/review-software-quality/references/standards/software-quality-rubric.md#sqr-34",
+      "recommendation": "Correct the HealthCheck <returns> text and the usage examples (webAppBuilder.ServicesConfiguration()) so the docs match the code.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "CS-05#1",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-05",
+      "severity": "Warning",
+      "title": "Connection and transaction managed with try/finally Close() instead of using declarations; transaction never disposed",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 73, "lineEnd": 79, "excerpt": "var connection = CreateConnection(...); ... var transaction = connection.BeginTransaction();" },
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 104, "lineEnd": 107, "excerpt": "finally { connection.Close(); }" }
+      ],
+      "standard": "Microsoft C# conventions — MSC-16",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions#try-catch-and-using-statements-in-exception-handling",
+      "recommendation": "Use 'using var connection = ...' and 'using var transaction = ...' (the .editorconfig already prefers csharp_prefer_simple_using_statement) and drop the Close() finally block.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "CS-05#2",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-05",
+      "severity": "Warning",
+      "title": "Nullable annotations are used but key nullable warnings are downgraded to suggestions",
+      "evidence": [
+        { "file": ".editorconfig", "lineStart": 256, "lineEnd": 260, "excerpt": "dotnet_diagnostic.CS8602.severity = suggestion ... dotnet_diagnostic.CS8604.severity = suggestion" },
+        { "file": "src/PilotUtiltyApi.Domain/Models/Responses/RetrieveResponse.cs", "lineStart": 26, "lineEnd": 27, "excerpt": "TReturn result, string? errorMessage = null)" }
+      ],
+      "standard": "Compliance Reviewer Software Quality Rubric — SQR-36",
+      "url": "../../compliance-reviewer/skills/review-software-quality/references/standards/software-quality-rubric.md#sqr-36",
+      "recommendation": "Restore CS8602/CS8604 to warning (or error) and fix the flagged dereferences, e.g. DataSources?.Find vs DataSources.FirstOrDefault usage.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    },
+    {
+      "id": "CS-05#3",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-05",
+      "severity": "Warning",
+      "title": "Private fields use camelCase without the _ prefix and no .editorconfig naming rule documents this convention",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 24, "lineEnd": 24, "excerpt": "private readonly IApplicationConfiguration applicationConfiguration;" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 21, "lineEnd": 21, "excerpt": "private readonly ITestingService testingService;" },
+        { "file": "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs", "lineStart": 16, "lineEnd": 17, "excerpt": "private readonly ILogger<UnhandledExceptionMiddleware> logger; private readonly RequestDelegate next;" }
+      ],
+      "standard": "Microsoft C# conventions — MSC-03",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/identifier-names#camel-case",
+      "recommendation": "Either rename private fields to _camelCase or add a dotnet_naming_rule for private fields in .editorconfig that documents the this.camelCase convention.",
+      "confidence": "Medium",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "S-CS-04#1",
+      "subject": "Software Quality",
+      "subSubject": "Coding Standards",
+      "checkId": "CS-04",
+      "title": "XML documentation on all public types and members, with GenerateDocumentationFile enabled",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/PilotUtilityApi.Web.csproj", "lineStart": 4, "lineEnd": 4, "excerpt": "<GenerateDocumentationFile>true</GenerateDocumentationFile>" }
+      ],
+      "standard": "Microsoft C# conventions — MSC-23",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions#comment-style"
+    },
+    {
+      "id": "S-AP-06#1",
+      "subject": "Software Quality",
+      "subSubject": "Architecture Patterns",
+      "checkId": "AP-06",
+      "title": "Error-to-ProblemDetails mapping centralized in one middleware instead of per controller",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs", "lineStart": 43, "lineEnd": 49, "excerpt": "public async Task InvokeAsync(HttpContext context) { try { await this.next(context); } catch (UserException uExc)" }
+      ],
+      "standard": "Azure Architecture Center — AAS-13",
+      "url": "https://learn.microsoft.com/azure/architecture/guide/design-principles/design-for-evolution#recommendations"
+    },
+    {
+      "id": "S-AP-01#1",
+      "subject": "Software Quality",
+      "subSubject": "Architecture Patterns",
+      "checkId": "AP-01",
+      "title": "Clean downward layering: controller → service → repository, no data access in controllers",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 53, "lineEnd": 55, "excerpt": "var response = await testingService.ResetTestingAsync(cancellationToken);" }
+      ],
+      "standard": "Martin Fowler bliki — MFB-01",
+      "url": "https://martinfowler.com/bliki/PresentationDomainDataLayering.html"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "SQ-01", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SQ-02", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SQ-03", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "fail", "reason": "The same DataSourceType switch is repeated in 3 repository methods (SQR-07).", "findingIds": ["SQ-03#1"] },
+    { "checkId": "SQ-04", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SQ-05", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "SQ-06", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Warning", "result": "fail", "reason": "Repository catches System.Exception without a filter below the request boundary (MSC-09).", "findingIds": ["SQ-06#1"] },
+    { "checkId": "SQ-08", "subject": "Software Quality", "subSubject": "Software Quality", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "DP-01", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "DP-02", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Information", "result": "N/A", "reason": "No project-defined class hierarchies in the reviewed files.", "findingIds": [] },
+    { "checkId": "DP-04", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Information", "result": "fail", "reason": "TestingService only forwards to the repository (SQR-23).", "findingIds": ["DP-04#1"] },
+    { "checkId": "DP-05", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "DP-06", "subject": "Software Quality", "subSubject": "Design Patterns", "severityIfFailed": "Warning", "result": "N/A", "reason": "No event or observer subscriptions in the reviewed files.", "findingIds": [] },
+    { "checkId": "AP-01", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "AP-02", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "AP-03", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "AP-04", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "AP-06", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "AP-07", "subject": "Software Quality", "subSubject": "Architecture Patterns", "severityIfFailed": "Warning", "result": "N/A", "reason": "Only one deployable unit (the Web API) in the reviewed files.", "findingIds": [] },
+    { "checkId": "CS-01", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "fail", "reason": "RetrieveResponse names a delete result and 'PilotUtilty' folders misspell the project name (SQR-32).", "findingIds": ["CS-01#1"] },
+    { "checkId": "CS-02", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "CS-03", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "fail", "reason": "Doc comments contradict the code (HealthCheck returns, extension usage examples).", "findingIds": ["CS-03#1"] },
+    { "checkId": "CS-04", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "CS-05", "subject": "Software Quality", "subSubject": "Coding Standards", "severityIfFailed": "Warning", "result": "fail", "reason": "No using for IDisposable connection/transaction (MSC-16), nullable warnings downgraded (SQR-36), undocumented private field naming (MSC-03).", "findingIds": ["CS-05#1", "CS-05#2", "CS-05#3"] }
+  ],
+  "urlsFetched": [],
+  "notes": "Team convention from .editorconfig (tabs, block-scoped namespaces, var/this. diagnostics disabled) judged instead of MSC-20/MSC-21/MSC-12 defaults. No generated files in the sample. Nullable setting itself not in the sampled files; SQR-36 inferred from nullable annotations."
+}

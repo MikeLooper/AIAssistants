@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2123-PilotUtilityApi",
+  "stepId": "14-review-security-identity-access",
+  "status": "completed",
+  "startedAt": "2026-11-09T21:23:03-07:00",
+  "completedAt": "2026-11-09T21:40:00-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "batchId": "batch-1",
+  "skill": "review-security-identity-access",
+  "subject": "Security / Identity & Access",
+  "findings": [
+    {
+      "id": "SEC-IA-01#1",
+      "subject": "Security / Identity & Access",
+      "subSubject": "Identity & Access",
+      "checkId": "SEC-IA-01",
+      "severity": "Error",
+      "title": "No authentication or authorization configured; every controller is explicitly [AllowAnonymous] (no deny-by-default)",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 79, "lineEnd": 85, "excerpt": "webApp.UseMiddleware<UnhandledExceptionMiddleware>(); ... webApp.MapControllers();  (no AddAuthentication/AddAuthorization, UseAuthentication/UseAuthorization)" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 15, "lineEnd": 19, "excerpt": "[ApiController] [ApiVersion(\"1.0\")] [Route(\"v{version:apiVersion}/[controller]\")] [AllowAnonymous] public class TestingController" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 16, "lineEnd": 19, "excerpt": "[ApiController] [ApiVersionNeutral] [AllowAnonymous] public class SystemController" }
+      ],
+      "standard": "OWASP .NET Security Cheat Sheet — ASP-09",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html#authorization",
+      "recommendation": "Add an authentication scheme and AddAuthorization with a FallbackPolicy requiring authenticated users, call UseAuthentication/UseAuthorization, and keep [AllowAnonymous] only on truly public endpoints such as healthcheck (ATZ-02, T10-01).",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "SEC-IA-02#1",
+      "subject": "Security / Identity & Access",
+      "subSubject": "Identity & Access",
+      "checkId": "SEC-IA-02",
+      "severity": "Error",
+      "title": "Destructive POST /v1/testing/reset and configuration details on /about?show-details=true are callable anonymously",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 46, "lineEnd": 53, "excerpt": "[HttpPost] [Route(\"reset\")] ... public async Task<IActionResult> ResetTesting(...) { var response = await testingService.ResetTestingAsync(cancellationToken);" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 64, "lineEnd": 87, "excerpt": "[FromQuery(Name = \"show-details\"), BindRequired] bool showDetails ... ApplicationConfiguration = showDetails ? new ApplicationConfiguration(this.ApplicationConfiguration, true) : null" }
+      ],
+      "standard": "OWASP .NET Security Cheat Sheet — ASP-10",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html#authorization",
+      "recommendation": "Protect the reset and configuration-detail operations with a named policy or role (e.g. [Authorize(Policy = \"TestAdmin\")]) and, for reset, also restrict it to non-production environments (T10-04).",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [],
+  "checkResults": [
+    { "checkId": "SEC-IA-01", "subject": "Security / Identity & Access", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "fail", "reason": "No fallback/deny-by-default policy; no authentication configured (ASP-09, ATZ-02).", "findingIds": ["SEC-IA-01#1"] },
+    { "checkId": "SEC-IA-02", "subject": "Security / Identity & Access", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "fail", "reason": "Privileged write and config-detail endpoints have no role or policy (ASP-10, T10-04).", "findingIds": ["SEC-IA-02#1"] },
+    { "checkId": "SEC-IA-03", "subject": "Security / Identity & Access", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No JWTs issued or validated in the reviewed files.", "findingIds": [] },
+    { "checkId": "SEC-IA-04", "subject": "Security / Identity & Access", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No OAuth 2.0/OIDC in use.", "findingIds": [] },
+    { "checkId": "SEC-IA-05", "subject": "Security / Identity & Access", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No sessions or cookie authentication in use.", "findingIds": [] },
+    { "checkId": "SEC-IA-06", "subject": "Security / Identity & Access", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "The target stores no user passwords.", "findingIds": [] },
+    { "checkId": "SEC-IA-07", "subject": "Security / Identity & Access", "subSubject": "Identity & Access", "severityIfFailed": "Error", "result": "N/A", "reason": "No custom authentication, session or credential-hashing code in the reviewed files.", "findingIds": [] },
+    { "checkId": "SEC-IA-08", "subject": "Security / Identity & Access", "subSubject": "Identity & Access", "severityIfFailed": "Warning", "result": "N/A", "reason": "No service-to-service auth, roles, scopes or accounts in the reviewed files.", "findingIds": [] },
+    { "checkId": "SEC-IA-09", "subject": "Security / Identity & Access", "subSubject": "Identity & Access", "severityIfFailed": "Warning", "result": "N/A", "reason": "No login flow or access-control decisions exist to fail.", "findingIds": [] },
+    { "checkId": "SEC-IA-10", "subject": "Security / Identity & Access", "subSubject": "Identity & Access", "severityIfFailed": "Warning", "result": "N/A", "reason": "No user password policy or application user credentials in scope.", "findingIds": [] },
+    { "checkId": "SEC-IA-11", "subject": "Security / Identity & Access", "subSubject": "Identity & Access", "severityIfFailed": "Warning", "result": "N/A", "reason": "No client-side token handling or credential endpoints.", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "ApiExtensions.cs shows no authentication scheme registered at all. SEC-IA-01 severity Error because ATZ-02 (MUST) fails on the same evidence as ASP-09 (SHOULD)."
+}
