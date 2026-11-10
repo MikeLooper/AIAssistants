@@ -61,5 +61,5 @@ Review only those files.
 
 ## Output
 
-Emit every finding, strength and check result with `subject: "Twelve-Factor"` (the subject name the orchestrator
-uses). Follow `compliance-review-core`'s `finding-schema.md`.
+Labels: copy `subject`/`subSubject` from `references/checklist.md` (the `Subject:` line and the check's `Sub-subject`
+column); never invent or combine labels. Follow `compliance-review-core`'s `finding-schema.md`.

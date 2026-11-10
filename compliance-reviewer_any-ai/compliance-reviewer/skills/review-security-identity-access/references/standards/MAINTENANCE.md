@@ -1,6 +1,6 @@
 # Maintenance — Security: Identity & Access localized standards
 
-**Maintainers only. Workers never load this file.** Background and design decisions: `docs/plan_localize-review-security-identity-access.md`.
+**Maintainers only. Workers never load this file.** Design decisions are recorded inline where they apply (DEC-n: this skill's localization decisions; D-n and C-n: cross-skill decisions and follow-ups); the planning documents they came from aren't kept in this repo.
 
 Cross-skill strategy, cadence overview and AI-tool usage: `compliance-reviewer/STANDARDS-MAINTENANCE.md`.
 
@@ -140,7 +140,7 @@ also uses cheatsheetseries.owasp.org (15) and top10.owasp.org (9); those budgets
 
 ## Open items
 
-- Plan §10 follow-ups (changes outside this skill): reviewed and closed by `docs/plan_localize-afterplanning-changes.md` on 2026-11-09 (see its Appendix A). Open hand-offs: none.
+- Follow-ups outside this skill: reviewed and closed in the cross-skill follow-up pass of 2026-11-09. Open hand-offs: none.
 - Plan §9 step 10: run reviews against sample repos (ASP.NET Core JWT + cookie login; Spring Boot with `csrf.disable()`
   and `NoOpPasswordEncoder`; Django defaults + SPA `localStorage` token; a target with no auth).
 
@@ -232,9 +232,9 @@ scope. Snapshot 2026-11-08: 601 headings + 41 bullets, 0 unaccounted.
 | S | superseded by a more precise element (SES-02 entropy rule) |
 | S17 | background for SES-17 (the actionable rule is the localStorage warning) |
 | D | framework behaviour that meets the OWASP element by default (Django rehashes on login / ignores session IDs in URLs); nothing to fail |
-| Oinj | owned by `review-security-input-injection` (`docs/plan_localize-review-security-input-injection.md`) |
+| Oinj | owned by `review-security-input-injection` (injection, XSS, deserialization and file-upload handling) |
 | Oops | owned by `review-security-operational` (logs, secrets, encryption, deployment config) |
-| Oweb | owned by `review-security-web-api` (HTTPS/HSTS, security headers; `docs/plan_localize-review-security-web-api.md`) |
+| Oweb | owned by `review-security-web-api` (HTTPS/HSTS, security headers, CORS) |
 | Odep | owned by `review-dependency-management` |
 | Otest | owned by `review-testing` TST-10 (STS-01) (plan C-5) |
 | Oscope | out of identity scope (WCF transport configuration) |

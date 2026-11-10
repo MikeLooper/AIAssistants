@@ -1,6 +1,6 @@
 ---
 name: review-security-operational
-description: 'Reviews error handling and fail-safe behaviour, security logging (sensitive data, log injection, security events, log protection), secrets management and production configuration, against pinned OWASP cheat sheets (Error Handling, Logging, Secrets Management, Secure Code Review), OWASP Top 10:2025 A09/A10 and pinned ASP.NET Core/.NET, Spring Boot and Django/Python guidance. Use when the compliance-reviewer orchestrator delegates the Security / Operational subject.'
+description: 'Reviews error handling and fail-safe behaviour, security logging (sensitive data, log injection, security events, log protection), secrets management and production configuration, against pinned OWASP cheat sheets (Error Handling, Logging, Secrets Management, Secure Code Review), OWASP Top 10:2025 A09/A10 and pinned ASP.NET Core/.NET, Spring Boot and Django/Python guidance. Use when the compliance-reviewer orchestrator delegates the Security subject (Operational sub-subject).'
 user-invocable: false
 ---
 

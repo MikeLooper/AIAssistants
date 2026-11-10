@@ -1,6 +1,6 @@
 # Maintenance — Reliability localized standards
 
-**Maintainers only. Workers never load this file.** Background and design decisions: `docs/plan_localize-review-reliability.md`.
+**Maintainers only. Workers never load this file.** Design decisions are recorded inline where they apply (DEC-n: this skill's localization decisions; D-n and C-n: cross-skill decisions and follow-ups); the planning documents they came from aren't kept in this repo.
 
 Cross-skill strategy, cadence overview and AI-tool usage: `compliance-reviewer/STANDARDS-MAINTENANCE.md`.
 
@@ -23,7 +23,7 @@ The cap is counted per skill per website (plan DEC-1).
 - Requirement text is generic: Azure product names (Service Bus, Front Door, API Management, Chaos Studio) are generalized ("message broker", "gateway", "fault injection"). Product-specific setting names belong in the lookup tables.
 - Keep rows to one line (≈ 200 characters where possible). Rows are summaries in our own words.
 - Every AZRL ID must be listed by exactly one check in `../checklist.md`, and the standards file's `## REL-xx` section must agree with it.
-- Don't add elements for client reuse, pool sizing, total concurrency, offloading, autoscale metrics or resource limits (`review-performance`), statelessness, session state or sticky sessions (`review-twelve-factor` TF-06, decision D-6 in `docs/plan_localize-afterplanning-changes.md`), the HTTP contract of the repo's own APIs (`review-api-design`), health-endpoint implementation or retry/breaker telemetry (`review-observability`), alerts (`review-monitoring`), cross-region redundancy, backups or delete protection (`review-disaster-recovery`), over-provisioning or autoscale maximums (`review-cost-sustainability`), or resilience tests (`review-testing` TST-13). Edge DDoS and WAF rules have no owner (README "Known coverage gaps"). See plan §4.4 (DEC-13) and §10.
+- Don't add elements for client reuse, pool sizing, total concurrency, offloading, autoscale metrics or resource limits (`review-performance`), statelessness, session state or sticky sessions (`review-twelve-factor` TF-06, cross-skill decision D-6, 2026-11-09), the HTTP contract of the repo's own APIs (`review-api-design`), health-endpoint implementation or retry/breaker telemetry (`review-observability`), alerts (`review-monitoring`), cross-region redundancy, backups or delete protection (`review-disaster-recovery`), over-provisioning or autoscale maximums (`review-cost-sustainability`), or resilience tests (`review-testing` TST-13). Edge DDoS and WAF rules have no owner (README "Known coverage gaps"). These boundaries were set by localization decision DEC-13 and the cross-skill follow-ups.
 - Rate limiting: API rate limiting and `429` for request endpoints, including per-client or per-API-key limits and download limits, are judged under AZRL-32. Login throttling stays with `review-security-identity-access` SEC-IA-09. No element change (afterplanning WP-6, 2026-11-09).
 
 ## Shared pages
@@ -76,7 +76,7 @@ The cap is counted per skill per website (plan DEC-1).
 
 ## Open items
 
-- Plan §10 follow-ups (changes outside this skill): reviewed and closed by `docs/plan_localize-afterplanning-changes.md` on 2026-11-09 (see its Appendix A). Open hand-offs: none.
+- Follow-ups outside this skill: reviewed and closed in the cross-skill follow-up pass of 2026-11-09. Open hand-offs: none.
 
 ## `localized-standard-gap` log
 

@@ -1,7 +1,6 @@
 # Maintenance — Security: Web & API localized standards
 
-**Maintainers only. Workers never load this file.** Background and design decisions:
-`docs/plan_localize-review-security-web-api.md`.
+**Maintainers only. Workers never load this file.** Design decisions are recorded inline where they apply (DEC-n: this skill's localization decisions; D-n and C-n: cross-skill decisions and follow-ups); the planning documents they came from aren't kept in this repo.
 
 Cross-skill strategy, cadence overview and AI-tool usage: `compliance-reviewer/STANDARDS-MAINTENANCE.md`.
 
@@ -162,7 +161,7 @@ those budgets are separate. docs.spring.io hosts both Spring Security and Spring
   with nonces, explicit CORS origins, HTTPS-only API, proxy headers with `always`) — expect strengths, no false positives.
 - Plan §10 C-1, C-2, C-12 and C-13 were applied on 2026-11-09 before the skill changes; C-14 needs no change.
   `approved-sources.md` was updated by plan §9 step 9, which closes `review-security-operational` plan C-15. The
-  remaining hand-offs were closed by `docs/plan_localize-afterplanning-changes.md` (2026-11-09): C-3 records and
+  remaining hand-offs were closed by the cross-skill follow-up pass (2026-11-09): C-3 records and
   management-endpoint placement (`review-security-operational` ORS-01); C-5 Trusted Types (MDN-01 here); C-6 →
   api-design boundary step; C-7 rate limiting → `review-reliability` AZRL-32; C-8 → AZPE-11 note; C-9 →
   `review-software-quality` SQR-37; C-12 → `languages/javascript.md` and `node-web-api.md`. Open: none.

@@ -1,6 +1,6 @@
 ---
 name: review-maintainability
-description: 'Reviews README and onboarding docs, repository layout, documented prerequisites and configuration, technical-debt markers, deprecated code, contributing guide, change history, architecture docs and doc accuracy, against a local maintainability rubric. Use when the compliance-reviewer orchestrator delegates the Operations / Maintainability subject.'
+description: 'Reviews README and onboarding docs, repository layout, documented prerequisites and configuration, technical-debt markers, deprecated code, contributing guide, change history, architecture docs and doc accuracy, against a local maintainability rubric. Use when the compliance-reviewer orchestrator delegates the Maintainability subject.'
 user-invocable: false
 ---
 

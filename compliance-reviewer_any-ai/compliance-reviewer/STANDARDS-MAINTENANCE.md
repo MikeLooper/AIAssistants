@@ -15,7 +15,7 @@ Per subject skill, `compliance-reviewer/skills/review-<name>/`:
 | `references/standards/<source>.md` | Header with pinned version / commit SHA / page dates / hashes, citation base URL and "Localized" date; one row per element (stable ID, the source's own level wording, summary, "applies when", anchors) | A source changes, or a gap is closed |
 | `references/standards/MAINTENANCE.md` | Element budget per website, editing rules, **refresh procedure** (cadence, drift detection, update, verify), pins and watch items, "Refresh due" dates, localization log, open items, gap log, anchor coverage map | Every refresh (log, pins, coverage map) |
 | `references/standards/pins.json` | Machine-readable pins for the drift checker (see "Drift checker" below); values copied from the file headers, or recorded baselines | Every time a header pin changes |
-| `references/checklist.md` | Checks and the element IDs each check owns | Elements are added, retired or moved between checks |
+| `references/checklist.md` | `Subject:` line, then the checks: ID, `Sub-subject` label and the element IDs each check owns | Elements are added, retired or moved between checks; checks are added or retired |
 | `references/sources.md` | Human-readable source list with pins and retrieval dates | Pins or retrieval dates change |
 | `SKILL.md` → `## Standards (local, authoritative)` | Which standards files workers load | A standards file is added, renamed or removed |
 | `references/languages/<id>.md`, `*-signals.md` | Lookup tables (libraries, defaults, config keys, IaC resource types) | A review logs a gap for an unrecognized library, setting or resource type. No source refresh needed |
@@ -83,10 +83,12 @@ Run this in a **maintenance session**, not during a review. Fetching is allowed 
    - IDs are stable forever. Add new IDs only; mark removed rules `(retired)`; never reuse an ID.
    - Keep the level in the source's own words (`REVIEW` for locally derived rules).
    - Every element belongs to exactly one check; keep `checklist.md` in step.
+   - Every new check gets a `Sub-subject` label (Title Case, `&` not `and`, no ` / `, at most about 32 characters). A retired check stays as a table row whose Check cell starts with `*(retired`. Labels are stable like check IDs: change one only in a dated, recorded edit (a localization-log entry; plus a README score-comparability note if it moves a check to another subject).
    - Stay within 100 elements per skill per website unless an exception is recorded in the budget table.
    - Don't add elements another subject owns (each skill's `SKILL.md` lists its boundaries).
    - Update the file header pins and "Localized" date, `sources.md`, the coverage map, and `approved-sources.md` if a URL or version path changed.
 4. **Verify.**
+   - Run `python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py labels <skill>`; it must report `ok: true`.
    - Script-check as the skill describes: IDs contiguous, element-to-check mapping holds, every cited anchor exists in the pinned source, every normative anchor of the pinned pages is in the coverage map with zero unaccounted.
    - Run a review of the subject against the small sample repos described in the skill's verify step, then `python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py validate transitions/<runId>`. Expect `ok: true`, `urlsFetched: []`, the expected check count, and citations that use pinned URLs and element IDs.
 5. **Record.**
@@ -145,4 +147,4 @@ The checker only detects that a source changed. Deciding what the change means, 
 
 ## Adding a new localized source
 
-Adding a source (rather than refreshing one) follows the localization recipe in `compliance-reviewer/README.md` → Maintenance → "Localize a subject's standards". Worked example and plan template: `docs/plan_localize-review-api-design.md`. The result must include a `MAINTENANCE.md` with the sections above, a `pins.json` entry for each pinned source (with its drift-check URL added to `approved-sources.md`), and a row in the cadence table in this file, so the source enters this refresh cycle. Run `check_source_drift.py lint <skill>` before finishing.
+Adding a source (rather than refreshing one) follows the localization recipe in `compliance-reviewer/README.md` → Maintenance → "Localize a subject's standards". Worked example: `skills/review-api-design/`. The result must include a `MAINTENANCE.md` with the sections above, a `pins.json` entry for each pinned source (with its drift-check URL added to `approved-sources.md`), and a row in the cadence table in this file, so the source enters this refresh cycle. Run `check_source_drift.py lint <skill>` before finishing.

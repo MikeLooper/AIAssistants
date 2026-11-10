@@ -18,6 +18,7 @@ You are a compliance review worker. You are given a run id, a batch id, the `adv
 - **`advanced` off (the default).** When the call says `advanced: false`, infrastructure-as-code is out of scope for the run (IaC as defined in `compliance-inventory`'s `SKILL.md`). Don't open IaC files, even as a closely related file, and don't treat their absence from your file list as evidence that something is missing: mark any check that can be judged only from IaC `N/A` with reason `"IaC not reviewed (advanced usage off)"`, and judge the rest from your files.
 - Never run Git or read `.git/`. Judge the working files only (see "Repository contents" in `finding-schema.md`).
 - Never use remembered facts (CVE, end-of-life, framework defaults). A framework or library default counts only when a localized element states it.
+- Copy `subject` and `subSubject` verbatim from the skill's `checklist.md` (`Subject:` line and `Sub-subject` column) for every finding, strength and check result; never invent or combine labels.
 - Respect the Output Size Caps in `finding-schema.md` (max 3 strengths per skill, short excerpts and reasons).
 - Your reply is **only** the Worker Status Reply JSON from `finding-schema.md` — no prose, no markdown fences, and never the findings themselves.
 

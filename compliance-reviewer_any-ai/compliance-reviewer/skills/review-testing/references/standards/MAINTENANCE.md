@@ -1,7 +1,6 @@
 # Maintenance — Testing localized standards
 
-**Maintainers only. Workers never load this file.** Background and design decisions:
-`docs/plan_localize-review-testing.md`.
+**Maintainers only. Workers never load this file.** Design decisions are recorded inline where they apply (DEC-n: this skill's localization decisions; D-n and C-n: cross-skill decisions and follow-ups); the planning documents they came from aren't kept in this repo.
 
 Cross-skill strategy, cadence overview and AI-tool usage: `compliance-reviewer/STANDARDS-MAINTENANCE.md`.
 
@@ -109,8 +108,8 @@ The signal table in `testing-rubric.md` is a lookup table: extend it when run no
 
 ### 2026-11-09 — load and resilience tests adopted (afterplanning WP-8, decision D-3)
 
-- Follow-ups F-1 (load/performance tests) and F-2 (resilience tests) adopted 2026-11-09 (D-3 in
-  `docs/plan_localize-afterplanning-changes.md`); this reverses the testing plan's DEC-3 for these two topics.
+- Follow-ups F-1 (load/performance tests) and F-2 (resilience tests) adopted 2026-11-09 (cross-skill
+  decision D-3); this reverses the testing plan's DEC-3 for these two topics.
 - New file `azure-waf-testing.md` (prefix `AZT-`, 9 elements) from three learn.microsoft.com pages fetched
   2026-11-09: WAF PE:06 `performance-efficiency/performance-test` (ms.date 2026-06-24, commit c96d7deceda…), WAF RE:08
   `reliability/reliability-test` (ms.date 2026-05-27, commit c96d7deceda…; the old path `reliability/testing-strategy`
@@ -128,7 +127,7 @@ The signal table in `testing-rubric.md` is a lookup table: extend it when run no
 
 ## Open items
 
-- Plan §10 follow-ups (changes outside this skill): reviewed and closed by `docs/plan_localize-afterplanning-changes.md` on 2026-11-09 (see its Appendix A). Open hand-offs: none.
+- Follow-ups outside this skill: reviewed and closed in the cross-skill follow-up pass of 2026-11-09. Open hand-offs: none.
 1. Run the plan §12 step 8 sample-repo reviews (three variants: C# Web API, Python package, Java Maven). Skipped by
    user decision on 2026-11-09.
 

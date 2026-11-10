@@ -1,23 +1,25 @@
 # Checklist — Security: Web & API
 
+Subject: Security
+
 Each check is evaluated through the elements it lists; every element belongs to exactly one check. Element
 definitions, anchors and citation bases are in `standards/`. Severity rules (SHOULD elements one level lower; HDR-11
 advisory) are in `../SKILL.md`. **Applies to:** `HTML` = HTML-serving targets only; `API` = targets with API endpoints
 or file downloads; `all` = every target with HTTP endpoints (`../SKILL.md` step 2).
 
-| id | Check | Default severity | Applies to | Elements | Source |
-|----|-------|------------------|------------|----------|--------|
-| SEC-WA-01 | HTML responses carry an enforced Content-Security-Policy header, preferably strict (nonces/hashes), with no `unsafe-inline`/`unsafe-eval` for scripts | Warning | HTML | CSP-01, CSP-03 … CSP-09, JVW-06, PYW-06, MDN-01, NDW-04 | CSP, JVW, PYW, MDN, NDW |
-| SEC-WA-02 | `Strict-Transport-Security` is sent on HTTPS responses with a long `max-age` and `includeSubDomains` | Warning | HTML, API serving HTTP | HDR-07, HST-01, HST-02, DNW-03, DNW-04, JVW-03, PYW-02 | HDR, HST, DNW, JVW, PYW |
-| SEC-WA-03 | `X-Content-Type-Options: nosniff` is sent on all responses | Warning | all | HDR-03, JVW-01, PYW-01 | HDR, JVW, PYW |
-| SEC-WA-04 | Pages can't be framed by untrusted sites (`frame-ancestors`, with `X-Frame-Options` for older browsers) | Warning | HTML | HDR-01, CSP-11, JVW-02, PYW-05 | HDR, CSP, JVW, PYW |
-| SEC-WA-05 | CORS is off unless needed, scoped to specific trusted origins on the endpoints that need it, never any-origin or reflected origin with credentials, and never used as access control | Error | all | HDR-09, RST-10, H5-01, H5-02, H5-03, DNW-05, DNW-06, DNW-07, JVW-09, JVW-10, JVW-11, PYW-09, A02-04 | HDR, RST, H5, DNW, JVW, PYW, A02 |
-| SEC-WA-06 | All endpoints use HTTPS with TLS 1.2+ and strong ciphers; HTML sites redirect HTTP to HTTPS, APIs refuse HTTP; no mixed content | Error | all | RST-01, TLS-01 … TLS-05, CSP-10, H5-04, DNW-01, DNW-02, JVW-08, PYW-03, PYW-04, A02-05, NDW-03 | RST, TLS, CSP, H5, DNW, JVW, PYW, A02, NDW |
-| SEC-WA-07 | Response headers don't reveal server or framework versions (`Server`, `X-Powered-By`, `X-AspNet-Version`, `X-AspNetMvc-Version`) | Warning | all | HDR-14 … HDR-17, NDW-02 | HDR, NDW |
-| SEC-WA-08 | API responses and file downloads carry safe headers: correct `Content-Type`, `no-store` on sensitive responses, `frame-ancestors 'none'`, attachment download headers, and no sensitive data in Cache API storage | Warning | API | HDR-05, HDR-06, HDR-19, RST-06 … RST-09, H5-05, DNW-09, JVW-04, NDW-05 | HDR, RST, H5, DNW, JVW, NDW |
-| SEC-WA-09 | Endpoints accept only allowlisted HTTP methods and declared content types (405/415), never copy `Accept` into `Content-Type`, and expose no unnecessary methods or formats | Warning | API | RST-02 … RST-05, DNW-08, DNW-10, A02-03 | RST, DNW, A02 |
-| SEC-WA-10 | Passwords, tokens and API keys aren't sent in URLs; sensitive request data travels in headers or bodies | Warning | API | RST-11, RST-12 | RST |
-| SEC-WA-11 | HTML responses set browser policy headers (Referrer-Policy, Permissions-Policy, COOP, CORP) and send no obsolete or harmful headers (`X-XSS-Protection: 1`, `Expect-CT`, HPKP, `X-Content-Security-Policy`) | Warning | HTML | CSP-02, HDR-02, HDR-04, HDR-08, HDR-10 … HDR-13, HDR-18, JVW-05, JVW-07, PYW-07, PYW-08, A02-01, A02-02, NDW-01 | CSP, HDR, JVW, PYW, A02, NDW |
+| id | Sub-subject | Check | Default severity | Applies to | Elements | Source |
+|----|-------------|-------|------------------|------------|----------|--------|
+| SEC-WA-01 | Web & API | HTML responses carry an enforced Content-Security-Policy header, preferably strict (nonces/hashes), with no `unsafe-inline`/`unsafe-eval` for scripts | Warning | HTML | CSP-01, CSP-03 … CSP-09, JVW-06, PYW-06, MDN-01, NDW-04 | CSP, JVW, PYW, MDN, NDW |
+| SEC-WA-02 | Web & API | `Strict-Transport-Security` is sent on HTTPS responses with a long `max-age` and `includeSubDomains` | Warning | HTML, API serving HTTP | HDR-07, HST-01, HST-02, DNW-03, DNW-04, JVW-03, PYW-02 | HDR, HST, DNW, JVW, PYW |
+| SEC-WA-03 | Web & API | `X-Content-Type-Options: nosniff` is sent on all responses | Warning | all | HDR-03, JVW-01, PYW-01 | HDR, JVW, PYW |
+| SEC-WA-04 | Web & API | Pages can't be framed by untrusted sites (`frame-ancestors`, with `X-Frame-Options` for older browsers) | Warning | HTML | HDR-01, CSP-11, JVW-02, PYW-05 | HDR, CSP, JVW, PYW |
+| SEC-WA-05 | Web & API | CORS is off unless needed, scoped to specific trusted origins on the endpoints that need it, never any-origin or reflected origin with credentials, and never used as access control | Error | all | HDR-09, RST-10, H5-01, H5-02, H5-03, DNW-05, DNW-06, DNW-07, JVW-09, JVW-10, JVW-11, PYW-09, A02-04 | HDR, RST, H5, DNW, JVW, PYW, A02 |
+| SEC-WA-06 | Web & API | All endpoints use HTTPS with TLS 1.2+ and strong ciphers; HTML sites redirect HTTP to HTTPS, APIs refuse HTTP; no mixed content | Error | all | RST-01, TLS-01 … TLS-05, CSP-10, H5-04, DNW-01, DNW-02, JVW-08, PYW-03, PYW-04, A02-05, NDW-03 | RST, TLS, CSP, H5, DNW, JVW, PYW, A02, NDW |
+| SEC-WA-07 | Web & API | Response headers don't reveal server or framework versions (`Server`, `X-Powered-By`, `X-AspNet-Version`, `X-AspNetMvc-Version`) | Warning | all | HDR-14 … HDR-17, NDW-02 | HDR, NDW |
+| SEC-WA-08 | Web & API | API responses and file downloads carry safe headers: correct `Content-Type`, `no-store` on sensitive responses, `frame-ancestors 'none'`, attachment download headers, and no sensitive data in Cache API storage | Warning | API | HDR-05, HDR-06, HDR-19, RST-06 … RST-09, H5-05, DNW-09, JVW-04, NDW-05 | HDR, RST, H5, DNW, JVW, NDW |
+| SEC-WA-09 | Web & API | Endpoints accept only allowlisted HTTP methods and declared content types (405/415), never copy `Accept` into `Content-Type`, and expose no unnecessary methods or formats | Warning | API | RST-02 … RST-05, DNW-08, DNW-10, A02-03 | RST, DNW, A02 |
+| SEC-WA-10 | Web & API | Passwords, tokens and API keys aren't sent in URLs; sensitive request data travels in headers or bodies | Warning | API | RST-11, RST-12 | RST |
+| SEC-WA-11 | Web & API | HTML responses set browser policy headers (Referrer-Policy, Permissions-Policy, COOP, CORP) and send no obsolete or harmful headers (`X-XSS-Protection: 1`, `Expect-CT`, HPKP, `X-Content-Security-Policy`) | Warning | HTML | CSP-02, HDR-02, HDR-04, HDR-08, HDR-10 … HDR-13, HDR-18, JVW-05, JVW-07, PYW-07, PYW-08, A02-01, A02-02, NDW-01 | CSP, HDR, JVW, PYW, A02, NDW |
 
 Totals: 54 OWASP cheat-sheet + 5 Top 10 + 10 DNW + 11 JVW + 9 PYW = 89 elements across 11 checks.
 

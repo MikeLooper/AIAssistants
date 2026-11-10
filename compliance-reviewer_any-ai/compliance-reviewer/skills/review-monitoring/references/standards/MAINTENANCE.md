@@ -1,6 +1,6 @@
 # Maintenance — Monitoring localized standards
 
-**Maintainers only. Workers never load this file.** Background and design decisions: `docs/plan_localize-review-monitoring.md`.
+**Maintainers only. Workers never load this file.** Design decisions are recorded inline where they apply (DEC-n: this skill's localization decisions; D-n and C-n: cross-skill decisions and follow-ups); the planning documents they came from aren't kept in this repo.
 
 Cross-skill strategy, cadence overview and AI-tool usage: `compliance-reviewer/STANDARDS-MAINTENANCE.md`.
 
@@ -60,7 +60,7 @@ The cap is counted per skill per website (plan DEC-1).
 
 ### 2026-11-09 — security-event alerting (afterplanning WP-10, decision D-2)
 
-- Monitoring owns security-event alert rules and SIEM routing (D-2 in `docs/plan_localize-afterplanning-changes.md`;
+- Monitoring owns security-event alert rules and SIEM routing (cross-skill decision D-2;
   closes monitoring C-4 security part and security-operational C-7). Pinned WAF SE:10
   `security/monitor-threats` (ms.date 2024-02-13, `git_commit_id` bb2e40b7f88c35b52263e5303880b7911f726d4a, retrieved
   2026-11-09; page key `se-mon`).
@@ -78,7 +78,7 @@ The cap is counted per skill per website (plan DEC-1).
 
 ## Open items
 
-- Plan §10 follow-ups (changes outside this skill): reviewed and closed by `docs/plan_localize-afterplanning-changes.md` on 2026-11-09 (see its Appendix A). Open hand-offs: none.
+- Follow-ups outside this skill: reviewed and closed in the cross-skill follow-up pass of 2026-11-09. Open hand-offs: none.
 
 ## `localized-standard-gap` log
 
@@ -92,7 +92,7 @@ Reason codes for "not localized":
 - **DR**: recovery signals (failover readiness, backup success, replication lag). Owned by `review-disaster-recovery` (WAFR-42).
 - **SEC**: sensitive data in logs and security-event *logging*: `review-security-operational`. Security-event alert rules and SIEM routing are owned here (WAFM-41 … WAFM-44, decision D-2, 2026-11-09).
 - **COST**: telemetry cost, sampling for cost, archive tiers. Owned by `review-cost-sustainability`.
-- **PERF**: performance data collection and boundaries: not localized; instrumentation owned by `review-observability` (see `docs/plan_localize-review-performance.md` §7.1).
+- **PERF**: performance data collection and boundaries: not localized; instrumentation owned by `review-observability` (decided when Performance was localized, 2026-11-08).
 - **TEST**: load and resilience (chaos, fault-injection) tests: `review-testing` (TST-12/TST-13).
 - **ARCH**: architecture or technology choice that isn't verifiable as a pass/fail check from IaC.
 - WAF sections split with `review-observability` (e.g. `dg-hm#use-health-probes`): health-endpoint implementation is WAFO (observability); probes that raise alerts are WAFM-32 here.

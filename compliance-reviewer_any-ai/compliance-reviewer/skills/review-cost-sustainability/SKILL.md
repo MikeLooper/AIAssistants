@@ -1,6 +1,6 @@
 ---
 name: review-cost-sustainability
-description: 'Reviews right-sizing, autoscaling, environment and data lifecycle cost, and green software practices visible in infrastructure-as-code, against the Azure Well-Architected Framework (Cost Optimization, Sustainability) and Green Software Foundation guidance. Use when the compliance-reviewer orchestrator delegates the Operations / Cost & Sustainability subject. Marked N/A when no IaC is found.'
+description: 'Reviews right-sizing, autoscaling, environment and data lifecycle cost, and green software practices visible in infrastructure-as-code, against the Azure Well-Architected Framework (Cost Optimization, Sustainability) and Green Software Foundation guidance. Use when the compliance-reviewer orchestrator delegates the Cost & Sustainability subject. Marked N/A when no IaC is found.'
 user-invocable: false
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: review-security-identity-access
-description: 'Reviews authentication enforcement, authorization (function- and object-level), JWT validation, OAuth 2.0/OIDC flows, session management and CSRF for cookie auth, password storage and policy, authentication failure handling, client-side token handling and Zero Trust posture, against pinned OWASP cheat sheets, OWASP Top 10:2025 A01/A07 and pinned ASP.NET Core, Spring Security and Django guidance. Use when the compliance-reviewer orchestrator delegates the Security / Identity & Access subject.'
+description: 'Reviews authentication enforcement, authorization (function- and object-level), JWT validation, OAuth 2.0/OIDC flows, session management and CSRF for cookie auth, password storage and policy, authentication failure handling, client-side token handling and Zero Trust posture, against pinned OWASP cheat sheets, OWASP Top 10:2025 A01/A07 and pinned ASP.NET Core, Spring Security and Django guidance. Use when the compliance-reviewer orchestrator delegates the Security subject (Identity & Access sub-subject).'
 user-invocable: false
 ---
 

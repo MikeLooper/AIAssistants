@@ -1,6 +1,6 @@
 # Maintenance — Cost & Sustainability localized standards
 
-**Maintainers only. Workers never load this file.** Background and design decisions: `docs/plan_localize-review-cost-sustainability.md`.
+**Maintainers only. Workers never load this file.** Design decisions are recorded inline where they apply (DEC-n: this skill's localization decisions; D-n and C-n: cross-skill decisions and follow-ups); the planning documents they came from aren't kept in this repo.
 
 Cross-skill strategy, cadence overview and AI-tool usage: `compliance-reviewer/STANDARDS-MAINTENANCE.md`.
 
@@ -50,7 +50,7 @@ The cap is counted per skill per website (plan DEC-1).
 
 ## Open items
 
-- Plan §10 follow-ups (changes outside this skill): reviewed and closed by `docs/plan_localize-afterplanning-changes.md` on 2026-11-09 (see its Appendix A). Open hand-offs: none.
+- Follow-ups outside this skill: reviewed and closed in the cross-skill follow-up pass of 2026-11-09. Open hand-offs: none.
 
 ## `localized-standard-gap` log
 

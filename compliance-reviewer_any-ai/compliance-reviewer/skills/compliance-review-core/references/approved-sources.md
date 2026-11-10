@@ -2,7 +2,7 @@
 
 ## Link Access Policy
 
-**No review-time fetching** since 2026-11-09 (plan: `docs/plan_localize-review-twelve-factor.md`, C-16 option (a)).
+**No review-time fetching** since 2026-11-09, when the last subject (Twelve-Factor) was localized.
 
 - The orchestrator, the worker and the skills never fetch a URL during a review, whether it is listed here or not. Each subject reviews against its local files: the `references/standards/` files a skill declares under `## Standards (local, authoritative)`, otherwise its `checklist.md` and `sources.md`. Citations use the URLs recorded in those files, without fetching them.
 - This file is a **maintainer-only registry**. It lists the exact pages that maintainers may fetch to refresh a skill's local standards, following that skill's `references/standards/MAINTENANCE.md`. The orchestrator and the workers don't load it during a review.
@@ -12,7 +12,7 @@
 
 ## API Design
 
-**Maintenance-only** since 2026-11-07: `review-api-design` declares local standards (plan: `docs/plan_localize-review-api-design.md`). Workers don't fetch these during a review.
+**Maintenance-only** since 2026-11-07: `review-api-design` declares local standards. Workers don't fetch these during a review.
 
 - https://spec.openapis.org/oas/latest.html
 - https://github.com/microsoft/api-guidelines/blob/vNext/azure/Guidelines.md
@@ -27,7 +27,7 @@
 
 ## Cost & Sustainability
 
-**Maintenance-only** since 2026-11-07: `review-cost-sustainability` declares local standards (plan: `docs/plan_localize-review-cost-sustainability.md`). Workers don't fetch these during a review. Exact pages only — this entry does not allowlist other learn.microsoft.com/azure/well-architected pages.
+**Maintenance-only** since 2026-11-07: `review-cost-sustainability` declares local standards. Workers don't fetch these during a review. Exact pages only — this entry does not allowlist other learn.microsoft.com/azure/well-architected pages.
 
 - Azure Well-Architected Framework (pinned pages; locale-less URLs):
   - https://learn.microsoft.com/azure/well-architected/cost-optimization/checklist
@@ -56,7 +56,7 @@
 
 ## Dependency Management
 
-**Maintenance-only** since 2026-11-07: `review-dependency-management` declares local standards (plan: `docs/plan_localize-review-dependency-management.md`). Workers don't fetch these during a review. Vulnerability data comes only from approved analyzers, never from these or other URLs. Exact pages only — this entry does not allowlist other pages on these sites.
+**Maintenance-only** since 2026-11-07: `review-dependency-management` declares local standards. Workers don't fetch these during a review. Vulnerability data comes only from approved analyzers, never from these or other URLs. Exact pages only — this entry does not allowlist other pages on these sites.
 
 - OWASP:
   - https://top10.owasp.org/2025/A03_2025-Software_Supply_Chain_Failures/
@@ -76,7 +76,7 @@
 
 ## Disaster Recovery
 
-**Maintenance-only** since 2026-11-08: `review-disaster-recovery` declares local standards (plan: `docs/plan_localize-review-disaster-recovery.md`). Workers don't fetch these during a review. Exact pages only — this entry does not allowlist other learn.microsoft.com/azure/well-architected pages.
+**Maintenance-only** since 2026-11-08: `review-disaster-recovery` declares local standards. Workers don't fetch these during a review. Exact pages only — this entry does not allowlist other learn.microsoft.com/azure/well-architected pages.
 
 - Azure Well-Architected Framework (pinned pages; locale-less URLs):
   - https://learn.microsoft.com/azure/well-architected/reliability/checklist
@@ -97,12 +97,12 @@
 ## Maintainability
 
 **Localized, no external sources** since 2026-11-08: `review-maintainability` reviews only against its local rubric
-(`references/standards/maintainability-rubric.md`; plan: `docs/plan_localize-review-maintainability.md`).
+(`references/standards/maintainability-rubric.md`).
 Workers fetch nothing for this subject, including URLs listed under other subjects. There are no maintenance URLs.
 
 ## Monitoring
 
-**Maintenance-only** since 2026-11-08: `review-monitoring` declares local standards (plan: `docs/plan_localize-review-monitoring.md`). Workers don't fetch these during a review. Exact pages only — this entry does not allowlist other learn.microsoft.com/azure/well-architected or sre.google pages (in particular not the `operational-excellence/` landing page).
+**Maintenance-only** since 2026-11-08: `review-monitoring` declares local standards. Workers don't fetch these during a review. Exact pages only — this entry does not allowlist other learn.microsoft.com/azure/well-architected or sre.google pages (in particular not the `operational-excellence/` landing page).
 
 - Azure Well-Architected Framework (pinned pages; locale-less URLs):
   - https://learn.microsoft.com/azure/well-architected/operational-excellence/checklist
@@ -123,7 +123,7 @@ Workers fetch nothing for this subject, including URLs listed under other subjec
 
 ## Observability
 
-**Maintenance-only** since 2026-11-08: `review-observability` declares local standards (plan: `docs/plan_localize-review-observability.md`). Workers don't fetch these during a review. Exact pages only — this entry does not allowlist other opentelemetry.io or learn.microsoft.com pages (in particular not `https://opentelemetry.io/docs/` as a prefix, nor the `operational-excellence/` landing page, nor other `azure/architecture/` pages).
+**Maintenance-only** since 2026-11-08: `review-observability` declares local standards. Workers don't fetch these during a review. Exact pages only — this entry does not allowlist other opentelemetry.io or learn.microsoft.com pages (in particular not `https://opentelemetry.io/docs/` as a prefix, nor the `operational-excellence/` landing page, nor other `azure/architecture/` pages).
 
 - OpenTelemetry (concept, SDK, Collector and security pages pinned by per-page commit; semconv pinned to v1.45.0; Specification v1.62.0):
   - https://opentelemetry.io/docs/concepts/signals/logs/
@@ -155,7 +155,7 @@ Workers fetch nothing for this subject, including URLs listed under other subjec
 
 ## Performance
 
-**Maintenance-only** since 2026-11-08: `review-performance` declares local standards (plan: `docs/plan_localize-review-performance.md`). Workers don't fetch these during a review. Exact pages only — this entry does not allowlist other learn.microsoft.com/azure/well-architected or learn.microsoft.com/azure/architecture pages (in particular not the `performance-efficiency/` landing page or `antipatterns/retry-storm/`, which is owned by `review-reliability`; see `docs/plan_localize-review-reliability.md`).
+**Maintenance-only** since 2026-11-08: `review-performance` declares local standards. Workers don't fetch these during a review. Exact pages only — this entry does not allowlist other learn.microsoft.com/azure/well-architected or learn.microsoft.com/azure/architecture pages (in particular not the `performance-efficiency/` landing page or `antipatterns/retry-storm/`, which is owned by `review-reliability`).
 
 - Azure Well-Architected Framework (pinned pages; locale-less URLs):
   - https://learn.microsoft.com/azure/well-architected/performance-efficiency/checklist (traceability)
@@ -183,7 +183,7 @@ Workers fetch nothing for this subject, including URLs listed under other subjec
 
 ## Reliability
 
-**Maintenance-only** since 2026-11-08: `review-reliability` declares local standards (plan: `docs/plan_localize-review-reliability.md`). Workers don't fetch these during a review. Exact pages only — this entry does not allowlist other learn.microsoft.com/azure/well-architected or learn.microsoft.com/azure/architecture pages (in particular not the `reliability/` landing page or the `design-guides/handle-transient-faults` and `design-guides/background-jobs` pages).
+**Maintenance-only** since 2026-11-08: `review-reliability` declares local standards. Workers don't fetch these during a review. Exact pages only — this entry does not allowlist other learn.microsoft.com/azure/well-architected or learn.microsoft.com/azure/architecture pages (in particular not the `reliability/` landing page or the `design-guides/handle-transient-faults` and `design-guides/background-jobs` pages).
 
 - Azure Well-Architected Framework (pinned pages; locale-less URLs):
   - https://learn.microsoft.com/azure/well-architected/reliability/checklist (traceability; also listed under Disaster Recovery)
@@ -224,8 +224,7 @@ below is also listed in the section of the subject that localizes it.
 
 ## Security — Identity & Access
 
-**Maintenance-only** since 2026-11-08: `review-security-identity-access` declares local standards
-(plan: `docs/plan_localize-review-security-identity-access.md`). Workers don't fetch these during a review.
+**Maintenance-only** since 2026-11-08: `review-security-identity-access` declares local standards. Workers don't fetch these during a review.
 Exact pages only — this entry does not allowlist other pages on these sites (in particular not other
 docs.spring.io or docs.djangoproject.com pages or versions).
 
@@ -268,8 +267,7 @@ docs.spring.io or docs.djangoproject.com pages or versions).
 
 ## Security — Input & Injection
 
-**Maintenance-only** since 2026-11-08: `review-security-input-injection` declares local standards
-(plan: `docs/plan_localize-review-security-input-injection.md`). Workers don't fetch these during a review.
+**Maintenance-only** since 2026-11-08: `review-security-input-injection` declares local standards. Workers don't fetch these during a review.
 Exact pages only — this entry does not allowlist other pages on these sites (in particular not other
 learn.microsoft.com, docs.oracle.com, docs.spring.io, docs.python.org or docs.djangoproject.com pages or versions).
 
@@ -322,8 +320,7 @@ learn.microsoft.com, docs.oracle.com, docs.spring.io, docs.python.org or docs.dj
 
 ## Security — Operational
 
-**Maintenance-only** since 2026-11-08: `review-security-operational` declares local standards
-(plan: `docs/plan_localize-review-security-operational.md`). Workers don't fetch these during a review.
+**Maintenance-only** since 2026-11-08: `review-security-operational` declares local standards. Workers don't fetch these during a review.
 Exact pages only — this entry does not allowlist other pages on these sites (in particular not other
 learn.microsoft.com, docs.spring.io, docs.djangoproject.com or docs.python.org pages or versions).
 
@@ -370,8 +367,7 @@ learn.microsoft.com, docs.spring.io, docs.djangoproject.com or docs.python.org p
 
 ## Security — Web & API
 
-**Maintenance-only** since 2026-11-09: `review-security-web-api` declares local standards
-(plan: `docs/plan_localize-review-security-web-api.md`). Workers don't fetch these during a review.
+**Maintenance-only** since 2026-11-09: `review-security-web-api` declares local standards. Workers don't fetch these during a review.
 Exact pages only — this entry does not allowlist other pages on these sites (in particular not other
 learn.microsoft.com, docs.spring.io or docs.djangoproject.com pages or versions).
 
@@ -413,8 +409,7 @@ learn.microsoft.com, docs.spring.io or docs.djangoproject.com pages or versions)
 
 ## Software Lifecycle
 
-**Maintenance-only** since 2026-11-09: `review-software-lifecycle` declares local standards
-(plan: `docs/plan_localize-review-software-lifecycle.md`). Workers don't fetch these during a review.
+**Maintenance-only** since 2026-11-09: `review-software-lifecycle` declares local standards. Workers don't fetch these during a review.
 Exact pages only — this entry does not allowlist other semver.org, nist.gov, slsa.dev or github.com pages.
 (Replaces the former "Semantic Versioning" section.)
 
@@ -441,8 +436,7 @@ Exact pages only — this entry does not allowlist other semver.org, nist.gov, s
 
 ## Software Quality
 
-**Maintenance-only** since 2026-11-09: `review-software-quality` declares local standards
-(plan: `docs/plan_localize-review-software-quality.md`). Workers don't fetch these during a review.
+**Maintenance-only** since 2026-11-09: `review-software-quality` declares local standards. Workers don't fetch these during a review.
 Exact pages only — this entry does not allowlist other iso25000.com, learn.microsoft.com, google.github.io,
 peps.python.org, martinfowler.com or refactoring.com pages (in particular not `/azure/architecture/patterns/`).
 (Replaces the former "Coding Standards" and "Software Quality" sections.)
@@ -480,8 +474,7 @@ peps.python.org, martinfowler.com or refactoring.com pages (in particular not `/
 
 ## Testing
 
-**Maintenance-only** since 2026-11-09: `review-testing` declares local standards
-(plan: `docs/plan_localize-review-testing.md`). Workers don't fetch these during a review.
+**Maintenance-only** since 2026-11-09: `review-testing` declares local standards. Workers don't fetch these during a review.
 Exact pages only — this entry does not allowlist other martinfowler.com, learn.microsoft.com,
 cheatsheetseries.owasp.org, top10.owasp.org, nvlpubs.nist.gov or github.com pages.
 
@@ -512,8 +505,7 @@ cheatsheetseries.owasp.org, top10.owasp.org, nvlpubs.nist.gov or github.com page
 
 ## Twelve-Factor App
 
-**Maintenance-only** since 2026-11-09: `review-twelve-factor` declares local standards
-(plan: `docs/plan_localize-review-twelve-factor.md`). Workers don't fetch these during a review.
+**Maintenance-only** since 2026-11-09: `review-twelve-factor` declares local standards. Workers don't fetch these during a review.
 Exact pages only — this entry does not allowlist other 12factor.net pages (in particular not the translations
 under `/<locale>/`) or the site's GitHub repositories.
 

@@ -1,7 +1,6 @@
 # Maintenance — Security: Operational localized standards
 
-**Maintainers only. Workers never load this file.** Background and design decisions:
-`docs/plan_localize-review-security-operational.md`.
+**Maintainers only. Workers never load this file.** Design decisions are recorded inline where they apply (DEC-n: this skill's localization decisions; D-n and C-n: cross-skill decisions and follow-ups); the planning documents they came from aren't kept in this repo.
 
 Cross-skill strategy, cadence overview and AI-tool usage: `compliance-reviewer/STANDARDS-MAINTENANCE.md`.
 
@@ -225,7 +224,7 @@ The cap is counted per skill per website and per host (plan DEC-6). `review-secu
   `sensitive_post_parameters`; (d) a well-configured app with a global handler, structured logging, Key Vault/managed
   identity and environment-gated diagnostics (expect SEC-OP-01/-05/-06/-07 to pass with strengths).
 - Plan §10 C-1, C-2 and C-14 were applied on 2026-11-08; C-15 done 2026-11-09. The remaining hand-offs were closed by
-  `docs/plan_localize-afterplanning-changes.md` (2026-11-09): C-7 security-event alerting → `review-monitoring`
+  the cross-skill follow-up pass (2026-11-09): C-7 security-event alerting → `review-monitoring`
   (WAFM-41 … WAFM-44); C-10 rate limiting → `review-reliability` AZRL-32; C-11 CI/CD secrets stay here; C-12
   dependency and API parts → boundary steps in those skills, secret-store backup → `review-disaster-recovery` DR-06.
   Open: none.

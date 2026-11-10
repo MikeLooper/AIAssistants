@@ -27,7 +27,7 @@ This file is AI-provider neutral. All paths are relative to the repository root.
 - **Scratch space.** Save downloaded pages and drift reports in a scratch or temp folder outside the repo, in a new empty folder. Run any Python over downloaded files with `python -I`, from outside that folder.
 - **No silent edits.** Never change an element row, a check or a pin until the user has approved the specific change list (step 6).
 - **Writes allowed:** the refreshed skill's folder (`SKILL.md`, `references/**`, including `pins.json`), `approved-sources.md`, the Maintenance section of `compliance-reviewer/README.md` (score-comparability notes) and the cadence table in `STANDARDS-MAINTENANCE.md`. Read `transitions/` but never change it. Don't touch other skills except to note a shared-source change for them.
-- **Editing rules** come from the skill's `MAINTENANCE.md` ("Rules for editing elements"): IDs are stable forever (new IDs only, `(retired)` for removed rules), levels keep the source's own wording, each element belongs to exactly one check, at most 100 elements per website unless an exception is recorded, and nothing another subject owns.
+- **Editing rules** come from the skill's `MAINTENANCE.md` ("Rules for editing elements"): IDs are stable forever (new IDs only, `(retired)` for removed rules), levels keep the source's own wording, each element belongs to exactly one check, at most 100 elements per website unless an exception is recorded, and nothing another subject owns. Every new check gets a `Sub-subject` label in `checklist.md`, and labels are stable like IDs (see step 3 of `STANDARDS-MAINTENANCE.md`).
 - Don't read Git history of this repo unless the user asks.
 
 ## Procedure
@@ -46,6 +46,7 @@ This file is AI-provider neutral. All paths are relative to the repository root.
 7. **Apply the approved changes.** Edit element rows; update each file header (pins, "Localized" date, element counts); update the checklist, `sources.md`, the coverage map and `pins.json` (copy the new pin values exactly as written in the header, and drop the `baseline` mark where the header now records the value). Keep each site within its element budget.
 8. **Verify.**
    - Run `lint` again; it must report `ok: true`.
+   - If `checklist.md` changed, run `python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py labels <skill>`; it must report `ok: true`.
    - Run `check <skill>` again; refreshed sources must now be `unchanged`.
    - Do the script checks the skill's `MAINTENANCE.md` verify step lists (IDs contiguous, element-to-check mapping, every cited anchor in the pinned source, coverage map with zero unaccounted).
    - Tell the user which sample-repo review the verify step asks for. It runs separately (`/compliance-reviewer <sample> <skill>` or the tool's equivalent), followed by `compliance_report.py validate`.

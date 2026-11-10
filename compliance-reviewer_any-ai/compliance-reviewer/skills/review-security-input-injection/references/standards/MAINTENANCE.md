@@ -1,7 +1,6 @@
 # Maintenance — Security: Input & Injection localized standards
 
-**Maintainers only. Workers never load this file.** Background and design decisions:
-`docs/plan_localize-review-security-input-injection.md`.
+**Maintainers only. Workers never load this file.** Design decisions are recorded inline where they apply (DEC-n: this skill's localization decisions; D-n and C-n: cross-skill decisions and follow-ups); the planning documents they came from aren't kept in this repo.
 
 Cross-skill strategy, cadence overview and AI-tool usage: `compliance-reviewer/STANDARDS-MAINTENANCE.md`.
 
@@ -208,7 +207,7 @@ those budgets are separate.
   `DATA_UPLOAD_MAX_MEMORY_SIZE = None`; (d) a JSON-only API with DTO validation and no uploads, XML or templates
   (expect SEC-II-05/06/07/08 N/A with reasons).
 - Plan §10 C-1, C-2 (description), C-9 and C-10 were applied on 2026-11-08. The remaining hand-offs were closed by
-  `docs/plan_localize-afterplanning-changes.md` (2026-11-09): C-2 SSRF → SEC-II-10 here (D-1); C-5 labels; C-6 →
+  the cross-skill follow-up pass (2026-11-09): C-2 SSRF → SEC-II-10 here (D-1); C-5 labels; C-6 →
   dependency-management boundary step; C-7 rate limiting → `review-reliability` AZRL-32; C-11 worker rule in
   `WORKER.md`; C-13 JavaScript language id and `languages/javascript.md`. Open: none.
 

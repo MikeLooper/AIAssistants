@@ -81,5 +81,5 @@ present), and any authorization or integration-client file it lists for this sub
 
 ## Output
 
-Emit every finding, strength and check result with `subject: "Testing"`. Follow `compliance-review-core`'s
-`finding-schema.md`.
+Labels: copy `subject`/`subSubject` from `references/checklist.md` (the `Subject:` line and the check's `Sub-subject`
+column); never invent or combine labels. Follow `compliance-review-core`'s `finding-schema.md`.

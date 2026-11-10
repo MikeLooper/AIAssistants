@@ -1,6 +1,6 @@
 ---
 name: review-disaster-recovery
-description: 'Reviews backup, restore, recovery targets (RTO/RPO), DR runbooks, multi-region and failover posture, recoverability as code and DR testing, against the Azure Well-Architected Framework (Reliability) and NIST SP 800-34. Use when the compliance-reviewer orchestrator delegates the Operations / Disaster Recovery subject. Marked N/A when no IaC is found.'
+description: 'Reviews backup, restore, recovery targets (RTO/RPO), DR runbooks, multi-region and failover posture, recoverability as code and DR testing, against the Azure Well-Architected Framework (Reliability) and NIST SP 800-34. Use when the compliance-reviewer orchestrator delegates the Disaster Recovery subject. Marked N/A when no IaC is found.'
 user-invocable: false
 ---
 

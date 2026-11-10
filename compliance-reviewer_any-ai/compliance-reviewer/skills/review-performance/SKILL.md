@@ -1,6 +1,6 @@
 ---
 name: review-performance
-description: 'Reviews caching, non-blocking I/O, client and connection reuse, N+1 and chatty data access, data retrieval efficiency, offloading of long-running work, hot-path code and scale-out readiness, against Azure Well-Architected Performance Efficiency and Azure Architecture Center performance antipattern and caching guidance. Use when the compliance-reviewer orchestrator delegates the Operations / Performance subject.'
+description: 'Reviews caching, non-blocking I/O, client and connection reuse, N+1 and chatty data access, data retrieval efficiency, offloading of long-running work, hot-path code and scale-out readiness, against Azure Well-Architected Performance Efficiency and Azure Architecture Center performance antipattern and caching guidance. Use when the compliance-reviewer orchestrator delegates the Performance subject.'
 user-invocable: false
 ---
 

@@ -17,7 +17,7 @@ _Generated {{generatedAt}} · Run `{{runId}}`_
 ### Top 5 Risks
 
 {{#topRisks}}
-1. **[{{severity}}] {{title}}** — {{subject}} / {{subSubject}} ({{file}}). {{recommendation}} {{cite}}
+1. **[{{severity}}] {{title}}** — {{where}} ({{file}}). {{recommendation}} {{cite}}
 {{/topRisks}}
 
 ## 2. Things Done Well
@@ -26,7 +26,7 @@ _Generated {{generatedAt}} · Run `{{runId}}`_
 ### {{subject}}
 
 {{#strengths}}
-- [{{subSubject}}] {{title}} — {{file}}
+- {{#tag}}[{{tag}}] {{/tag}}{{title}} — {{file}}
 {{/strengths}}
 
 {{/strengthsBySubject}}
@@ -36,19 +36,19 @@ _Generated {{generatedAt}} · Run `{{runId}}`_
 ### Errors
 
 {{#errorFindings}}
-- **{{title}}** — {{subject}} / {{subSubject}} ({{file}}, lines {{lineStart}}-{{lineEnd}}). {{recommendation}} {{cite}}
+- **{{title}}** — {{where}} ({{file}}, lines {{lineStart}}-{{lineEnd}}). {{recommendation}} {{cite}}
 {{/errorFindings}}
 
 ### Warnings
 
 {{#warningFindings}}
-- **{{title}}** — {{subject}} / {{subSubject}} ({{file}}, lines {{lineStart}}-{{lineEnd}}). {{recommendation}} {{cite}}
+- **{{title}}** — {{where}} ({{file}}, lines {{lineStart}}-{{lineEnd}}). {{recommendation}} {{cite}}
 {{/warningFindings}}
 
 ### Information
 
 {{#infoFindings}}
-- **{{title}}** — {{subject}} / {{subSubject}} ({{file}}, lines {{lineStart}}-{{lineEnd}}). {{recommendation}} {{cite}}
+- **{{title}}** — {{where}} ({{file}}, lines {{lineStart}}-{{lineEnd}}). {{recommendation}} {{cite}}
 {{/infoFindings}}
 
 ## 4. Full Results
@@ -57,8 +57,10 @@ _Generated {{generatedAt}} · Run `{{runId}}`_
 ### {{name}}
 
 {{#subSubjects}}
-#### {{subSubject}}
+{{#heading}}
+#### {{heading}}
 
+{{/heading}}
 | Check | Result | Evidence |
 |-------|--------|----------|
 {{#checks}}

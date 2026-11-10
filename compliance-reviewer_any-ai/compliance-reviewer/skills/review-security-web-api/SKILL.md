@@ -1,6 +1,6 @@
 ---
 name: review-security-web-api
-description: 'Reviews Content Security Policy, HTTP security response headers, HSTS and HTTPS/TLS enforcement, CORS, and API transport hygiene (response headers, methods and content types, credentials in URLs), against pinned OWASP cheat sheets (CSP, HTTP Headers, REST Security, HTML5 CORS, HSTS, TLS), OWASP Top 10:2025 A02 and pinned ASP.NET Core, Spring Security and Django guidance. Use when the compliance-reviewer orchestrator delegates the Security / Web & API subject.'
+description: 'Reviews Content Security Policy, HTTP security response headers, HSTS and HTTPS/TLS enforcement, CORS, and API transport hygiene (response headers, methods and content types, credentials in URLs), against pinned OWASP cheat sheets (CSP, HTTP Headers, REST Security, HTML5 CORS, HSTS, TLS), OWASP Top 10:2025 A02 and pinned ASP.NET Core, Spring Security and Django guidance. Use when the compliance-reviewer orchestrator delegates the Security subject (Web & API sub-subject).'
 user-invocable: false
 ---
 

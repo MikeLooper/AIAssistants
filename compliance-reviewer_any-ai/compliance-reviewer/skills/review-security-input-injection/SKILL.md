@@ -1,6 +1,6 @@
 ---
 name: review-security-input-injection
-description: 'Reviews input validation, SQL and ORM injection, query parameterization, command and other interpreter injection, XML parser security, file upload handling, XSS output encoding, unsafe deserialization and server-side request forgery (SSRF), against pinned OWASP cheat sheets, OWASP Top 10:2025 A05 and pinned .NET, Java (Oracle, Spring Data JPA) and Python/Django guidance. Use when the compliance-reviewer orchestrator delegates the Security / Input & Injection subject.'
+description: 'Reviews input validation, SQL and ORM injection, query parameterization, command and other interpreter injection, XML parser security, file upload handling, XSS output encoding, unsafe deserialization and server-side request forgery (SSRF), against pinned OWASP cheat sheets, OWASP Top 10:2025 A05 and pinned .NET, Java (Oracle, Spring Data JPA) and Python/Django guidance. Use when the compliance-reviewer orchestrator delegates the Security subject (Input & Injection sub-subject).'
 user-invocable: false
 ---
 

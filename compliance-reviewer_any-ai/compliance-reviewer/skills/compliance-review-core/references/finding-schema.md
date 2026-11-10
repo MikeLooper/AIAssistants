@@ -23,6 +23,8 @@
 }
 ```
 
+- `subject` and `subSubject` are copied verbatim from the skill's `checklist.md`: `subject` from its `Subject:` line, `subSubject` from the check's `Sub-subject` column. Never invent or combine labels (no `Operations / Reliability`). This applies to strengths and check results too. The report script rewrites both labels from the checklist (by skill and `checkId`) before scoring, so drift can't change a report, but `validate` warns about it.
+- `checkId` must be an active id in the checklist. An unknown id blocks `validate`; a retired id only warns and is dropped from scoring.
 - `evidence` may have more than one entry after aggregation collapses duplicate findings across files.
 - `standard` is part of the aggregator's duplicate key: two findings of the same check merge only when they cite the same `standard` string. Skills with element IDs put the ID in it (e.g. `Microsoft Azure REST API Guidelines — AZ-088`); give each distinct rule violation its own finding.
 - `url` may be empty; the report then shows `standard` as plain text. A `url` with no scheme is a repo path written relative to `docs/reports/` (e.g. `../../compliance-reviewer/skills/<skill>/references/standards/<file>.md#<anchor>`); `render` rebases it onto the folder the report is actually written to.

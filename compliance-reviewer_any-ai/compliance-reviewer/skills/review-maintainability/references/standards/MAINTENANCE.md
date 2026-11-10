@@ -1,6 +1,6 @@
 # Maintenance — Maintainability localized standard
 
-**Maintainers only. Workers never load this file.** Background and design decisions: `docs/plan_localize-review-maintainability.md`.
+**Maintainers only. Workers never load this file.** Design decisions are recorded inline where they apply (DEC-n: this skill's localization decisions; D-n and C-n: cross-skill decisions and follow-ups); the planning documents they came from aren't kept in this repo.
 
 Cross-skill strategy, cadence overview and AI-tool usage: `compliance-reviewer/STANDARDS-MAINTENANCE.md`.
 
@@ -36,7 +36,7 @@ There is no external source to drift, so maintenance is driven by findings quali
 
 ## Version log
 
-- **1.0 — 2026-11-08** — initial rubric from `docs/plan_localize-review-maintainability.md` (36 elements, 9 checks). Wording shortened against the plan's §5 inventory to keep rows near 200 characters, meaning unchanged: MR-08, MR-11, MR-13, MR-14, MR-19, MR-20, MR-23, MR-27, MR-34.
+- **1.0 — 2026-11-08** — initial rubric from the Maintainability localization (36 elements, 9 checks). Wording shortened against the planned element inventory to keep rows near 200 characters, meaning unchanged: MR-08, MR-11, MR-13, MR-14, MR-19, MR-20, MR-23, MR-27, MR-34.
 
 - **1.1 — 2026-11-09** — MR-37 … MR-39 and check MAINT-10 (license and code of conduct; afterplanning WP-12d, closes
   maintainability C-6 and lifecycle C-5). Local rubric, no fetch. Maintainability grew from 9 to 10 checks; scores
@@ -45,7 +45,7 @@ There is no external source to drift, so maintenance is driven by findings quali
 
 ## Open items
 
-- Plan §10 follow-ups (changes outside this skill): reviewed and closed by `docs/plan_localize-afterplanning-changes.md` on 2026-11-09 (see its Appendix A). Open hand-offs: none.
+- Follow-ups outside this skill: reviewed and closed in the cross-skill follow-up pass of 2026-11-09. Open hand-offs: none.
 
 ## `localized-standard-gap` log
 

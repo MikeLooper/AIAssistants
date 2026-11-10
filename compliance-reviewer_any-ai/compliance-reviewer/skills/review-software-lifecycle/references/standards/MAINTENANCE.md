@@ -1,7 +1,6 @@
 # Maintenance — Software Lifecycle localized standards
 
-**Maintainers only. Workers never load this file.** Background and design decisions:
-`docs/plan_localize-review-software-lifecycle.md`.
+**Maintainers only. Workers never load this file.** Design decisions are recorded inline where they apply (DEC-n: this skill's localization decisions; D-n and C-n: cross-skill decisions and follow-ups); the planning documents they came from aren't kept in this repo.
 
 Cross-skill strategy, cadence overview and AI-tool usage: `compliance-reviewer/STANDARDS-MAINTENANCE.md`.
 
@@ -114,7 +113,7 @@ maintenance URL; the budgets are separate. csrc.nist.gov and nvlpubs.nist.gov co
 
 ## Open items
 
-- Plan §10 follow-ups (changes outside this skill): reviewed and closed by `docs/plan_localize-afterplanning-changes.md` on 2026-11-09 (see its Appendix A). Open hand-offs: none.
+- Follow-ups outside this skill: reviewed and closed in the cross-skill follow-up pass of 2026-11-09. Open hand-offs: none.
 1. Re-take the snapshot (plan §11 step 1) and verify: SemVer anchors; SSDF physical PDF pages per task; SLSA v1.2
    anchors at `releases/v1.2`; Scorecard anchors at v5.6.0 (and whether a newer release exists).
 2. Script-check the coverage map below against the published heading/anchor lists (it was built from the plan, not

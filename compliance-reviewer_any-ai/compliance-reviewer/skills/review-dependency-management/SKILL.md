@@ -1,6 +1,6 @@
 ---
 name: review-dependency-management
-description: 'Reviews dependency version pinning, lock files, analyzer-reported vulnerabilities, end-of-life runtimes and frameworks, SBOM presence, automated update/scanning configuration, trusted package sources and pre-release dependencies, against OWASP supply-chain guidance and pinned vendor lifecycle data. Use when the compliance-reviewer orchestrator delegates the Implementation / Dependency Management subject.'
+description: 'Reviews dependency version pinning, lock files, analyzer-reported vulnerabilities, end-of-life runtimes and frameworks, SBOM presence, automated update/scanning configuration, trusted package sources and pre-release dependencies, against OWASP supply-chain guidance and pinned vendor lifecycle data. Use when the compliance-reviewer orchestrator delegates the Dependency Management subject.'
 user-invocable: false
 ---
 

@@ -1,5 +1,7 @@
 # Checklist — Software Quality
 
+Subject: Software Quality
+
 Elements are defined in `standards/` (SQR in `software-quality-rubric.md`; AAS in `azure-architecture.md`; MFB in
 `fowler-bliki.md`; FRC in `fowler-refactoring-catalog.md` (remedies only); MSC in `microsoft-csharp.md`; GJS in
 `google-java-style.md`; PEP in `python-peps.md`). ISO elements classify findings and belong to no check.
@@ -21,6 +23,7 @@ CS-05, CS-04 and SQ-06; retired 2026-11-09).
 | SQ-08 | Software Quality | No dead code (unreachable, unused private members or parameters) and no commented-out code blocks | Information | SQR-17, SQR-18 (FRC-15) |
 | DP-01 | Design Patterns | No singleton, static or global holds per-request or unsynchronized shared mutable state (scale-out bottlenecks: PERF-08) | Warning | SQR-19, SQR-20 (FRC-16) |
 | DP-02 | Design Patterns | Inheritance is shallow, with composition preferred; no Refused Bequest | Information | SQR-21, SQR-22 (FRC-17, FRC-18) |
+| DP-03 | — | *(retired 2026-11-09: folded into SQ-04; ID not reused)* | — | — |
 | DP-04 | Design Patterns | Patterns and abstractions match a real problem (no Middle Man, speculative abstraction, misnamed patterns or pass-through CRUD tiers) | Information | SQR-23, SQR-24, AAS-04 (FRC-19, FRC-20) |
 | DP-05 | Design Patterns | Complex construction goes through a factory, builder or options object instead of being repeated | Information | SQR-25 (FRC-21) |
 | DP-06 | Design Patterns | Observer and event subscriptions to longer-lived publishers are removed or disposed | Warning | SQR-26 |
@@ -36,6 +39,9 @@ CS-05, CS-04 and SQ-06; retired 2026-11-09).
 | CS-03 | Coding Standards | Comments explain *why*, are current, and don't restate the code (commented-out code: SQ-08) | Information | SQR-34 |
 | CS-04 | Coding Standards | Public APIs (exported functions, classes, modules) have well-formed documentation comments | Information | SQR-35, MSC-23, GJS-33, GJS-34, PEP-21, PEP-22, PEP-23, GTS-22 |
 | CS-05 | Coding Standards | Code follows the applicable language style guide, or the documented team convention, and applies adopted static checking consistently | Warning | SQR-36; MSC-01 … MSC-05, MSC-07, MSC-08, MSC-10 … MSC-22; GJS-01 … GJS-32; PEP-01 … PEP-17, PEP-19, PEP-20; GTS-01 … GTS-19, GTS-23 |
+| CS-CS-01…05 | — | *(retired 2026-11-09: C# language checks, now language elements under CS-05, CS-04 and SQ-06; IDs not reused)* | — | — |
+| CS-JV-01…05 | — | *(retired 2026-11-09: Java language checks, now language elements under CS-05, CS-04 and SQ-06; IDs not reused)* | — | — |
+| CS-PY-01…05 | — | *(retired 2026-11-09: Python language checks, now language elements under CS-05, CS-04 and SQ-06; IDs not reused)* | — | — |
 
 23 active checks (SQ 7, DP 5, AP 6, CS 5). 143 scored elements, 23 remedy elements (FRC) and 40 classification
 elements (ISO).

@@ -1,6 +1,6 @@
 ---
 name: review-reliability
-description: 'Reviews timeouts, transient-fault retries (including retry storms), idempotency of retried operations, circuit breakers, instance redundancy, fault isolation and load protection, reliable message and background-job processing, and in-region high-availability configuration, against Azure Well-Architected Reliability and Azure Architecture Center resiliency patterns. Use when the compliance-reviewer orchestrator delegates the Operations / Reliability subject.'
+description: 'Reviews timeouts, transient-fault retries (including retry storms), idempotency of retried operations, circuit breakers, instance redundancy, fault isolation and load protection, reliable message and background-job processing, and in-region high-availability configuration, against Azure Well-Architected Reliability and Azure Architecture Center resiliency patterns. Use when the compliance-reviewer orchestrator delegates the Reliability subject.'
 user-invocable: false
 ---
 

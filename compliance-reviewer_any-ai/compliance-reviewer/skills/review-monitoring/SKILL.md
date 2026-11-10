@@ -1,6 +1,6 @@
 ---
 name: review-monitoring
-description: 'Reviews alerting rules, alert quality and routing, dashboards-as-code and the wiring of platform telemetry, probes and platform-health alerts, against the Azure Well-Architected Framework and Google SRE guidance. Use when the compliance-reviewer orchestrator delegates the Operations / Monitoring subject. Marked N/A when no IaC is found.'
+description: 'Reviews alerting rules, alert quality and routing, dashboards-as-code and the wiring of platform telemetry, probes and platform-health alerts, against the Azure Well-Architected Framework and Google SRE guidance. Use when the compliance-reviewer orchestrator delegates the Monitoring subject. Marked N/A when no IaC is found.'
 user-invocable: false
 ---
 

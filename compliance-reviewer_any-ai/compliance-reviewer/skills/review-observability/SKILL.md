@@ -1,6 +1,6 @@
 ---
 name: review-observability
-description: 'Reviews structured logging, trace-context propagation, distributed tracing, metrics, telemetry export and identity, error recording and telemetry safety in code, plus health check endpoints and SLO/SLI documentation, against OpenTelemetry and the Azure Well-Architected Framework. Use when the compliance-reviewer orchestrator delegates the Implementation / Observability subject.'
+description: 'Reviews structured logging, trace-context propagation, distributed tracing, metrics, telemetry export and identity, error recording and telemetry safety in code, plus health check endpoints and SLO/SLI documentation, against OpenTelemetry and the Azure Well-Architected Framework. Use when the compliance-reviewer orchestrator delegates the Observability subject.'
 user-invocable: false
 ---
 
