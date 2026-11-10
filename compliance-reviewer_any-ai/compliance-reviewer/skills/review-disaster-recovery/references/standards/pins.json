@@ -1,0 +1,81 @@
+{
+  "$comment": "Source pins for check_source_drift.py (maintainers only; never used during a review). Pins copied from the standards file headers must match them; 'baseline' marks values recorded by the script.",
+  "skill": "review-disaster-recovery",
+  "checks": [
+    {
+      "id": "learn-re-check",
+      "file": "azure-well-architected-reliability-dr.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/checklist",
+      "msDate": "2023-11-15"
+    },
+    {
+      "id": "learn-re-prin",
+      "file": "azure-well-architected-reliability-dr.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/principles",
+      "msDate": "2025-09-30"
+    },
+    {
+      "id": "learn-re-met",
+      "file": "azure-well-architected-reliability-dr.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/metrics",
+      "msDate": "2024-08-16"
+    },
+    {
+      "id": "learn-re-red",
+      "file": "azure-well-architected-reliability-dr.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/redundancy",
+      "msDate": "2025-08-13"
+    },
+    {
+      "id": "learn-re-test",
+      "file": "azure-well-architected-reliability-dr.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/reliability-test",
+      "msDate": "2026-05-27"
+    },
+    {
+      "id": "learn-re-dr",
+      "file": "azure-well-architected-reliability-dr.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/disaster-recovery",
+      "msDate": "2025-11-19"
+    },
+    {
+      "id": "learn-dg-dr",
+      "file": "azure-well-architected-reliability-dr.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/design-guides/disaster-recovery",
+      "msDate": "2025-09-19"
+    },
+    {
+      "id": "learn-dg-az",
+      "file": "azure-well-architected-reliability-dr.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/design-guides/regions-availability-zones",
+      "msDate": "2025-09-08"
+    },
+    {
+      "id": "nist-sp800-34-record",
+      "file": "nist-sp-800-34-contingency-planning.md",
+      "method": "text-hash",
+      "url": "https://csrc.nist.gov/pubs/sp/800/34/r1/upd1/final",
+      "pinned": "68e35fb6ff1e3bb9",
+      "watch": true,
+      "note": "Look for a new revision or a withdrawal notice.",
+      "baseline": "2026-11-09"
+    },
+    {
+      "id": "owasp-smg",
+      "file": "owasp-secrets-backup.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Secrets_Management_Cheat_Sheet.md",
+      "pinned": "d6474de095dedba6caf536fdf8926d6ae53f3cfc",
+      "pinnedDate": "2026-11-08"
+    }
+  ]
+}

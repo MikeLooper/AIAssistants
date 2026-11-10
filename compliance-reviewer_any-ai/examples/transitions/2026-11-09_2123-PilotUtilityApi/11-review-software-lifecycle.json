@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2123-PilotUtilityApi",
+  "stepId": "11-review-software-lifecycle",
+  "status": "completed",
+  "startedAt": "2026-11-09T21:23:03-07:00",
+  "completedAt": "2026-11-09T21:31:00-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "batchId": "batch-11",
+  "skill": "review-software-lifecycle",
+  "subject": "Software Lifecycle",
+  "findings": [
+    {
+      "id": "SL-04#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Branch Protection",
+      "checkId": "SL-04",
+      "severity": "Warning",
+      "title": "No CODEOWNERS file on a GitHub repository, so pipeline and build files have no required code-owner review",
+      "evidence": [
+        { "file": ".github/workflows/dotnet.yml", "lineStart": 4, "lineEnd": 10, "excerpt": "name: .NET\n\non:\n  push:" }
+      ],
+      "standard": "OpenSSF Scorecard v5.6.0 — OSC-04",
+      "url": "https://github.com/ossf/scorecard/blob/v5.6.0/docs/checks.md#branch-protection",
+      "recommendation": "Add .github/CODEOWNERS with a '*' rule (or at least rules for .github/workflows/ and Directory.Build.props) naming the maintainers, and require code-owner review on main.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-07#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Security Policy",
+      "checkId": "SL-07",
+      "severity": "Information",
+      "title": "No SECURITY.md security policy in the root, .github/ or docs/",
+      "evidence": [
+        { "file": ".github/workflows/dotnet.yml", "lineStart": 4, "lineEnd": 4, "excerpt": "name: .NET" }
+      ],
+      "standard": "OpenSSF Scorecard v5.6.0 — OSC-15",
+      "url": "https://github.com/ossf/scorecard/blob/v5.6.0/docs/checks.md#security-policy",
+      "recommendation": "Add a SECURITY.md giving a private reporting channel (email or GitHub private vulnerability reporting), the handling process and disclosure timelines, and supported versions.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-10#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Pipeline Hardening",
+      "checkId": "SL-10",
+      "severity": "Warning",
+      "title": "Workflow declares no permissions block, so the GITHUB_TOKEN inherits the repository default scopes",
+      "evidence": [
+        { "file": ".github/workflows/dotnet.yml", "lineStart": 6, "lineEnd": 15, "excerpt": "on:\n  push:\n    branches: [ \"main\" ]\n...\njobs:\n  build:" }
+      ],
+      "standard": "OpenSSF Scorecard v5.6.0 — OSC-09",
+      "url": "https://github.com/ossf/scorecard/blob/v5.6.0/docs/checks.md#token-permissions",
+      "recommendation": "Add a top-level 'permissions: contents: read' (or 'permissions: {}') and grant any write scopes only on the jobs that need them.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-10#2",
+      "subject": "Software Lifecycle",
+      "subSubject": "Pipeline Hardening",
+      "checkId": "SL-10",
+      "severity": "Warning",
+      "title": "Actions are pinned to mutable tags (@v4) rather than full commit SHAs",
+      "evidence": [
+        { "file": ".github/workflows/dotnet.yml", "lineStart": 20, "lineEnd": 22, "excerpt": "- uses: actions/checkout@v4\n  uses: actions/setup-dotnet@v4" }
+      ],
+      "standard": "OpenSSF Scorecard v5.6.0 — OSC-11",
+      "url": "https://github.com/ossf/scorecard/blob/v5.6.0/docs/checks.md#pinned-dependencies",
+      "recommendation": "Pin each action to its full 40-character commit SHA with a version comment (e.g. actions/checkout@<sha> # v4.x.y) and let an update bot keep the pins current.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-11#1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Static Analysis",
+      "checkId": "SL-11",
+      "severity": "Warning",
+      "title": "No SAST tool runs in CI on pull requests or pushes",
+      "evidence": [
+        { "file": ".github/workflows/dotnet.yml", "lineStart": 25, "lineEnd": 30, "excerpt": "run: dotnet restore\n...\nrun: dotnet build --no-restore\n...\nrun: dotnet test --no-build --verbosity normal" }
+      ],
+      "standard": "OpenSSF Scorecard v5.6.0 — OSC-14",
+      "url": "https://github.com/ossf/scorecard/blob/v5.6.0/docs/checks.md#sast",
+      "recommendation": "Add a CodeQL workflow (github/codeql-action init + analyze for csharp) on pull_request and push to main, uploading SARIF results, with a defined severity threshold that blocks merge.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "SL-11#2",
+      "subject": "Software Lifecycle",
+      "subSubject": "Static Analysis",
+      "checkId": "SL-11",
+      "severity": "Warning",
+      "title": "Compiler warnings are not treated as errors in the shared build configuration",
+      "evidence": [
+        { "file": "Directory.Build.props", "lineStart": 2, "lineEnd": 9, "excerpt": "<PropertyGroup>\n  <Version>1.0.1</Version> ... <Nullable>enable</Nullable>" }
+      ],
+      "standard": "NIST SSDF 1.1 — SSDF-04",
+      "url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-218.pdf#page=23",
+      "recommendation": "Set <TreatWarningsAsErrors>true</TreatWarningsAsErrors> (at least for CI builds, e.g. via ContinuousIntegrationBuild) and an explicit <AnalysisLevel> in Directory.Build.props.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "SL-01#S1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Continuous Integration",
+      "checkId": "SL-01",
+      "title": "CI builds every pull request to main on hosted GitHub Actions from a pipeline defined in the repository",
+      "evidence": [
+        { "file": ".github/workflows/dotnet.yml", "lineStart": 6, "lineEnd": 10, "excerpt": "on:\n  push:\n    branches: [ \"main\" ]\n  pull_request:\n    branches: [ \"main\" ]" }
+      ],
+      "standard": "OpenSSF Scorecard v5.6.0 — OSC-06",
+      "url": "https://github.com/ossf/scorecard/blob/v5.6.0/docs/checks.md#ci-tests"
+    },
+    {
+      "id": "SL-03#S1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Versioning",
+      "checkId": "SL-03",
+      "title": "A single, valid SemVer version is declared centrally in Directory.Build.props",
+      "evidence": [
+        { "file": "Directory.Build.props", "lineStart": 3, "lineEnd": 3, "excerpt": "<Version>1.0.1</Version>" }
+      ],
+      "standard": "Semantic Versioning 2.0.0 — SV-01",
+      "url": "https://semver.org/spec/v2.0.0.html#semantic-versioning-specification-semver"
+    },
+    {
+      "id": "SL-09#S1",
+      "subject": "Software Lifecycle",
+      "subSubject": "Workflow Security",
+      "checkId": "SL-09",
+      "title": "Workflow uses only push and pull_request triggers and interpolates no untrusted context into scripts",
+      "evidence": [
+        { "file": ".github/workflows/dotnet.yml", "lineStart": 6, "lineEnd": 10, "excerpt": "on:\n  push: ...\n  pull_request:" }
+      ],
+      "standard": "OpenSSF Scorecard v5.6.0 — OSC-07",
+      "url": "https://github.com/ossf/scorecard/blob/v5.6.0/docs/checks.md#dangerous-workflow"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "SL-01", "subject": "Software Lifecycle", "subSubject": "Continuous Integration", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "SL-02", "subject": "Software Lifecycle", "subSubject": "Release Automation", "severityIfFailed": "Warning", "result": "N/A", "reason": "Repo publishes no versioned artifacts: no release, packaging or deploy pipeline in the reviewed files.", "findingIds": [] },
+    { "checkId": "SL-03", "subject": "Software Lifecycle", "subSubject": "Versioning", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SL-04", "subject": "Software Lifecycle", "subSubject": "Branch Protection", "severityIfFailed": "Warning", "result": "fail", "reason": "No CODEOWNERS on a GitHub repository (OSC-04, SSDF-10); other setting elements skipped as repository settings are not visible in files.", "findingIds": ["SL-04#1"] },
+    { "checkId": "SL-05", "subject": "Software Lifecycle", "subSubject": "Provenance & Signing", "severityIfFailed": "Information", "result": "N/A", "reason": "Repo publishes no versioned artifacts.", "findingIds": [] },
+    { "checkId": "SL-07", "subject": "Software Lifecycle", "subSubject": "Security Policy", "severityIfFailed": "Information", "result": "fail", "reason": "No SECURITY.md exists in the repository.", "findingIds": ["SL-07#1"] },
+    { "checkId": "SL-09", "subject": "Software Lifecycle", "subSubject": "Workflow Security", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "SL-10", "subject": "Software Lifecycle", "subSubject": "Pipeline Hardening", "severityIfFailed": "Warning", "result": "fail", "reason": "Workflow has no permissions block and actions are pinned to mutable @v4 tags.", "findingIds": ["SL-10#1", "SL-10#2"] },
+    { "checkId": "SL-11", "subject": "Software Lifecycle", "subSubject": "Static Analysis", "severityIfFailed": "Warning", "result": "fail", "reason": "No SAST in CI and warnings are not treated as errors in build config.", "findingIds": ["SL-11#1", "SL-11#2"] },
+    { "checkId": "SL-12", "subject": "Software Lifecycle", "subSubject": "Committed Binaries", "severityIfFailed": "Information", "result": "pass", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "Platform: GitHub Actions. No settings-as-code, CODEOWNERS, SECURITY.md, release tooling or Dockerfile present (per orchestrator context). Binary-artifact glob over the target found no matches. Restore locked-mode/lock files left to review-dependency-management."
+}

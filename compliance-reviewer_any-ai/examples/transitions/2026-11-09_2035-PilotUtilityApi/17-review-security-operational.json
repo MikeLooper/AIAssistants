@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2035-PilotUtilityApi",
+  "stepId": "17-review-security-operational",
+  "status": "completed",
+  "startedAt": "2026-11-09T20:35:41-07:00",
+  "completedAt": "2026-11-09T20:48:00-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "batchId": "batch-2",
+  "skill": "review-security-operational",
+  "subject": "Security",
+  "findings": [
+    {
+      "id": "SEC-OP-05#1",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-05",
+      "severity": "Warning",
+      "title": "CI workflow runs no secret scanner before merge",
+      "evidence": [
+        { "file": ".github/workflows/dotnet.yml", "lineStart": 23, "lineEnd": 28, "excerpt": "- name: Restore dependencies ... - name: Build ... - name: Test (no secret-scanning step)" }
+      ],
+      "standard": "OWASP Secrets Management Cheat Sheet — SMG-05",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html#81-general-detection-approaches",
+      "recommendation": "Add a secret-detection step (e.g. a CI secret scanner or pre-commit hook) to the pull-request workflow so credentials in appsettings*.json or code are caught before merge.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-OP-07#1",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-07",
+      "severity": "Warning",
+      "title": "Test-data reset endpoint is exposed in every environment on the public listener",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 13, "lineEnd": 19, "excerpt": "/// A controller for testing management operations. ... [Route(\"v{version:apiVersion}/[controller]\")] [AllowAnonymous]" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 46, "lineEnd": 53, "excerpt": "[HttpPost] [Route(\"reset\")] ... await testingService.ResetTestingAsync(cancellationToken);" }
+      ],
+      "standard": "OWASP REST Security Cheat Sheet — ORS-01",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html#management-endpoints",
+      "recommendation": "Register the testing controller only in Development/test environments (or move it to a separate, network-restricted host or port); per SCR-01, production builds should not ship test-management routes.",
+      "confidence": "Low",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "SEC-OP-01#S1",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-01",
+      "title": "Global exception middleware logs unexpected errors and returns a generic ProblemDetails body",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs", "lineStart": 70, "lineEnd": 87, "excerpt": "this.logger.LogError(exception, \"{UserMessage}\", loggingCorrelation.UserMessage); ... Detail = loggingCorrelation.UserMessage" }
+      ],
+      "standard": "OWASP .NET Security Cheat Sheet — DNO-04",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html#configuration-and-deployment"
+    },
+    {
+      "id": "SEC-OP-03#S1",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-03",
+      "title": "Data-source password is redacted in ToString and in suppressed configuration copies",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Configuration/Models/DataSourceConfiguration.cs", "lineStart": 89, "lineEnd": 89, "excerpt": "$\"{nameof(this.Password)}={(string.IsNullOrEmpty(this.Password) ? \"--Empty--\" : \"[Redacted]\")}, \"" },
+        { "file": "src/PilotUtiltyApi.Shared/Configuration/Models/DataSourceConfiguration.cs", "lineStart": 118, "lineEnd": 118, "excerpt": "this.Password = suppressSensitiveValues? \"[Redacted]\" : sourceConfiguration.Password;" }
+      ],
+      "standard": "OWASP Logging Cheat Sheet — LOG-12",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html#data-to-exclude"
+    },
+    {
+      "id": "SEC-OP-09#S1",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-09",
+      "title": "File log sink is bounded by rolling interval, size limit and retention count, in structured JSON",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 61, "lineEnd": 66, "excerpt": "\"rollingInterval\": \"Day\", \"rollOnFileSizeLimit\": true, \"fileSizeLimitBytes\": 104857600, \"retainedFileCountLimit\": 14" }
+      ],
+      "standard": "OWASP Logging Cheat Sheet — LOG-21",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html#verification"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "SEC-OP-01", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-OP-02", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-OP-03", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-OP-04", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-OP-05", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Error", "result": "fail", "reason": "No literal credentials found (placeholders only), but the CI workflow in scope has no secret-detection step (SMG-05, SHOULD).", "findingIds": ["SEC-OP-05#1"] },
+    { "checkId": "SEC-OP-06", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-OP-07", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "fail", "reason": "Anonymous test-data reset endpoint is served in all environments with no environment gate or network restriction in the files.", "findingIds": ["SEC-OP-07#1"] },
+    { "checkId": "SEC-OP-08", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-OP-09", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-OP-10", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "N/A", "reason": "No multi-step writes, transactions or security decisions in the subject's files (reset logic lives in a service outside scope).", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "Middleware registration confirmed via closely related file src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs:79 (UseMiddleware<UnhandledExceptionMiddleware>). logs/log-20261014.json searched rather than read in full (size); no secrets found, only startup bind-failure stack traces. logs/ is listed in .gitignore, so runtime log files are local artifacts. TestingController returns service ErrorMessage in a Warning header; content not visible in scope, header handling belongs to web-api. localized-standard-gap: Serilog UseSerilogRequestLogging and Serilog.Exceptions WithExceptionDetails destructuring defaults not localized. localized-standard-gap: OpenTelemetry OTLP exporter transport scheme default not localized (collector host otel-collector:4318)."
+}

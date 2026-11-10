@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2123-PilotUtilityApi",
+  "stepId": "12-review-twelve-factor",
+  "status": "completed",
+  "startedAt": "2026-11-09T21:23:03-07:00",
+  "completedAt": "2026-11-09T21:29:30-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "batchId": "batch-2",
+  "skill": "review-twelve-factor",
+  "subject": "Twelve-Factor",
+  "findings": [
+    {
+      "id": "TF-11#1",
+      "subject": "Twelve-Factor",
+      "subSubject": "XI. Logs",
+      "checkId": "TF-11",
+      "severity": "Warning",
+      "title": "Production config writes rolling log files via the Serilog File sink",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 58, "lineEnd": 66, "excerpt": "\"Name\": \"File\", \"Args\": { \"path\": \"logs/log-.json\", \"rollingInterval\": \"Day\", ... \"retainedFileCountLimit\": 14" },
+        { "file": "src/PilotUtiltyApi.Shared/Logging/Extensions/LoggingExtensions.cs", "lineStart": 71, "lineEnd": 77, "excerpt": "builder.Services.AddSerilog((services, loggerConfig) => loggerConfig.ReadFrom.Configuration(builder.Configuration)" },
+        { "file": "src/PilotUtiltyApi.Web/logs/log-20260811.json", "lineStart": 1, "lineEnd": 1, "excerpt": "{\"@t\":\"2026-08-12T04:48:57.6374108Z\",\"@mt\":\"Now listening on: {address}\",..." }
+      ],
+      "standard": "Compliance Reviewer Twelve-Factor Rubric — TFR-19",
+      "url": "../../compliance-reviewer/skills/review-twelve-factor/references/standards/twelve-factor-rubric.md#tfr-19",
+      "recommendation": "Remove the File sink (path, rolling and retention settings) from the base appsettings.json and keep only the Console sink and OTLP exporter; if file logging is wanted locally, move it into appsettings.Development.json.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "TF-04#S1",
+      "subject": "Twelve-Factor",
+      "subSubject": "IV. Backing services",
+      "checkId": "TF-04",
+      "title": "Database provider and handle are selected purely by config (DataSourceType + Active flag) and validated at startup",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 3, "lineEnd": 27, "excerpt": "\"Active\": true, ... \"DataSourceType\": \"SqlServer\", \"Host\": \"localhost\" ... \"DataSourceType\": \"PostgreSQL\"" },
+        { "file": "src/PilotUtiltyApi.Shared/Configuration/ApplicationConfiguration.cs", "lineStart": 69, "lineEnd": 87, "excerpt": "var activeDataSources = DataSources.Where(ds => ds.Active).ToArray();" }
+      ],
+      "standard": "Compliance Reviewer Twelve-Factor Rubric — TFR-09",
+      "url": "../../compliance-reviewer/skills/review-twelve-factor/references/standards/twelve-factor-rubric.md#tfr-09"
+    },
+    {
+      "id": "TF-02#S1",
+      "subject": "Twelve-Factor",
+      "subSubject": "II. Dependencies",
+      "checkId": "TF-02",
+      "title": "All dependencies declared through central package management and project references; CI restores and builds deterministically",
+      "evidence": [
+        { "file": "Directory.Packages.props", "lineStart": 2, "lineEnd": 4, "excerpt": "<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>" },
+        { "file": ".github/workflows/dotnet.yml", "lineStart": 23, "lineEnd": 26, "excerpt": "run: dotnet restore ... run: dotnet build --no-restore" }
+      ],
+      "standard": "Compliance Reviewer Twelve-Factor Rubric — TFR-03",
+      "url": "../../compliance-reviewer/skills/review-twelve-factor/references/standards/twelve-factor-rubric.md#tfr-03"
+    },
+    {
+      "id": "TF-09#S1",
+      "subject": "Twelve-Factor",
+      "subSubject": "IX. Disposability",
+      "checkId": "TF-09",
+      "title": "Self-hosted Generic Host/Kestrel app with lean startup and log flush on shutdown",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Program.cs", "lineStart": 16, "lineEnd": 32, "excerpt": "var webAppBuilder = WebApplication.CreateBuilder(args); ... webApp.Run();" },
+        { "file": "src/PilotUtiltyApi.Web/Program.cs", "lineStart": 38, "lineEnd": 41, "excerpt": "finally { Log.CloseAndFlush(); }" }
+      ],
+      "standard": "Compliance Reviewer Twelve-Factor Rubric — TFR-16",
+      "url": "../../compliance-reviewer/skills/review-twelve-factor/references/standards/twelve-factor-rubric.md#tfr-16"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "TF-01", "subject": "Twelve-Factor", "subSubject": "I. Codebase", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-02", "subject": "Twelve-Factor", "subSubject": "II. Dependencies", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-03", "subject": "Twelve-Factor", "subSubject": "III. Config", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-04", "subject": "Twelve-Factor", "subSubject": "IV. Backing services", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-05", "subject": "Twelve-Factor", "subSubject": "V. Build, release, run", "severityIfFailed": "Warning", "result": "N/A", "reason": "No Dockerfile, deployment manifest or deploy step visible; CI only builds and tests.", "findingIds": [] },
+    { "checkId": "TF-06", "subject": "Twelve-Factor", "subSubject": "VI. Processes", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-07", "subject": "Twelve-Factor", "subSubject": "VII. Port binding", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-08", "subject": "Twelve-Factor", "subSubject": "VIII. Concurrency", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-09", "subject": "Twelve-Factor", "subSubject": "IX. Disposability", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-10", "subject": "Twelve-Factor", "subSubject": "X. Dev/prod parity", "severityIfFailed": "Warning", "result": "N/A", "reason": "Production backing-service definition not visible (no IaC/compose/manifests; only localhost config).", "findingIds": [] },
+    { "checkId": "TF-11", "subject": "Twelve-Factor", "subSubject": "XI. Logs", "severityIfFailed": "Warning", "result": "fail", "reason": "Base appsettings.json configures a Serilog rolling File sink with retention, and runtime log files exist under logs/.", "findingIds": ["TF-11#1"] },
+    { "checkId": "TF-12", "subject": "Twelve-Factor", "subSubject": "XII. Admin processes", "severityIfFailed": "Information", "result": "N/A", "reason": "No admin or migration tasks visible in the reviewed files.", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "Deployable: PilotUtilityApi.Web, long-running ASP.NET Core network service; Repositories is a library. TF-03 passed: committed DataSources use localhost hosts and placeholder passwords (UserSecretsId present); base config also holds OpenTelemetry Server 'otel-collector', a non-secret collector hostname - consider supplying it from the environment. appsettings.Development.json holds localhost values only. Shared csproj grepped to confirm Serilog packages are declared. Committed log files (13) are out of scope here (review-security-operational / review-software-lifecycle)."
+}

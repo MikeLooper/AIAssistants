@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2035-PilotUtilityApi",
+  "stepId": "19-review-testing",
+  "status": "completed",
+  "startedAt": "2026-11-09T20:35:41-07:00",
+  "completedAt": "2026-11-09T20:52:00-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "batchId": "batch-5",
+  "skill": "review-testing",
+  "subject": "Testing",
+  "findings": [
+    {
+      "id": "TST-02#1",
+      "subject": "Testing",
+      "subSubject": "Coverage",
+      "checkId": "TST-02",
+      "severity": "Warning",
+      "title": "coverlet.collector is referenced but coverage is never collected or published in CI",
+      "evidence": [
+        { "file": ".github/workflows/dotnet.yml", "lineStart": 27, "lineEnd": 28, "excerpt": "- name: Test\n  run: dotnet test --no-build --verbosity normal" },
+        { "file": "test/PilotUtiltyApi.Web.Tests/PilotUtilityApi.Web.Tests.csproj", "lineStart": 9, "lineEnd": 12, "excerpt": "<PackageReference Include=\"coverlet.collector\">" }
+      ],
+      "standard": "Compliance Reviewer Testing Rubric — TSR-04",
+      "url": "../../compliance-reviewer/skills/review-testing/references/standards/testing-rubric.md#tsr-04",
+      "recommendation": "Run `dotnet test --collect:\"XPlat Code Coverage\"` in CI and publish the result (reportgenerator artifact, PR comment or Codecov upload) so untested code is visible.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "TST-03#1",
+      "subject": "Testing",
+      "subSubject": "Assertion quality",
+      "checkId": "TST-03",
+      "severity": "Warning",
+      "title": "Placeholder test always passes and a controller test cannot detect the behaviour its name claims",
+      "evidence": [
+        { "file": "test/PilotUtiltyApi.Domain.Tests/ExampleTest.cs", "lineStart": 9, "lineEnd": 14, "excerpt": "public void ExampleClass_ExampleTest_Test() { ... Assert.Pass(\"Example Test\"); }" },
+        { "file": "test/PilotUtiltyApi.Web.Tests/Controllers/TestingControllerTests.cs", "lineStart": 115, "lineEnd": 132, "excerpt": "WithErrorAndNullMessage_ReturnsBadRequestWithDefaultWarning ... ReturnsAsync(new RetrieveResponse<int>(0, \"test error\")); ... ContainsKey(\"Warning\")" }
+      ],
+      "standard": "Compliance Reviewer Testing Rubric — TSR-07",
+      "url": "../../compliance-reviewer/skills/review-testing/references/standards/testing-rubric.md#tsr-07",
+      "recommendation": "Delete the Assert.Pass placeholder or replace it with a real Domain test; make the null-message controller test stub a null ErrorMessage and assert the actual default Warning value.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "TST-07#1",
+      "subject": "Testing",
+      "subSubject": "Coverage of production modules",
+      "checkId": "TST-07",
+      "severity": "Warning",
+      "title": "No automated acceptance-level tests; the Bruno collection has no assertions and is not run in CI",
+      "evidence": [
+        { "file": "test/Bruno/PilotUtilityApi/v1/Testing/TestingReset.yml", "lineStart": 6, "lineEnd": 9, "excerpt": "http:\n  method: POST\n  url: \"{{Host}}v{{version}}/{{controller}}/reset\"" },
+        { "file": ".github/workflows/dotnet.yml", "lineStart": 27, "lineEnd": 28, "excerpt": "run: dotnet test --no-build --verbosity normal" }
+      ],
+      "standard": "Martin Fowler (martinfowler.com) — MFT-15",
+      "url": "https://martinfowler.com/articles/practical-test-pyramid.html#acceptance",
+      "recommendation": "Add acceptance tests for the reset feature, e.g. WebApplicationFactory-based API tests or Bruno requests with assertions run by the Bruno CLI in CI.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    },
+    {
+      "id": "TST-08#1",
+      "subject": "Testing",
+      "subSubject": "Test code quality",
+      "checkId": "TST-08",
+      "severity": "Information",
+      "title": "DataSourceConfiguration arrange blocks (>10 lines) are copied across many tests with no builder",
+      "evidence": [
+        { "file": "test/PilotUtiltyApi.Shared.Tests/Configuration/ApplicationConfigurationTests.cs", "lineStart": 44, "lineEnd": 56, "excerpt": "var config = new ApplicationConfiguration { DataSources = [ new DataSourceConfiguration { Active = false, ... } ] }; (13 lines, repeated in 6 tests)" },
+        { "file": "test/PilotUtiltyApi.Repositories.Tests/Repositories/TestingRepositoryTests.cs", "lineStart": 30, "lineEnd": 45, "excerpt": "var mockConfig = new Mock<IApplicationConfiguration>(); mockConfig.Setup(c => c.DataSources).Returns([ new DataSourceConfiguration { ... } ]);" }
+      ],
+      "standard": "Compliance Reviewer Testing Rubric — TSR-17",
+      "url": "../../compliance-reviewer/skills/review-testing/references/standards/testing-rubric.md#tsr-17",
+      "recommendation": "Add a DataSourceConfiguration builder or factory in PilotUtilityApi.TestingShared that returns a valid default, so each test sets only the property under test.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "TST-08#2",
+      "subject": "Testing",
+      "subSubject": "Test code quality",
+      "checkId": "TST-08",
+      "severity": "Information",
+      "title": "Misleading test name with unused arrange code, and a non-descriptive placeholder test name",
+      "evidence": [
+        { "file": "test/PilotUtiltyApi.Web.Tests/Controllers/TestingControllerTests.cs", "lineStart": 117, "lineEnd": 121, "excerpt": "var expectedResult = new RetrieveResponse<int>(0, null); expectedResult.ErrorMessage = null; ... ReturnsAsync(new RetrieveResponse<int>(0, \"test error\"));" },
+        { "file": "test/PilotUtiltyApi.Domain.Tests/ExampleTest.cs", "lineStart": 9, "lineEnd": 9, "excerpt": "public void ExampleClass_ExampleTest_Test()" }
+      ],
+      "standard": "Microsoft .NET unit testing best practices — MSU-08",
+      "url": "https://learn.microsoft.com/dotnet/core/testing/unit-testing-best-practices#follow-test-naming-standards",
+      "recommendation": "Remove the unused expectedResult and align the test name with the scenario actually arranged; rename or remove the example test.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "TST-09#1",
+      "subject": "Testing",
+      "subSubject": "Integration and contract tests",
+      "checkId": "TST-09",
+      "severity": "Warning",
+      "title": "Data access is never exercised against a real database engine",
+      "evidence": [
+        { "file": "test/PilotUtiltyApi.Repositories.Tests/Repositories/TestingRepositoryTests.cs", "lineStart": 51, "lineEnd": 72, "excerpt": "ResetTestingAsync_WithNoActiveDataSource_ReturnsError ... Assert.That(result.ErrorMessage, Does.Contain(\"No active data source configured\"));" },
+        { "file": "test/PilotUtiltyApi.Repositories.Tests/PilotUtilityApi.Repositories.Tests.csproj", "lineStart": 8, "lineEnd": 21, "excerpt": "coverlet.collector, Microsoft.NET.Test.Sdk, Moq, NUnit ... (no Testcontainers or DB fixture)" }
+      ],
+      "standard": "Compliance Reviewer Testing Rubric — TSR-18",
+      "url": "../../compliance-reviewer/skills/review-testing/references/standards/testing-rubric.md#tsr-18",
+      "recommendation": "Add an integration test project that runs TestingRepository.ResetTestingAsync against SQL Server and PostgreSQL in containers (e.g. Testcontainers), covering the success path.",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "TST-10#1",
+      "subject": "Testing",
+      "subSubject": "Security tests",
+      "checkId": "TST-10",
+      "severity": "Warning",
+      "title": "No test verifies that failures become a generic error response; tests assert the raw error is echoed in a header",
+      "evidence": [
+        { "file": "test/PilotUtiltyApi.Web.Tests/Controllers/TestingControllerTests.cs", "lineStart": 91, "lineEnd": 110, "excerpt": "var errorMessage = \"Database connection failed\"; ... Assert.That(controller.Response.Headers[\"Warning\"].ToString(), Is.EqualTo(errorMessage));" }
+      ],
+      "standard": "Compliance Reviewer Testing Rubric — TSR-22",
+      "url": "../../compliance-reviewer/skills/review-testing/references/standards/testing-rubric.md#tsr-22",
+      "recommendation": "Add tests that throw from the service/repository and assert the API returns a generic error body without internal details (exception text, connection info).",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "TST-11#1",
+      "subject": "Testing",
+      "subSubject": "Security tests",
+      "checkId": "TST-11",
+      "severity": "Information",
+      "title": "No fuzz/property-based tests and no DAST job in the pipeline",
+      "evidence": [
+        { "file": ".github/workflows/dotnet.yml", "lineStart": 23, "lineEnd": 28, "excerpt": "dotnet restore / dotnet build --no-restore / dotnet test --no-build (no DAST step)" }
+      ],
+      "standard": "Compliance Reviewer Testing Rubric — TSR-23",
+      "url": "../../compliance-reviewer/skills/review-testing/references/standards/testing-rubric.md#tsr-23",
+      "recommendation": "Add an OWASP ZAP API baseline scan against the OpenAPI document in CI, or property-based tests (FsCheck/CsCheck) for input and configuration parsing.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    },
+    {
+      "id": "TST-12#1",
+      "subject": "Testing",
+      "subSubject": "Load and performance tests",
+      "checkId": "TST-12",
+      "severity": "Information",
+      "title": "The deployable web API has no automated load or performance tests",
+      "evidence": [
+        { "file": ".github/workflows/dotnet.yml", "lineStart": 12, "lineEnd": 28, "excerpt": "jobs: build: ... (no k6, JMeter, NBomber or other load-test step)" }
+      ],
+      "standard": "Azure Well-Architected Framework — AZT-01",
+      "url": "https://learn.microsoft.com/azure/well-architected/performance-efficiency/performance-test#apply-multiple-performance-test-types",
+      "recommendation": "Add a small k6 or NBomber script for the API endpoints with p95 latency and error-rate thresholds, run on a schedule against a production-like environment.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "TST-06#S1",
+      "subject": "Testing",
+      "subSubject": "CI execution",
+      "checkId": "TST-06",
+      "title": "CI runs the full test suite on push and pull request to main with no failure suppression",
+      "evidence": [
+        { "file": ".github/workflows/dotnet.yml", "lineStart": 6, "lineEnd": 28, "excerpt": "on: push: branches: [ \"main\" ] pull_request: branches: [ \"main\" ] ... run: dotnet test --no-build" }
+      ]
+    },
+    {
+      "id": "TST-05#S1",
+      "subject": "Testing",
+      "subSubject": "Isolation and determinism",
+      "checkId": "TST-05",
+      "title": "Tests build their own state per test with no shared statics, sleeps, clock reads or skips",
+      "evidence": [
+        { "file": "test/PilotUtiltyApi.TestingShared/Base/TestBase.cs", "lineStart": 14, "lineEnd": 52, "excerpt": "public abstract class TestBase { //all setup/teardown commented out }" }
+      ]
+    },
+    {
+      "id": "TST-03#S1",
+      "subject": "Testing",
+      "subSubject": "Assertion quality",
+      "title": "Configuration validation has thorough negative tests asserting exception type and message",
+      "evidence": [
+        { "file": "test/PilotUtiltyApi.Shared.Tests/Configuration/ApplicationConfigurationTests.cs", "lineStart": 14, "lineEnd": 24, "excerpt": "var exception = Assert.Throws<ConfigurationException>(() => config.Validate()); Assert.That(exception.Message, Does.Contain(\"No data sources configured\"));" }
+      ]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "TST-01", "subject": "Testing", "subSubject": "Test pyramid", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TST-02", "subject": "Testing", "subSubject": "Coverage", "severityIfFailed": "Warning", "result": "fail", "reason": "coverlet.collector is referenced but CI never collects or publishes coverage.", "findingIds": ["TST-02#1"] },
+    { "checkId": "TST-03", "subject": "Testing", "subSubject": "Assertion quality", "severityIfFailed": "Warning", "result": "fail", "reason": "An Assert.Pass placeholder test and a controller test whose arrangement cannot detect its named behaviour.", "findingIds": ["TST-03#1"] },
+    { "checkId": "TST-04", "subject": "Testing", "subSubject": "Test doubles", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TST-05", "subject": "Testing", "subSubject": "Isolation and determinism", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TST-06", "subject": "Testing", "subSubject": "CI execution", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "TST-07", "subject": "Testing", "subSubject": "Coverage of production modules", "severityIfFailed": "Warning", "result": "fail", "reason": "Every production root has a test project, but no automated acceptance-level tests exist.", "findingIds": ["TST-07#1"] },
+    { "checkId": "TST-08", "subject": "Testing", "subSubject": "Test code quality", "severityIfFailed": "Information", "result": "fail", "reason": "Copied >10-line arrange blocks without a builder, and a misleading test name with dead arrange code.", "findingIds": ["TST-08#1", "TST-08#2"] },
+    { "checkId": "TST-09", "subject": "Testing", "subSubject": "Integration and contract tests", "severityIfFailed": "Warning", "result": "fail", "reason": "A database is used but no repository test runs against a real engine (0 integration tests).", "findingIds": ["TST-09#1"] },
+    { "checkId": "TST-10", "subject": "Testing", "subSubject": "Security tests", "severityIfFailed": "Warning", "result": "fail", "reason": "No access control (authorization elements N/A); no test checks that failures become a generic error response.", "findingIds": ["TST-10#1"] },
+    { "checkId": "TST-11", "subject": "Testing", "subSubject": "Security tests", "severityIfFailed": "Information", "result": "fail", "reason": "Untrusted input is parsed but there are no fuzz/property-based tests and no DAST job.", "findingIds": ["TST-11#1"] },
+    { "checkId": "TST-12", "subject": "Testing", "subSubject": "Load and performance tests", "severityIfFailed": "Information", "result": "fail", "reason": "Deployable web API with no load-test signals in the sample or inventory.", "findingIds": ["TST-12#1"] },
+    { "checkId": "TST-13", "subject": "Testing", "subSubject": "Resilience tests", "severityIfFailed": "Information", "result": "pass", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "Pyramid judged from inventory totals (unit 5, integration 0, e2e 0). Test framework NUnit + Moq. Only 1 of 4 Bruno request files was sampled; it has no assertions. TST-13: no retry/timeout/breaker logic visible in the reviewed files, so AZT-06/07 not failed; dependency-error propagation is tested via stubs at service and controller level; AZT-09 not judged (no chaos definitions). Domain.Tests contains only an Assert.Pass placeholder; whether PilotUtiltyApi.Domain is DTO-only (TSR-15 exempt) was not confirmed from the sample. No coverage threshold configured (no TSR-05 observation)."
+}

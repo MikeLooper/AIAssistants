@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2123-PilotUtilityApi",
+  "status": "completed",
+  "startedAt": "2026-11-09T21:23:03-07:00",
+  "completedAt": "2026-11-09T21:24:46-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "stepId": "25-review-monitoring",
+  "batchId": null,
+  "skill": "review-monitoring",
+  "subject": "Monitoring",
+  "findings": [],
+  "strengths": [],
+  "checkResults": [
+    {
+      "checkId": "N/A",
+      "subject": "Monitoring",
+      "subSubject": "Monitoring",
+      "severityIfFailed": "Information",
+      "result": "N/A",
+      "reason": "advanced usage off (IaC not reviewed)"
+    }
+  ],
+  "urlsFetched": [],
+  "notes": "N/A: advanced usage off (IaC not reviewed)"
+}

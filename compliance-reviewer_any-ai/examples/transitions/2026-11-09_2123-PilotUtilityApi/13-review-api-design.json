@@ -1,0 +1,356 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2123-PilotUtilityApi",
+  "stepId": "13-review-api-design",
+  "status": "completed",
+  "startedAt": "2026-11-09T21:23:03-07:00",
+  "completedAt": "2026-11-09T21:31:00-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "batchId": "batch-5",
+  "skill": "review-api-design",
+  "subject": "API Design",
+  "findings": [
+    {
+      "id": "API-03#1",
+      "subject": "API Design",
+      "subSubject": "Spec ↔ Implementation",
+      "checkId": "API-03",
+      "severity": "Error",
+      "title": "Spec documents /testing/reset but the controller route is /v{version}/testing/reset",
+      "evidence": [
+        { "file": "docs/PilotUtilityApi_v1.json", "lineStart": 81, "lineEnd": 82, "excerpt": "\"/testing/reset\": {\n  \"post\": {" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 16, "lineEnd": 17, "excerpt": "[ApiVersion(\"1.0\")]\n[Route(\"v{version:apiVersion}/[controller]\")]" }
+      ],
+      "standard": "OpenAPI Specification — OAS-38",
+      "url": "https://spec.openapis.org/oas/v3.1.2.html#paths-object",
+      "recommendation": "Regenerate the committed spec from the running app (or fix the route) so the documented path matches the implemented route exactly.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "API-03#2",
+      "subject": "API Design",
+      "subSubject": "Spec ↔ Implementation",
+      "checkId": "API-03",
+      "severity": "Error",
+      "title": "show-details is [BindRequired] in code but optional with a default in the spec",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 64, "lineEnd": 64, "excerpt": "[FromQuery(Name = \"show-details\"), BindRequired] bool showDetails = false)" },
+        { "file": "docs/PilotUtilityApi_v1.json", "lineStart": 49, "lineEnd": 53, "excerpt": "\"name\": \"show-details\", \"in\": \"query\", ... \"default\": false" }
+      ],
+      "standard": "OpenAPI Specification — OAS-39",
+      "url": "https://spec.openapis.org/oas/v3.1.2.html#parameter-object",
+      "recommendation": "Decide whether the parameter is optional; either drop [BindRequired] (keeping the default) or mark it required: true in the spec without a default.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "API-03#3",
+      "subject": "API Design",
+      "subSubject": "Spec ↔ Implementation",
+      "checkId": "API-03",
+      "severity": "Error",
+      "title": "AboutResponse.ApplicationConfiguration is returned but absent from the spec schema",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Domain/Models/Responses/AboutResponse.cs", "lineStart": 20, "lineEnd": 21, "excerpt": "[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]\npublic IApplicationConfiguration? ApplicationConfiguration { get; set; }" },
+        { "file": "docs/PilotUtilityApi_v1.json", "lineStart": 151, "lineEnd": 153, "excerpt": "\"AboutResponse\": { \"type\": \"object\", \"properties\": {" }
+      ],
+      "standard": "OpenAPI Specification — OAS-40",
+      "url": "https://spec.openapis.org/oas/v3.1.2.html#schema-object",
+      "recommendation": "Add the applicationConfiguration property (with its schema) to AboutResponse in the spec, or stop returning it.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "API-03#4",
+      "subject": "API Design",
+      "subSubject": "Spec ↔ Implementation",
+      "checkId": "API-03",
+      "severity": "Error",
+      "title": "500 ProblemDetails responses from the exception middleware are not documented",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs", "lineStart": 83, "lineEnd": 92, "excerpt": "Status = StatusCodes.Status500InternalServerError, ... context.Response.StatusCode = problemDetails.Status.Value;" },
+        { "file": "docs/PilotUtilityApi_v1.json", "lineStart": 18, "lineEnd": 19, "excerpt": "\"responses\": { \"200\": {" }
+      ],
+      "standard": "OpenAPI Specification — OAS-41",
+      "url": "https://spec.openapis.org/oas/v3.1.2.html#responses-object",
+      "recommendation": "Document the error responses every operation can return (e.g. a `default` response with the error schema).",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "API-04#1",
+      "subject": "API Design",
+      "subSubject": "URLs",
+      "checkId": "API-04",
+      "severity": "Warning",
+      "title": "Reset action uses a path segment instead of the :action pattern",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 46, "lineEnd": 47, "excerpt": "[HttpPost]\n[Route(\"reset\")]" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines — AZ-069",
+      "url": "https://github.com/microsoft/api-guidelines/blob/15c12663c363250bea4d60aa054e81466a1f0106/azure/Guidelines.md#actions-url-pattern-for-resource-action",
+      "recommendation": "Expose the action as `POST /<collection>:reset` (e.g. `/testing-data:reset`) rather than a `/reset` sub-path.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "API-05#1",
+      "subject": "API Design",
+      "subSubject": "Status Codes & Errors",
+      "checkId": "API-05",
+      "severity": "Error",
+      "title": "Error bodies do not use the standard { error: { code, message } } structure",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs", "lineStart": 59, "lineEnd": 65, "excerpt": "var problemDetails = new ProblemDetails { Status = ..., Title = \"Internal Server Error\", Detail = uExc.Message, ..." },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 57, "lineEnd": 58, "excerpt": "Response.Headers.Append(\"Warning\", response.ErrorMessage ?? \"An error occurred\");\nreturn BadRequest();" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines — AZ-046",
+      "url": "https://github.com/microsoft/api-guidelines/blob/15c12663c363250bea4d60aa054e81466a1f0106/azure/Guidelines.md#rest-error-response-body-structure",
+      "recommendation": "Return one error body shape everywhere with `error.code` and `error.message` (extra fields allowed), and put the message in the body rather than a Warning header.",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "API-05#2",
+      "subject": "API Design",
+      "subSubject": "Status Codes & Errors",
+      "checkId": "API-05",
+      "severity": "Error",
+      "title": "Error responses carry no x-ms-error-code header",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs", "lineStart": 91, "lineEnd": 94, "excerpt": "context.Response.ContentType = \"application/json\"; ... await context.Response.WriteAsJsonAsync(problemDetails);" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines — AZ-044",
+      "url": "https://github.com/microsoft/api-guidelines/blob/15c12663c363250bea4d60aa054e81466a1f0106/azure/Guidelines.md#rest-error-code-header",
+      "recommendation": "Set an `x-ms-error-code` header on every error response, matching `error.code` in the body.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "API-05#3",
+      "subject": "API Design",
+      "subSubject": "Status Codes & Errors",
+      "checkId": "API-05",
+      "severity": "Error",
+      "title": "Synchronous POST action returns 204 instead of 200 with a body",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 61, "lineEnd": 63, "excerpt": "if (response.Result == null || response.Result == 0) { return NoContent(); }" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines — AZ-017",
+      "url": "https://github.com/microsoft/api-guidelines/blob/15c12663c363250bea4d60aa054e81466a1f0106/azure/Guidelines.md#http-post-action-returns-200",
+      "recommendation": "Always return 200 with a JSON object body (e.g. `{ \"deletedCount\": 0 }`) from the reset action.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "API-05#4",
+      "subject": "API Design",
+      "subSubject": "Status Codes & Errors",
+      "checkId": "API-05",
+      "severity": "Error",
+      "title": "Service-side reset failures are reported as 400 with an empty body",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 55, "lineEnd": 58, "excerpt": "if (response.IsError) { Response.Headers.Append(\"Warning\", ...); return BadRequest(); }" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines — AZ-031",
+      "url": "https://github.com/microsoft/api-guidelines/blob/15c12663c363250bea4d60aa054e81466a1f0106/azure/Guidelines.md#rest-use-standard-status-codes",
+      "recommendation": "Return a 5xx for failures the caller cannot fix (400 only for invalid requests), with a diagnosable error body.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "API-07#1",
+      "subject": "API Design",
+      "subSubject": "Versioning",
+      "checkId": "API-07",
+      "severity": "Error",
+      "title": "API version is placed in the URL path",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 17, "lineEnd": 17, "excerpt": "[Route(\"v{version:apiVersion}/[controller]\")]" },
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 34, "lineEnd": 34, "excerpt": "new UrlSegmentApiVersionReader());" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines — AZ-088",
+      "url": "https://github.com/microsoft/api-guidelines/blob/15c12663c363250bea4d60aa054e81466a1f0106/azure/Guidelines.md#versioning-no-version-in-path",
+      "recommendation": "Remove the `v{version}` path segment and the URL-segment reader; carry the version in the `api-version` query parameter.",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "API-07#2",
+      "subject": "API Design",
+      "subSubject": "Versioning",
+      "checkId": "API-07",
+      "severity": "Error",
+      "title": "api-version is not required on every operation",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 35, "lineEnd": 35, "excerpt": "options.AssumeDefaultVersionWhenUnspecified = true;" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 17, "lineEnd": 17, "excerpt": "[ApiVersionNeutral]" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines — AZ-085",
+      "url": "https://github.com/microsoft/api-guidelines/blob/15c12663c363250bea4d60aa054e81466a1f0106/azure/Guidelines.md#versioning-api-version-query-param",
+      "recommendation": "Require the `api-version` query parameter on all operations and document it in the spec.",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "API-07#3",
+      "subject": "API Design",
+      "subSubject": "Versioning",
+      "checkId": "API-07",
+      "severity": "Error",
+      "title": "Missing api-version silently falls back to a default instead of returning 400",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 35, "lineEnd": 36, "excerpt": "options.AssumeDefaultVersionWhenUnspecified = true;\noptions.DefaultApiVersion = new ApiVersion(1, 0);" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines — AZ-087",
+      "url": "https://github.com/microsoft/api-guidelines/blob/15c12663c363250bea4d60aa054e81466a1f0106/azure/Guidelines.md#versioning-api-version-missing",
+      "recommendation": "Set AssumeDefaultVersionWhenUnspecified to false and return 400 with code `MissingApiVersionParameter` / `UnsupportedApiVersionValue`.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "API-07#4",
+      "subject": "API Design",
+      "subSubject": "Versioning",
+      "checkId": "API-07",
+      "severity": "Error",
+      "title": "API versions are numeric (1.0) rather than date-based",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 16, "lineEnd": 16, "excerpt": "[ApiVersion(\"1.0\")]" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines — AZ-086",
+      "url": "https://github.com/microsoft/api-guidelines/blob/15c12663c363250bea4d60aa054e81466a1f0106/azure/Guidelines.md#versioning-date-based-versioning",
+      "recommendation": "Use `YYYY-MM-DD` version values (with `-preview` for previews).",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "API-10#1",
+      "subject": "API Design",
+      "subSubject": "Query Parameters & Headers",
+      "checkId": "API-10",
+      "severity": "Error",
+      "title": "Query parameter show-details is kebab-case, not camelCase",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 64, "lineEnd": 64, "excerpt": "[FromQuery(Name = \"show-details\"), BindRequired] bool showDetails = false)" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines — AZ-020",
+      "url": "https://github.com/microsoft/api-guidelines/blob/15c12663c363250bea4d60aa054e81466a1f0106/azure/Guidelines.md#http-query-names-casing",
+      "recommendation": "Rename the query parameter to `showDetails` (and update the spec).",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "API-11#1",
+      "subject": "API Design",
+      "subSubject": "JSON Representation",
+      "checkId": "API-11",
+      "severity": "Error",
+      "title": "AboutResponse can serialize null-valued fields",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Domain/Models/Responses/AboutResponse.cs", "lineStart": 33, "lineEnd": 33, "excerpt": "public string? DeployDate { get; set; }" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 69, "lineEnd": 69, "excerpt": "var deployDate = Environment.GetEnvironmentVariable(\"APP_DEPLOY_DATE\");" },
+        { "file": "docs/PilotUtilityApi_v1.json", "lineStart": 166, "lineEnd": 170, "excerpt": "\"deployDate\": { \"type\": [ \"null\", \"string\" ] }" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines — AZ-054",
+      "url": "https://github.com/microsoft/api-guidelines/blob/15c12663c363250bea4d60aa054e81466a1f0106/azure/Guidelines.md#json-null-response-values",
+      "recommendation": "Omit null fields from responses (e.g. JsonIgnoreCondition.WhenWritingNull on the DTO or globally).",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "API-11#2",
+      "subject": "API Design",
+      "subSubject": "JSON Representation",
+      "checkId": "API-11",
+      "severity": "Error",
+      "title": "deployDate is an unformatted string passed through from an environment variable",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 86, "lineEnd": 86, "excerpt": "DeployDate = deployDate," },
+        { "file": "docs/PilotUtilityApi_v1.json", "lineStart": 166, "lineEnd": 170, "excerpt": "\"deployDate\": { \"type\": [ \"null\", \"string\" ] }" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines — AZ-058",
+      "url": "https://github.com/microsoft/api-guidelines/blob/15c12663c363250bea4d60aa054e81466a1f0106/azure/Guidelines.md#json-date-time-is-rfc3339",
+      "recommendation": "Parse the deploy date and emit it as an RFC 3339 date-time (`format: date-time` in the spec).",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "API-15#1",
+      "subject": "API Design",
+      "subSubject": "Correlation & Telemetry",
+      "checkId": "API-15",
+      "severity": "Error",
+      "title": "No x-ms-request-id is generated or returned, including on error responses",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs", "lineStart": 75, "lineEnd": 76, "excerpt": "var loggingCorrelation = LoggingUtilities.GetLoggingCorrelation();\nthis.logger.LogError(exception, \"{UserMessage}\", loggingCorrelation.UserMessage);" },
+        { "file": "docs/PilotUtilityApi_v1.json", "lineStart": 19, "lineEnd": 20, "excerpt": "\"200\": { \"description\": \"OK\"," }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines — AZ-027",
+      "url": "https://github.com/microsoft/api-guidelines/blob/15c12663c363250bea4d60aa054e81466a1f0106/azure/Guidelines.md#http-header-request-id",
+      "recommendation": "Generate an opaque request ID per request, return it in an `x-ms-request-id` response header (documented in the spec) and include it in error logs.",
+      "confidence": "Medium",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "S-API-02#1",
+      "subject": "API Design",
+      "subSubject": "OpenAPI Spec",
+      "checkId": "API-02",
+      "title": "Committed OAS 3.1 spec is structurally valid, with 3.1-style nullability and resolving $refs",
+      "evidence": [
+        { "file": "docs/PilotUtilityApi_v1.json", "lineStart": 1, "lineEnd": 5, "excerpt": "\"openapi\": \"3.1.1\", \"info\": { \"title\": \"PilotUtilityApi.Web | v1\", \"version\": \"1.0.0\" }" }
+      ],
+      "standard": "OpenAPI Specification — OAS-23",
+      "url": "https://spec.openapis.org/oas/v3.1.2.html#schema-object"
+    },
+    {
+      "id": "S-API-09#1",
+      "subject": "API Design",
+      "subSubject": "Method Semantics",
+      "checkId": "API-09",
+      "title": "About details redact sensitive configuration values before returning them",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/SystemController.cs", "lineStart": 87, "lineEnd": 87, "excerpt": "ApplicationConfiguration = showDetails ? new ApplicationConfiguration(this.ApplicationConfiguration, true) : null" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines — AZ-041",
+      "url": "https://github.com/microsoft/api-guidelines/blob/15c12663c363250bea4d60aa054e81466a1f0106/azure/Guidelines.md#rest-no-secrets-in-get-response"
+    },
+    {
+      "id": "S-API-04#1",
+      "subject": "API Design",
+      "subSubject": "URLs",
+      "checkId": "API-04",
+      "title": "Route tokens are lowercased consistently via a route token transformer",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Transformers/LowercaseParameterTransformer.cs", "lineStart": 19, "lineEnd": 20, "excerpt": "public string? TransformOutbound(object? value) =>\n\tvalue?.ToString()?.ToLowerInvariant();" }
+      ],
+      "standard": "Microsoft Azure REST API Guidelines — AZ-001",
+      "url": "https://github.com/microsoft/api-guidelines/blob/15c12663c363250bea4d60aa054e81466a1f0106/azure/Guidelines.md#http-url-casing"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "API-01", "subject": "API Design", "subSubject": "OpenAPI Spec", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "API-02", "subject": "API Design", "subSubject": "OpenAPI Spec", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "API-03", "subject": "API Design", "subSubject": "Spec ↔ Implementation", "severityIfFailed": "Error", "result": "fail", "reason": "Spec path, parameter required-ness, response schema and error status codes drift from the implementation.", "findingIds": ["API-03#1", "API-03#2", "API-03#3", "API-03#4"] },
+    { "checkId": "API-04", "subject": "API Design", "subSubject": "URLs", "severityIfFailed": "Error", "result": "fail", "reason": "The reset action uses a /reset sub-path instead of the :action URL pattern.", "findingIds": ["API-04#1"] },
+    { "checkId": "API-05", "subject": "API Design", "subSubject": "Status Codes & Errors", "severityIfFailed": "Error", "result": "fail", "reason": "Non-standard error body and header, 204 from a POST action, and 400 for service-side failures.", "findingIds": ["API-05#1", "API-05#2", "API-05#3", "API-05#4"] },
+    { "checkId": "API-06", "subject": "API Design", "subSubject": "Pagination", "severityIfFailed": "Warning", "result": "N/A", "reason": "No collection/list endpoints in scope.", "findingIds": [] },
+    { "checkId": "API-07", "subject": "API Design", "subSubject": "Versioning", "severityIfFailed": "Warning", "result": "fail", "reason": "Version is in the path, not required, defaults silently and is not date-based.", "findingIds": ["API-07#1", "API-07#2", "API-07#3", "API-07#4"] },
+    { "checkId": "API-08", "subject": "API Design", "subSubject": "Filtering & Sorting", "severityIfFailed": "Information", "result": "N/A", "reason": "No collection query options are offered.", "findingIds": [] },
+    { "checkId": "API-09", "subject": "API Design", "subSubject": "Method Semantics", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "API-10", "subject": "API Design", "subSubject": "Query Parameters & Headers", "severityIfFailed": "Error", "result": "fail", "reason": "Query parameter name show-details is not camelCase.", "findingIds": ["API-10#1"] },
+    { "checkId": "API-11", "subject": "API Design", "subSubject": "JSON Representation", "severityIfFailed": "Error", "result": "fail", "reason": "Null fields can be serialized and deployDate has no RFC 3339 contract.", "findingIds": ["API-11#1", "API-11#2"] },
+    { "checkId": "API-12", "subject": "API Design", "subSubject": "Enums & Polymorphism", "severityIfFailed": "Warning", "result": "N/A", "reason": "No enums or polymorphic types in the API contract.", "findingIds": [] },
+    { "checkId": "API-13", "subject": "API Design", "subSubject": "Long-Running Operations", "severityIfFailed": "Error", "result": "N/A", "reason": "No long-running operations exist.", "findingIds": [] },
+    { "checkId": "API-14", "subject": "API Design", "subSubject": "Conditional Requests", "severityIfFailed": "Warning", "result": "N/A", "reason": "No resource read/update operations (only health, about and a reset action).", "findingIds": [] },
+    { "checkId": "API-15", "subject": "API Design", "subSubject": "Correlation & Telemetry", "severityIfFailed": "Warning", "result": "fail", "reason": "No x-ms-request-id is generated, returned or documented.", "findingIds": ["API-15#1"] }
+  ],
+  "urlsFetched": [],
+  "notes": "Spec openapi 3.1.1 → OAS v3.1.2 rules. No languages/csharp.md exists for this skill. Closely related files read: ApplicationConfiguration/DataSourceConfiguration (secret redaction for AZ-041) and OpenTelemetryExtensions (ASP.NET Core instrumentation present, so SDK-04/05 not failed). Authorization of anonymous /about details deferred to security skills."
+}

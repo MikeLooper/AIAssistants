@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2123-PilotUtilityApi",
+  "stepId": "17-review-security-operational",
+  "status": "completed",
+  "startedAt": "2026-11-09T21:23:03-07:00",
+  "completedAt": "2026-11-09T21:31:00-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "batchId": "batch-3",
+  "skill": "review-security-operational",
+  "subject": "Security",
+  "findings": [
+    {
+      "id": "SEC-OP-05#1",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-05",
+      "severity": "Warning",
+      "title": "CI workflow runs no secret-detection scan before merge",
+      "evidence": [
+        { "file": ".github/workflows/dotnet.yml", "lineStart": 17, "lineEnd": 28, "excerpt": "steps: checkout, setup-dotnet, dotnet restore, dotnet build, dotnet test" }
+      ],
+      "standard": "OWASP Secrets Management Cheat Sheet — SMG-05",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html#81-general-detection-approaches",
+      "recommendation": "Add a secret-scanning step (e.g. gitleaks or GitHub secret scanning/push protection) to the pull_request workflow and a matching pre-commit hook.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-OP-06#1",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-06",
+      "severity": "Error",
+      "title": "SQL Server connection string disables server-certificate validation while sending database credentials",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 140, "lineEnd": 145, "excerpt": "\"sqlserver\" => $\"Server={dataSource.Host},{dataSource.Port};\" + ... \"TrustServerCertificate=True;\"" }
+      ],
+      "standard": "OWASP Secrets Management Cheat Sheet — SMG-11",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html#28-transport-layer-security-tls-everywhere",
+      "recommendation": "Remove TrustServerCertificate=True (or make it a development-only setting) and require encrypted connections with certificate validation for both SQL Server and PostgreSQL credential exchanges.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-OP-07#1",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-07",
+      "severity": "Warning",
+      "title": "Base appsettings.json (all environments) carries development data-source values",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 10, "lineEnd": 13, "excerpt": "\"Host\": \"localhost\", \"Password\": \"<DevUser password>\", \"Port\": 1433, \"UserName\": \"DevUser\"" }
+      ],
+      "standard": "OWASP Secure Code Review Cheat Sheet — SCR-02",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html#configuration-deployment",
+      "recommendation": "Keep development host/user values only in appsettings.Development.json and leave the base file with empty or environment-supplied values so production cannot silently inherit development settings.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-OP-07#2",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-07",
+      "severity": "Warning",
+      "title": "Anonymous test-data reset endpoint served on the public listener with no environment or network restriction",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 15, "lineEnd": 18, "excerpt": "[Route(\"v{version:apiVersion}/[controller]\")] [AllowAnonymous]" },
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 46, "lineEnd": 53, "excerpt": "[HttpPost] [Route(\"reset\")] ... await testingService.ResetTestingAsync(cancellationToken);" }
+      ],
+      "standard": "OWASP REST Security Cheat Sheet — ORS-01",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html#management-endpoints",
+      "recommendation": "Register the testing/reset controller only in Development or test environments, or serve it on a separate restricted port/host (network allowlist).",
+      "confidence": "Low",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-OP-08#1",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-08",
+      "severity": "Warning",
+      "title": "Data-deleting reset operation logs only failures, not its use",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 51, "lineEnd": 53, "excerpt": "public async Task<IActionResult> ResetTesting(...) { var response = await testingService.ResetTestingAsync(cancellationToken);" },
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 89, "lineEnd": 109, "excerpt": "result = await connection.QueryFirstOrDefaultAsync<int>(command); transaction.Commit(); ... return new RetrieveResponse<int>(result);" }
+      ],
+      "standard": "OWASP Logging Cheat Sheet — LOG-04",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html#which-events-to-log",
+      "recommendation": "Log each reset invocation and its outcome (caller/source address, deleted row count, result) through ILogger with structured parameters (OWASP Top 10 A09).",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "SEC-OP-10#1",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-10",
+      "severity": "Warning",
+      "title": "Database connection and transaction not disposed; connection leaks if BeginTransaction or command setup throws",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 73, "lineEnd": 79, "excerpt": "var connection = CreateConnection(...); ... connection.Open(); ... var transaction = connection.BeginTransaction();" },
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 104, "lineEnd": 107, "excerpt": "finally { connection.Close(); }" }
+      ],
+      "standard": "OWASP Top 10:2025 A10 — A10-06",
+      "url": "https://top10.owasp.org/2025/A10_2025-Mishandling_of_Exceptional_Conditions/#example-attack-scenarios",
+      "recommendation": "Wrap the connection and transaction in using declarations (await using where supported) so both are released on every exception path.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "SEC-OP-01#S1",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-01",
+      "title": "Global exception middleware logs the exception and returns a generic ProblemDetails with only a correlation ID",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs", "lineStart": 70, "lineEnd": 86, "excerpt": "this.logger.LogError(exception, \"{UserMessage}\", loggingCorrelation.UserMessage); ... Detail = loggingCorrelation.UserMessage" }
+      ],
+      "standard": "OWASP Error Handling Cheat Sheet — ERR-02",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Error_Handling_Cheat_Sheet.html#objective"
+    },
+    {
+      "id": "SEC-OP-03#S1",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-03",
+      "title": "Data-source configuration redacts the password in ToString and copy-with-suppression",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Shared/Configuration/Models/DataSourceConfiguration.cs", "lineStart": 89, "lineEnd": 89, "excerpt": "$\"{nameof(this.Password)}={(string.IsNullOrEmpty(this.Password) ? \"--Empty--\" : \"[Redacted]\")}, \"" }
+      ],
+      "standard": "OWASP Logging Cheat Sheet — LOG-12",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html#data-to-exclude"
+    },
+    {
+      "id": "SEC-OP-09#S1",
+      "subject": "Security",
+      "subSubject": "Operational",
+      "checkId": "SEC-OP-09",
+      "title": "File log sink is size-capped, rolled daily with bounded retention and structured JSON output",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 61, "lineEnd": 66, "excerpt": "\"rollingInterval\": \"Day\", \"rollOnFileSizeLimit\": true, \"fileSizeLimitBytes\": 104857600, \"retainedFileCountLimit\": 14" }
+      ],
+      "standard": "OWASP Logging Cheat Sheet — LOG-21",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html#verification"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "SEC-OP-01", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-OP-02", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-OP-03", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-OP-04", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-OP-05", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Error", "result": "fail", "reason": "No literal secrets (passwords are placeholders), but the CI workflow has no secret-detection step (SMG-05).", "findingIds": ["SEC-OP-05#1"] },
+    { "checkId": "SEC-OP-06", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Error", "result": "fail", "reason": "SQL Server credentials are sent over a connection with TrustServerCertificate=True (SMG-11).", "findingIds": ["SEC-OP-06#1"] },
+    { "checkId": "SEC-OP-07", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "fail", "reason": "Base config carries development values and an anonymous test-reset endpoint is exposed with no environment or network restriction.", "findingIds": ["SEC-OP-07#1", "SEC-OP-07#2"] },
+    { "checkId": "SEC-OP-08", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "fail", "reason": "The data-deleting reset operation is not logged on success (LOG-04).", "findingIds": ["SEC-OP-08#1"] },
+    { "checkId": "SEC-OP-09", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "SEC-OP-10", "subject": "Security", "subSubject": "Operational", "severityIfFailed": "Warning", "result": "fail", "reason": "Connection and transaction are not disposed and leak on some exception paths (A10-06).", "findingIds": ["SEC-OP-10#1"] }
+  ],
+  "urlsFetched": [],
+  "notes": "localized-standard-gap: OpenTelemetry OTLP exporter default transport scheme not localized (LOG-24 judged on explicit values only). Program.cs not in file list; global middleware registration assumed from UnhandledExceptionMiddleware. logs/ is listed in .gitignore, so the on-disk log file was not treated as a committed log."
+}

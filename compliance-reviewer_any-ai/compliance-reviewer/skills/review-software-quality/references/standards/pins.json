@@ -1,0 +1,150 @@
+{
+  "$comment": "Source pins for check_source_drift.py (maintainers only; never used during a review). Pins copied from the standards file headers must match them; 'baseline' marks values recorded by the script.",
+  "skill": "review-software-quality",
+  "checks": [
+    {
+      "id": "learn-as",
+      "file": "azure-architecture.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/guide/architecture-styles/",
+      "msDate": "2025-09-25",
+      "gitCommit": "d1d0ebff1b2a"
+    },
+    {
+      "id": "learn-nt",
+      "file": "azure-architecture.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/guide/architecture-styles/n-tier",
+      "msDate": "2025-08-15",
+      "gitCommit": "03e41c0834ab"
+    },
+    {
+      "id": "learn-wqw",
+      "file": "azure-architecture.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/guide/architecture-styles/web-queue-worker",
+      "msDate": "2026-01-06",
+      "gitCommit": "c32bf659d950"
+    },
+    {
+      "id": "learn-ms",
+      "file": "azure-architecture.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/guide/architecture-styles/microservices",
+      "msDate": "2025-06-30",
+      "gitCommit": "f69851e7c8b2"
+    },
+    {
+      "id": "learn-dfe",
+      "file": "azure-architecture.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/guide/design-principles/design-for-evolution",
+      "msDate": "2018-08-30",
+      "gitCommit": "f440454b6512"
+    },
+    {
+      "id": "learn-cc",
+      "file": "microsoft-csharp.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/coding-conventions",
+      "msDate": "2025-01-15",
+      "gitCommit": "156931bb4ec1"
+    },
+    {
+      "id": "learn-in",
+      "file": "microsoft-csharp.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/coding-style/identifier-names",
+      "msDate": "2025-10-10",
+      "gitCommit": "6b2c20688c8f"
+    },
+    {
+      "id": "google-java-style",
+      "file": "google-java-style.md",
+      "method": "github-commit",
+      "repo": "google/styleguide",
+      "path": "javaguide.html",
+      "ref": "gh-pages",
+      "pinned": "5cfdc38868c8",
+      "pinnedDate": "2026-10-28"
+    },
+    {
+      "id": "google-ts-style",
+      "file": "google-typescript-style.md",
+      "method": "github-commit",
+      "repo": "google/styleguide",
+      "path": "tsguide.html",
+      "ref": "gh-pages",
+      "pinned": "5d6fa5e1d2d3",
+      "pinnedDate": "2026-10-29"
+    },
+    {
+      "id": "pep-8",
+      "file": "python-peps.md",
+      "method": "github-commit",
+      "repo": "python/peps",
+      "path": "peps/pep-0008.rst",
+      "pinned": "5514795ade79",
+      "pinnedDate": "2025-04-04"
+    },
+    {
+      "id": "pep-257",
+      "file": "python-peps.md",
+      "method": "github-commit",
+      "repo": "python/peps",
+      "path": "peps/pep-0257.rst",
+      "pinned": "f22614f903cd",
+      "pinnedDate": "2024-04-17"
+    },
+    {
+      "id": "iso25010-p1",
+      "file": "iso-25010.md",
+      "method": "text-hash",
+      "url": "https://iso25000.com/index.php/en/iso-25000-standards/iso-25010",
+      "pinned": "38dec93b5137822a",
+      "note": "The page carries a news box; on a change, compare the characteristic text before concluding there is drift.",
+      "baseline": "2026-11-09"
+    },
+    {
+      "id": "iso25010-p2",
+      "file": "iso-25010.md",
+      "method": "text-hash",
+      "url": "https://iso25000.com/index.php/en/iso-25000-standards/iso-25010?start=5",
+      "pinned": "ec53ac4b037675ee",
+      "note": "The page carries a news box; on a change, compare the characteristic text before concluding there is drift.",
+      "baseline": "2026-11-09"
+    },
+    {
+      "id": "refactoring-catalog",
+      "file": "fowler-refactoring-catalog.md",
+      "method": "text-hash",
+      "extract": "ids",
+      "url": "https://refactoring.com/catalog/",
+      "pinned": "9e8b0781d17a175c",
+      "note": "Look for renamed or removed entries (66 at localization).",
+      "baseline": "2026-11-09"
+    },
+    {
+      "id": "fowler-codesmell",
+      "file": "fowler-bliki.md",
+      "method": "http-status",
+      "url": "https://martinfowler.com/bliki/CodeSmell.html",
+      "pinned": 200
+    },
+    {
+      "id": "fowler-pdd",
+      "file": "fowler-bliki.md",
+      "method": "http-status",
+      "url": "https://martinfowler.com/bliki/PresentationDomainDataLayering.html",
+      "pinned": 200
+    }
+  ],
+  "unpinned": {
+    "software-quality-rubric.md": "Local rubric written in this repo; no external source."
+  },
+  "lint": {
+    "elementsNotInChecklist": [
+      "ISO-"
+    ]
+  }
+}

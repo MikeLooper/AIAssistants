@@ -1,0 +1,148 @@
+{
+  "$comment": "Source pins for check_source_drift.py (maintainers only; never used during a review). Pins copied from the standards file headers must match them; 'baseline' marks values recorded by the script.",
+  "skill": "review-cost-sustainability",
+  "checks": [
+    {
+      "id": "learn-co-check",
+      "file": "azure-well-architected-cost-sustainability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/cost-optimization/checklist",
+      "msDate": "2023-11-15"
+    },
+    {
+      "id": "learn-co-model",
+      "file": "azure-well-architected-cost-sustainability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/cost-optimization/cost-model",
+      "msDate": "2023-11-15"
+    },
+    {
+      "id": "learn-co-costdata",
+      "file": "azure-well-architected-cost-sustainability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/cost-optimization/collect-review-cost-data",
+      "msDate": "2026-05-20"
+    },
+    {
+      "id": "learn-co-guard",
+      "file": "azure-well-architected-cost-sustainability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/cost-optimization/set-spending-guardrails",
+      "msDate": "2026-08-31"
+    },
+    {
+      "id": "learn-co-rates",
+      "file": "azure-well-architected-cost-sustainability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/cost-optimization/get-best-rates",
+      "msDate": "2023-11-15"
+    },
+    {
+      "id": "learn-co-billing",
+      "file": "azure-well-architected-cost-sustainability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/cost-optimization/align-usage-to-billing-increments",
+      "msDate": "2023-11-15"
+    },
+    {
+      "id": "learn-co-comp",
+      "file": "azure-well-architected-cost-sustainability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/cost-optimization/optimize-component-costs",
+      "msDate": "2023-11-15"
+    },
+    {
+      "id": "learn-co-env",
+      "file": "azure-well-architected-cost-sustainability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/cost-optimization/optimize-environment-costs",
+      "msDate": "2023-11-15"
+    },
+    {
+      "id": "learn-co-flow",
+      "file": "azure-well-architected-cost-sustainability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/cost-optimization/optimize-flow-costs",
+      "msDate": "2023-11-15"
+    },
+    {
+      "id": "learn-co-data",
+      "file": "azure-well-architected-cost-sustainability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/cost-optimization/optimize-data-costs",
+      "msDate": "2023-11-15"
+    },
+    {
+      "id": "learn-co-code",
+      "file": "azure-well-architected-cost-sustainability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/cost-optimization/optimize-code-costs",
+      "msDate": "2023-11-15"
+    },
+    {
+      "id": "learn-co-scale",
+      "file": "azure-well-architected-cost-sustainability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/cost-optimization/optimize-scaling-costs",
+      "msDate": "2023-11-15"
+    },
+    {
+      "id": "learn-co-consol",
+      "file": "azure-well-architected-cost-sustainability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/cost-optimization/consolidation",
+      "msDate": "2023-11-15"
+    },
+    {
+      "id": "learn-su-co",
+      "file": "azure-well-architected-cost-sustainability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/sustainability/sustainability-cost-optimization-recommendations",
+      "msDate": "2026-06-25"
+    },
+    {
+      "id": "learn-su-pe",
+      "file": "azure-well-architected-cost-sustainability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/sustainability/sustainability-performance-efficiency-recommendations",
+      "msDate": "2026-06-25"
+    },
+    {
+      "id": "learn-su-rel",
+      "file": "azure-well-architected-cost-sustainability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/sustainability/sustainability-reliability-recommendations",
+      "msDate": "2026-06-25"
+    },
+    {
+      "id": "learn-su-sec",
+      "file": "azure-well-architected-cost-sustainability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/sustainability/sustainability-security-recommendations",
+      "msDate": "2026-06-25"
+    },
+    {
+      "id": "learn-su-oe",
+      "file": "azure-well-architected-cost-sustainability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/sustainability/sustainability-operational-excellence-recommendations",
+      "msDate": "2026-06-25"
+    },
+    {
+      "id": "gsf-learn",
+      "file": "green-software-principles.md",
+      "method": "github-commit",
+      "repo": "Green-Software-Foundation/learn",
+      "pinned": "dbe70f6e4e2640485b320dfd85ae5f368d2e1e88",
+      "pinnedDate": "2026-05-21"
+    },
+    {
+      "id": "gsf-patterns",
+      "file": "green-software-patterns.md",
+      "method": "github-commit",
+      "repo": "Green-Software-Foundation/patterns",
+      "pinned": "36ccf754849bce89af87fb5222f7bce069cd2ffd",
+      "pinnedDate": "2026-09-10"
+    }
+  ]
+}

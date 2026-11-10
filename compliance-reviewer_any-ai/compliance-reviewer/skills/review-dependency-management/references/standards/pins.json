@@ -1,0 +1,111 @@
+{
+  "$comment": "Source pins for check_source_drift.py (maintainers only; never used during a review). Pins copied from the standards file headers must match them; 'baseline' marks values recorded by the script.",
+  "skill": "review-dependency-management",
+  "checks": [
+    {
+      "id": "top10-a03",
+      "file": "owasp-supply-chain.md",
+      "method": "github-commit",
+      "repo": "OWASP/Top10",
+      "path": "2025/docs/en/A03_2025-Software_Supply_Chain_Failures.md",
+      "pinned": "d4d000ec89ef2b2eb87de0eb7dcfa8c05f8dd966",
+      "pinnedDate": "2025-12-24"
+    },
+    {
+      "id": "owasp-vdm",
+      "file": "owasp-supply-chain.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Vulnerable_Dependency_Management_Cheat_Sheet.md",
+      "pinned": "b724e32f29a1d7e1c966943f7b30e3b776d46bfe",
+      "pinnedDate": "2026-10-04"
+    },
+    {
+      "id": "owasp-sscs",
+      "file": "owasp-supply-chain.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Software_Supply_Chain_Security_Cheat_Sheet.md",
+      "pinned": "995524d4a18e64672c80c8e13869d29ef850bd43",
+      "pinnedDate": "2026-10-03"
+    },
+    {
+      "id": "dotnet-releases-index",
+      "file": "lifecycle-dotnet.md",
+      "method": "json",
+      "url": "https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json",
+      "select": "releases-index[*]{channel-version,support-phase,eol-date,release-type}",
+      "hash": true,
+      "pinned": "97b5aa77be9f529d",
+      "baseline": "2026-11-09"
+    },
+    {
+      "id": "netfx-lifecycle",
+      "file": "lifecycle-dotnet.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/lifecycle/products/microsoft-net-framework",
+      "msDate": "2023-01-25",
+      "gitCommit": "cf6de02ce49b",
+      "baseline": "2026-11-09"
+    },
+    {
+      "id": "temurin-support",
+      "file": "lifecycle-java.md",
+      "method": "text-hash",
+      "url": "https://adoptium.net/support/",
+      "pinned": "8e6d89eb9d35d4b5",
+      "baseline": "2026-11-09"
+    },
+    {
+      "id": "spring-boot-generations",
+      "file": "lifecycle-java.md",
+      "method": "json",
+      "url": "https://api.spring.io/projects/spring-boot/generations",
+      "select": "_embedded.generations[*]{name,initialReleaseDate,ossSupportEndDate,commercialSupportEndDate}",
+      "hash": true,
+      "pinned": "5fbe60e2b776d55a",
+      "baseline": "2026-11-09"
+    },
+    {
+      "id": "spring-framework-generations",
+      "file": "lifecycle-java.md",
+      "method": "json",
+      "url": "https://api.spring.io/projects/spring-framework/generations",
+      "select": "_embedded.generations[*]{name,initialReleaseDate,ossSupportEndDate,commercialSupportEndDate}",
+      "hash": true,
+      "pinned": "c5779f0800001afd",
+      "baseline": "2026-11-09"
+    },
+    {
+      "id": "python-versions",
+      "file": "lifecycle-python.md",
+      "method": "text-hash",
+      "url": "https://devguide.python.org/versions/",
+      "pinned": "5495a03730d528be",
+      "baseline": "2026-11-09"
+    },
+    {
+      "id": "node-schedule",
+      "file": "lifecycle-javascript.md",
+      "method": "json",
+      "url": "https://raw.githubusercontent.com/nodejs/Release/main/schedule.json",
+      "select": "",
+      "hash": true,
+      "pinned": "70f6de0ec6aa9b84",
+      "baseline": "2026-11-09"
+    },
+    {
+      "id": "express-security-page",
+      "method": "text-hash",
+      "url": "https://expressjs.com/en/advanced/best-practice-security.html",
+      "pinned": "0ae2ce811c4c1637",
+      "file": "lifecycle-javascript.md",
+      "baseline": "2026-11-09"
+    },
+    {
+      "id": "refresh-due-dates",
+      "method": "manual",
+      "note": "Process the dated entries in MAINTENANCE.md 'Refresh due' (vendor GA and end-of-support dates)."
+    }
+  ]
+}

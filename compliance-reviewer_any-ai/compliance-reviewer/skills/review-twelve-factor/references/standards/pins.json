@@ -1,0 +1,126 @@
+{
+  "$comment": "Source pins for check_source_drift.py (maintainers only; never used during a review). Pins copied from the standards file headers must match them; 'baseline' marks values recorded by the script.",
+  "skill": "review-twelve-factor",
+  "checks": [
+    {
+      "id": "12f-idx",
+      "file": "twelve-factor-app.md",
+      "method": "text-hash",
+      "url": "https://12factor.net/",
+      "startMarker": "id=\"introduction\"",
+      "endMarker": "id=\"locales\"",
+      "pinned": "f03929b9938874bb"
+    },
+    {
+      "id": "12f-cb",
+      "file": "twelve-factor-app.md",
+      "method": "text-hash",
+      "url": "https://12factor.net/codebase",
+      "startMarker": "id=\"factor\"",
+      "endMarker": "id=\"locales\"",
+      "pinned": "3e451703fee54f70"
+    },
+    {
+      "id": "12f-dep",
+      "file": "twelve-factor-app.md",
+      "method": "text-hash",
+      "url": "https://12factor.net/dependencies",
+      "startMarker": "id=\"factor\"",
+      "endMarker": "id=\"locales\"",
+      "pinned": "8d1b16459beb17ac"
+    },
+    {
+      "id": "12f-cfg",
+      "file": "twelve-factor-app.md",
+      "method": "text-hash",
+      "url": "https://12factor.net/config",
+      "startMarker": "id=\"factor\"",
+      "endMarker": "id=\"locales\"",
+      "pinned": "ea9d3387e9814032"
+    },
+    {
+      "id": "12f-bs",
+      "file": "twelve-factor-app.md",
+      "method": "text-hash",
+      "url": "https://12factor.net/backing-services",
+      "startMarker": "id=\"factor\"",
+      "endMarker": "id=\"locales\"",
+      "pinned": "eabe1c7b6ac5e3d0"
+    },
+    {
+      "id": "12f-brr",
+      "file": "twelve-factor-app.md",
+      "method": "text-hash",
+      "url": "https://12factor.net/build-release-run",
+      "startMarker": "id=\"factor\"",
+      "endMarker": "id=\"locales\"",
+      "pinned": "d73c40174ab1d2c8"
+    },
+    {
+      "id": "12f-proc",
+      "file": "twelve-factor-app.md",
+      "method": "text-hash",
+      "url": "https://12factor.net/processes",
+      "startMarker": "id=\"factor\"",
+      "endMarker": "id=\"locales\"",
+      "pinned": "034941af715125b4"
+    },
+    {
+      "id": "12f-port",
+      "file": "twelve-factor-app.md",
+      "method": "text-hash",
+      "url": "https://12factor.net/port-binding",
+      "startMarker": "id=\"factor\"",
+      "endMarker": "id=\"locales\"",
+      "pinned": "d55f90364f8926e1"
+    },
+    {
+      "id": "12f-conc",
+      "file": "twelve-factor-app.md",
+      "method": "text-hash",
+      "url": "https://12factor.net/concurrency",
+      "startMarker": "id=\"factor\"",
+      "endMarker": "id=\"locales\"",
+      "pinned": "8476d1a0d0358fd2"
+    },
+    {
+      "id": "12f-disp",
+      "file": "twelve-factor-app.md",
+      "method": "text-hash",
+      "url": "https://12factor.net/disposability",
+      "startMarker": "id=\"factor\"",
+      "endMarker": "id=\"locales\"",
+      "pinned": "ccfe65679edb41dc"
+    },
+    {
+      "id": "12f-dpp",
+      "file": "twelve-factor-app.md",
+      "method": "text-hash",
+      "url": "https://12factor.net/dev-prod-parity",
+      "startMarker": "id=\"factor\"",
+      "endMarker": "id=\"locales\"",
+      "pinned": "0ff764560773b1c5"
+    },
+    {
+      "id": "12f-logs",
+      "file": "twelve-factor-app.md",
+      "method": "text-hash",
+      "url": "https://12factor.net/logs",
+      "startMarker": "id=\"factor\"",
+      "endMarker": "id=\"locales\"",
+      "pinned": "4ebc9229a16ba3a3"
+    },
+    {
+      "id": "12f-adm",
+      "file": "twelve-factor-app.md",
+      "method": "text-hash",
+      "url": "https://12factor.net/admin-processes",
+      "startMarker": "id=\"factor\"",
+      "endMarker": "id=\"locales\"",
+      "pinned": "2d731c00c3c98032"
+    }
+  ],
+  "unpinned": {
+    "twelve-factor-rubric.md": "Local rubric written in this repo; no external source."
+  }
+}

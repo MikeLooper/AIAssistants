@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2035-PilotUtilityApi",
+  "stepId": "21-review-dependency-management",
+  "status": "completed",
+  "startedAt": "2026-11-09T20:35:41-07:00",
+  "completedAt": "2026-11-09T20:48:00-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "batchId": "batch-4",
+  "skill": "review-dependency-management",
+  "subject": "Implementation",
+  "findings": [
+    {
+      "id": "DEP-01#1",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "checkId": "DEP-01",
+      "severity": "Warning",
+      "title": "The .NET SDK (build tooling) isn't pinned; there's no global.json",
+      "evidence": [
+        { "file": "Directory.Build.props", "lineStart": 2, "lineEnd": 4, "excerpt": "<PropertyGroup> ... <TargetFramework>net10.0</TargetFramework>" }
+      ],
+      "standard": "OWASP Software Supply Chain Security Cheat Sheet — OCS-15",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Software_Supply_Chain_Security_Cheat_Sheet.html#inventory-build-tools",
+      "recommendation": "Add a root global.json that pins the .NET 10 SDK version, with a narrow rollForward policy such as latestPatch, so every build uses the same, inventoried toolchain.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "DEP-02#1",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "checkId": "DEP-02",
+      "severity": "Warning",
+      "title": "No NuGet lock file; RestorePackagesWithLockFile isn't enabled and there's no packages.lock.json",
+      "evidence": [
+        { "file": "Directory.Packages.props", "lineStart": 2, "lineEnd": 4, "excerpt": "<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>" },
+        { "file": "Directory.Build.props", "lineStart": 2, "lineEnd": 9, "excerpt": "<Version>1.0.1</Version> <TargetFramework>net10.0</TargetFramework> (no RestorePackagesWithLockFile)" }
+      ],
+      "standard": "OWASP Software Supply Chain Security Cheat Sheet — OCS-12",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Software_Supply_Chain_Security_Cheat_Sheet.html#lockfileversion-pinning",
+      "recommendation": "Set <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile> in Directory.Build.props, commit each project's packages.lock.json, and restore with --locked-mode in CI.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "DEP-05#1",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "checkId": "DEP-05",
+      "severity": "Information",
+      "title": "No SBOM file, and no SBOM generator is configured in the build",
+      "evidence": [
+        { "file": "Directory.Build.props", "lineStart": 2, "lineEnd": 9, "excerpt": "<PropertyGroup> <Version>1.0.1</Version> ... <Product>Pilot Utility API</Product>" }
+      ],
+      "standard": "OWASP Top 10:2025 A03 — OTT-04",
+      "url": "https://top10.owasp.org/2025/A03_2025-Software_Supply_Chain_Failures/#how-to-prevent",
+      "recommendation": "Generate a CycloneDX or SPDX SBOM in the build (for example with a CycloneDX .NET tool or the Microsoft SBOM tool) and publish it with each release.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "DEP-08#1",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "checkId": "DEP-08",
+      "severity": "Warning",
+      "title": "No repository nuget.config with <clear/> or package source mapping, so the package feed setup isn't controlled by the repo",
+      "evidence": [
+        { "file": "Directory.Packages.props", "lineStart": 5, "lineEnd": 8, "excerpt": "<PackageVersion Include=\"Asp.Versioning.Mvc.ApiExplorer\" Version=\"10.2.1\" /> ..." }
+      ],
+      "standard": "OWASP Software Supply Chain Security Cheat Sheet — OCS-13",
+      "url": "https://cheatsheetseries.owasp.org/cheatsheets/Software_Supply_Chain_Security_Cheat_Sheet.html#use-private-artifact-repository",
+      "recommendation": "Add a root nuget.config that clears inherited sources, declares only the trusted HTTPS feed(s) with packageSourceMapping, and consider signatureValidationMode=require with trustedSigners.",
+      "confidence": "Medium",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "DEP-S#1",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "title": "Central Package Management with exact versions for every package; project files carry no version strings",
+      "evidence": [
+        { "file": "Directory.Packages.props", "lineStart": 3, "lineEnd": 8, "excerpt": "<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally> ... <PackageVersion Include=\"Dapper\" Version=\"2.1.89\" />" }
+      ],
+      "standard": "OWASP Top 10:2025 A03 — OTT-07",
+      "url": "https://top10.owasp.org/2025/A03_2025-Software_Supply_Chain_Failures/#how-to-prevent"
+    },
+    {
+      "id": "DEP-S#2",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "checkId": "DEP-04",
+      "title": "All projects target the supported .NET 10 LTS line, with Microsoft.AspNetCore and Microsoft.Extensions packages aligned at 10.0.13",
+      "evidence": [
+        { "file": "Directory.Build.props", "lineStart": 4, "lineEnd": 4, "excerpt": "<TargetFramework>net10.0</TargetFramework>" },
+        { "file": "Directory.Packages.props", "lineStart": 9, "lineEnd": 13, "excerpt": "<PackageVersion Include=\"Microsoft.AspNetCore.OpenApi\" Version=\"10.0.13\" />" }
+      ],
+      "standard": "Microsoft .NET Support Policy — NET-02",
+      "url": "https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core#lifecycle"
+    },
+    {
+      "id": "DEP-S#3",
+      "subject": "Implementation",
+      "subSubject": "Dependency Management",
+      "checkId": "DEP-09",
+      "title": "Test frameworks and mocking libraries are referenced only from test projects, and analyzers and collectors use PrivateAssets=all",
+      "evidence": [
+        { "file": "test/PilotUtiltyApi.Web.Tests/PilotUtilityApi.Web.Tests.csproj", "lineStart": 9, "lineEnd": 15, "excerpt": "<PackageReference Include=\"coverlet.collector\"> <PrivateAssets>all</PrivateAssets>" }
+      ],
+      "standard": "OWASP Top 10:2025 A03 — OTT-05",
+      "url": "https://top10.owasp.org/2025/A03_2025-Software_Supply_Chain_Failures/#how-to-prevent"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "DEP-01", "subject": "Implementation", "subSubject": "Dependency Management", "severityIfFailed": "Warning", "result": "fail", "reason": "All packages use exact versions, but the .NET SDK build tooling isn't pinned because there's no global.json.", "findingIds": ["DEP-01#1"] },
+    { "checkId": "DEP-02", "subject": "Implementation", "subSubject": "Dependency Management", "severityIfFailed": "Warning", "result": "fail", "reason": "NuGet supports lock files, but RestorePackagesWithLockFile isn't set and there's no packages.lock.json.", "findingIds": ["DEP-02#1"] },
+    { "checkId": "DEP-03", "subject": "Implementation", "subSubject": "Dependency Management", "severityIfFailed": "Error", "result": "N/A", "reason": "No vulnerability analyzer output for this run.", "findingIds": [] },
+    { "checkId": "DEP-04", "subject": "Implementation", "subSubject": "Dependency Management", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "DEP-05", "subject": "Implementation", "subSubject": "Dependency Management", "severityIfFailed": "Information", "result": "fail", "reason": "No SBOM file, and no SBOM generator is configured in the manifests.", "findingIds": ["DEP-05#1"] },
+    { "checkId": "DEP-07", "subject": "Implementation", "subSubject": "Dependency Management", "severityIfFailed": "Warning", "result": "N/A", "reason": "No dependency-update or scanning config (Dependabot, Renovate, NuGetAudit settings, suppressions) is in the file list.", "findingIds": [] },
+    { "checkId": "DEP-08", "subject": "Implementation", "subSubject": "Dependency Management", "severityIfFailed": "Warning", "result": "fail", "reason": "No repo-level nuget.config with <clear/> or package source mapping, so feed selection isn't enforced; no http feeds or vendored binaries found.", "findingIds": ["DEP-08#1"] },
+    { "checkId": "DEP-09", "subject": "Implementation", "subSubject": "Dependency Management", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "no-analyzer-output; DEP-07 N/A because no update/scanning config is in the file list (inventory found no Dependabot or Renovate config and NuGetAudit isn't set explicitly in the manifests); test/PilotUtiltyApi.Domain.Tests csproj not sampled."
+}

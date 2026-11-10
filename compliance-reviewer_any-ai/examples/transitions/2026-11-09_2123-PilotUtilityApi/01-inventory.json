@@ -1,0 +1,438 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2123-PilotUtilityApi",
+  "stepId": "01-inventory",
+  "status": "completed",
+  "startedAt": "2026-11-09T21:23:03-07:00",
+  "completedAt": "2026-11-09T21:24:46-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "languages": [
+    "csharp"
+  ],
+  "frameworks": [
+    "ASP.NET Core (.NET, controllers)",
+    "Dapper (SQL Server / PostgreSQL)",
+    "Serilog",
+    "OpenTelemetry",
+    "NUnit + Moq"
+  ],
+  "apiSpecsFound": true,
+  "advanced": false,
+  "iacFound": false,
+  "maxFilesPerSubject": 12,
+  "fileBatches": [
+    {
+      "batchId": "batch-1",
+      "subjects": [
+        "review-software-quality",
+        "review-performance",
+        "review-reliability",
+        "review-security-identity-access"
+      ],
+      "subjectFiles": {
+        "review-software-quality": [
+          "src/PilotUtiltyApi.Web/Program.cs",
+          "src/PilotUtiltyApi.Web/Controllers/SystemController.cs",
+          "src/PilotUtiltyApi.Web/Controllers/TestingController.cs",
+          "src/PilotUtiltyApi.Services/Services/TestingService.cs",
+          "src/PilotUtiltyApi.Services/Extensions/ServicesInjectionExtensions.cs",
+          "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+          "src/PilotUtiltyApi.Repositories/Constants/SqlConstants.cs",
+          "src/PilotUtiltyApi.Shared/Configuration/ApplicationConfiguration.cs",
+          "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs",
+          "src/PilotUtiltyApi.Domain/Models/Responses/RetrieveResponse.cs",
+          ".editorconfig",
+          "src/PilotUtiltyApi.Web/PilotUtilityApi.Web.csproj"
+        ],
+        "review-performance": [
+          "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+          "src/PilotUtiltyApi.Repositories/Constants/SqlConstants.cs",
+          "src/PilotUtiltyApi.Web/Controllers/TestingController.cs",
+          "src/PilotUtiltyApi.Web/Controllers/SystemController.cs",
+          "src/PilotUtiltyApi.Services/Services/TestingService.cs",
+          "src/PilotUtiltyApi.Services/Extensions/ServicesInjectionExtensions.cs",
+          "src/PilotUtiltyApi.Web/Program.cs",
+          "src/PilotUtiltyApi.Web/Extensions/ApplicationInjectionExtensions.cs",
+          "src/PilotUtiltyApi.Web/appsettings.json",
+          "src/PilotUtiltyApi.Shared/Configuration/Models/DataSourceConfiguration.cs"
+        ],
+        "review-reliability": [
+          "src/PilotUtiltyApi.Web/Program.cs",
+          "src/PilotUtiltyApi.Services/Extensions/ServicesInjectionExtensions.cs",
+          "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+          "src/PilotUtiltyApi.Services/Services/TestingService.cs",
+          "src/PilotUtiltyApi.Shared/Configuration/Models/DataSourceConfiguration.cs",
+          "src/PilotUtiltyApi.Web/appsettings.json",
+          "src/PilotUtiltyApi.Web/Extensions/ApplicationInjectionExtensions.cs",
+          "src/PilotUtiltyApi.Web/Controllers/SystemController.cs"
+        ],
+        "review-security-identity-access": [
+          "src/PilotUtiltyApi.Web/Program.cs",
+          "src/PilotUtiltyApi.Web/Extensions/ApplicationInjectionExtensions.cs",
+          "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs",
+          "src/PilotUtiltyApi.Web/appsettings.json",
+          "src/PilotUtiltyApi.Web/Controllers/SystemController.cs",
+          "src/PilotUtiltyApi.Web/Controllers/TestingController.cs",
+          "src/PilotUtiltyApi.Shared/Swagger/Extensions/SwaggerExtensions.cs"
+        ]
+      }
+    },
+    {
+      "batchId": "batch-2",
+      "subjects": [
+        "review-twelve-factor"
+      ],
+      "subjectFiles": {
+        "review-twelve-factor": [
+          "src/PilotUtiltyApi.Web/Program.cs",
+          "src/PilotUtiltyApi.Web/Extensions/ApplicationInjectionExtensions.cs",
+          "src/PilotUtiltyApi.Shared/Configuration/ApplicationConfiguration.cs",
+          "src/PilotUtiltyApi.Web/appsettings.json",
+          "src/PilotUtiltyApi.Web/appsettings.Development.json",
+          "src/PilotUtiltyApi.Web/Properties/launchSettings.json",
+          "src/PilotUtiltyApi.Shared/Logging/Extensions/LoggingExtensions.cs",
+          "src/PilotUtiltyApi.Web/logs/log-20260811.json",
+          ".github/workflows/dotnet.yml",
+          "Directory.Packages.props",
+          "src/PilotUtiltyApi.Web/PilotUtilityApi.Web.csproj",
+          "src/PilotUtiltyApi.Repositories/PilotUtilityApi.Repositories.csproj"
+        ]
+      }
+    },
+    {
+      "batchId": "batch-3",
+      "subjects": [
+        "review-security-operational"
+      ],
+      "subjectFiles": {
+        "review-security-operational": [
+          "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs",
+          "src/PilotUtiltyApi.Shared/Logging/Extensions/LoggingExtensions.cs",
+          "src/PilotUtiltyApi.Shared/Logging/LoggingUtilities.cs",
+          "src/PilotUtiltyApi.Web/appsettings.json",
+          "src/PilotUtiltyApi.Web/appsettings.Development.json",
+          "src/PilotUtiltyApi.Web/Properties/launchSettings.json",
+          "src/PilotUtiltyApi.Shared/Configuration/ApplicationConfiguration.cs",
+          "src/PilotUtiltyApi.Shared/Configuration/Models/DataSourceConfiguration.cs",
+          "src/PilotUtiltyApi.Web/logs/log-20260811.json",
+          "src/PilotUtiltyApi.Web/Controllers/TestingController.cs",
+          "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+          ".github/workflows/dotnet.yml"
+        ]
+      }
+    },
+    {
+      "batchId": "batch-4",
+      "subjects": [
+        "review-maintainability"
+      ],
+      "subjectFiles": {
+        "review-maintainability": [
+          "README.md",
+          "CONTRIBUTING.md",
+          "LICENSE",
+          "PilotUtilityApi.sln",
+          ".github/instructions/architecture.instructions.md",
+          "docs/PilotUtilityApi_v1.json",
+          "src/PilotUtiltyApi.Web/appsettings.json",
+          "Directory.Packages.props",
+          "Directory.Build.props",
+          "src/PilotUtiltyApi.Shared/Configuration/ApplicationConfiguration.cs",
+          "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+          "src/PilotUtiltyApi.Web/Controllers/SystemController.cs"
+        ]
+      }
+    },
+    {
+      "batchId": "batch-5",
+      "subjects": [
+        "review-api-design"
+      ],
+      "subjectFiles": {
+        "review-api-design": [
+          "docs/PilotUtilityApi_v1.json",
+          "src/PilotUtiltyApi.Web/Controllers/SystemController.cs",
+          "src/PilotUtiltyApi.Web/Controllers/TestingController.cs",
+          "src/PilotUtiltyApi.Domain/Models/Responses/AboutResponse.cs",
+          "src/PilotUtiltyApi.Domain/Models/Responses/RetrieveResponse.cs",
+          "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs",
+          "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs",
+          "src/PilotUtiltyApi.Shared/Api/Transformers/LowercaseParameterTransformer.cs",
+          "src/PilotUtiltyApi.Shared/OpenApi/Extensions/OpenApiExtensions.cs",
+          "src/PilotUtiltyApi.Shared/Models/ControllerAttributes.cs",
+          "src/PilotUtiltyApi.Shared/Exceptions/UserException.cs"
+        ]
+      }
+    },
+    {
+      "batchId": "batch-6",
+      "subjects": [
+        "review-testing"
+      ],
+      "subjectFiles": {
+        "review-testing": [
+          "test/PilotUtiltyApi.Domain.Tests/ExampleTest.cs",
+          "test/PilotUtiltyApi.Repositories.Tests/Repositories/TestingRepositoryTests.cs",
+          "test/PilotUtiltyApi.Services.Tests/Services/TestingServiceTests.cs",
+          "test/PilotUtiltyApi.Shared.Tests/Configuration/ApplicationConfigurationTests.cs",
+          "test/PilotUtiltyApi.Web.Tests/Controllers/TestingControllerTests.cs",
+          "test/PilotUtiltyApi.TestingShared/Base/TestBase.cs",
+          "test/Bruno/PilotUtilityApi/System/HealthCheck.yml",
+          "test/Bruno/PilotUtilityApi/opencollection.yml",
+          ".github/workflows/dotnet.yml",
+          "test/PilotUtiltyApi.Web.Tests/PilotUtilityApi.Web.Tests.csproj",
+          "src/PilotUtiltyApi.Services/Extensions/ServicesInjectionExtensions.cs"
+        ]
+      }
+    },
+    {
+      "batchId": "batch-7",
+      "subjects": [
+        "review-observability"
+      ],
+      "subjectFiles": {
+        "review-observability": [
+          "src/PilotUtiltyApi.Shared/OpenTelemetry/Extensions/OpenTelemetryExtensions.cs",
+          "src/PilotUtiltyApi.Shared/Configuration/Models/OpenTelemetryConfiguration.cs",
+          "src/PilotUtiltyApi.Shared/Logging/Extensions/LoggingExtensions.cs",
+          "src/PilotUtiltyApi.Shared/Logging/Models/LoggingCorrelation.cs",
+          "src/PilotUtiltyApi.Web/appsettings.json",
+          "src/PilotUtiltyApi.Web/appsettings.Development.json",
+          "src/PilotUtiltyApi.Web/Program.cs",
+          "src/PilotUtiltyApi.Shared/Api/Middleware/UnhandledExceptionMiddleware.cs",
+          "src/PilotUtiltyApi.Web/Controllers/SystemController.cs",
+          "README.md",
+          "src/PilotUtiltyApi.Web/Controllers/TestingController.cs"
+        ]
+      }
+    },
+    {
+      "batchId": "batch-8",
+      "subjects": [
+        "review-security-input-injection"
+      ],
+      "subjectFiles": {
+        "review-security-input-injection": [
+          "src/PilotUtiltyApi.Web/Controllers/TestingController.cs",
+          "src/PilotUtiltyApi.Web/Controllers/SystemController.cs",
+          "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs",
+          "src/PilotUtiltyApi.Repositories/Constants/SqlConstants.cs",
+          "src/PilotUtiltyApi.Services/Services/TestingService.cs",
+          "src/PilotUtiltyApi.Domain/Models/Responses/AboutResponse.cs",
+          "src/PilotUtiltyApi.Domain/Models/Responses/RetrieveResponse.cs",
+          "src/PilotUtiltyApi.Shared/Utilities/FileUtilities.cs",
+          "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs",
+          "src/PilotUtiltyApi.Web/appsettings.json"
+        ]
+      }
+    },
+    {
+      "batchId": "batch-9",
+      "subjects": [
+        "review-security-web-api"
+      ],
+      "subjectFiles": {
+        "review-security-web-api": [
+          "src/PilotUtiltyApi.Web/Program.cs",
+          "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs",
+          "src/PilotUtiltyApi.Web/Extensions/ApplicationInjectionExtensions.cs",
+          "src/PilotUtiltyApi.Web/appsettings.json",
+          "src/PilotUtiltyApi.Web/appsettings.Development.json",
+          "src/PilotUtiltyApi.Web/Properties/launchSettings.json",
+          "src/PilotUtiltyApi.Shared/Swagger/Extensions/SwaggerExtensions.cs",
+          "src/PilotUtiltyApi.Shared/OpenApi/Extensions/OpenApiExtensions.cs",
+          "src/PilotUtiltyApi.Web/Controllers/SystemController.cs",
+          "src/PilotUtiltyApi.Web/Controllers/TestingController.cs"
+        ]
+      }
+    },
+    {
+      "batchId": "batch-10",
+      "subjects": [
+        "review-dependency-management"
+      ],
+      "subjectFiles": {
+        "review-dependency-management": [
+          "Directory.Packages.props",
+          "Directory.Build.props",
+          "src/PilotUtiltyApi.Web/PilotUtilityApi.Web.csproj",
+          "src/PilotUtiltyApi.Shared/PilotUtilityApi.Shared.csproj",
+          "src/PilotUtiltyApi.Repositories/PilotUtilityApi.Repositories.csproj",
+          "src/PilotUtiltyApi.Services/PilotUtilityApi.Services.csproj",
+          "src/PilotUtiltyApi.Domain/PilotUtilityApi.Domain.csproj",
+          "test/PilotUtiltyApi.Web.Tests/PilotUtilityApi.Web.Tests.csproj",
+          "test/PilotUtiltyApi.TestingShared/PilotUtilityApi.TestingShared.csproj",
+          "test/PilotUtiltyApi.Repositories.Tests/PilotUtilityApi.Repositories.Tests.csproj"
+        ]
+      }
+    },
+    {
+      "batchId": "batch-11",
+      "subjects": [
+        "review-software-lifecycle"
+      ],
+      "subjectFiles": {
+        "review-software-lifecycle": [
+          ".github/workflows/dotnet.yml",
+          "Directory.Build.props",
+          "src/PilotUtiltyApi.Web/PilotUtilityApi.Web.csproj"
+        ]
+      }
+    }
+  ],
+  "subjects": {
+    "review-software-quality": {
+      "batch": "batch-1",
+      "applicable": true,
+      "fileCount": 12,
+      "sampled": true,
+      "totalMatched": 40
+    },
+    "review-performance": {
+      "batch": "batch-1",
+      "applicable": true,
+      "fileCount": 10
+    },
+    "review-reliability": {
+      "batch": "batch-1",
+      "applicable": true,
+      "fileCount": 8
+    },
+    "review-security-identity-access": {
+      "batch": "batch-1",
+      "applicable": true,
+      "fileCount": 7
+    },
+    "review-twelve-factor": {
+      "batch": "batch-2",
+      "applicable": true,
+      "fileCount": 12
+    },
+    "review-security-operational": {
+      "batch": "batch-3",
+      "applicable": true,
+      "fileCount": 12
+    },
+    "review-maintainability": {
+      "batch": "batch-4",
+      "applicable": true,
+      "fileCount": 12
+    },
+    "review-api-design": {
+      "batch": "batch-5",
+      "applicable": true,
+      "fileCount": 11
+    },
+    "review-testing": {
+      "batch": "batch-6",
+      "applicable": true,
+      "fileCount": 11
+    },
+    "review-observability": {
+      "batch": "batch-7",
+      "applicable": true,
+      "fileCount": 11
+    },
+    "review-security-input-injection": {
+      "batch": "batch-8",
+      "applicable": true,
+      "fileCount": 10
+    },
+    "review-security-web-api": {
+      "batch": "batch-9",
+      "applicable": true,
+      "fileCount": 10
+    },
+    "review-dependency-management": {
+      "batch": "batch-10",
+      "applicable": true,
+      "fileCount": 10,
+      "sampled": true,
+      "totalMatched": 13
+    },
+    "review-software-lifecycle": {
+      "batch": "batch-11",
+      "applicable": true,
+      "fileCount": 3
+    },
+    "review-disaster-recovery": {
+      "batch": null,
+      "applicable": false
+    },
+    "review-monitoring": {
+      "batch": null,
+      "applicable": false
+    },
+    "review-cost-sustainability": {
+      "batch": null,
+      "applicable": false
+    }
+  },
+  "skippedSubjects": {
+    "review-disaster-recovery": "advanced usage off (IaC not reviewed)",
+    "review-monitoring": "advanced usage off (IaC not reviewed)",
+    "review-cost-sustainability": "advanced usage off (IaC not reviewed)"
+  },
+  "testInventory": {
+    "testProjects": [
+      {
+        "path": "test/PilotUtiltyApi.Domain.Tests",
+        "category": "unit",
+        "files": 1
+      },
+      {
+        "path": "test/PilotUtiltyApi.Repositories.Tests",
+        "category": "unit",
+        "files": 1
+      },
+      {
+        "path": "test/PilotUtiltyApi.Services.Tests",
+        "category": "unit",
+        "files": 1
+      },
+      {
+        "path": "test/PilotUtiltyApi.Shared.Tests",
+        "category": "unit",
+        "files": 1
+      },
+      {
+        "path": "test/PilotUtiltyApi.Web.Tests",
+        "category": "unit",
+        "files": 1
+      },
+      {
+        "path": "test/PilotUtiltyApi.TestingShared",
+        "category": "unit",
+        "files": 4
+      },
+      {
+        "path": "test/Bruno/PilotUtilityApi",
+        "category": "unclassified",
+        "files": 4
+      }
+    ],
+    "totals": {
+      "unit": 9,
+      "integration": 0,
+      "e2e": 0,
+      "unclassified": 4
+    },
+    "productionRoots": [
+      "src/PilotUtiltyApi.Web",
+      "src/PilotUtiltyApi.Services",
+      "src/PilotUtiltyApi.Repositories",
+      "src/PilotUtiltyApi.Domain",
+      "src/PilotUtiltyApi.Shared"
+    ],
+    "signals": {
+      "accessControl": false,
+      "integrationPoints": true,
+      "untrustedInput": true,
+      "loadTests": false,
+      "faultInjection": false
+    }
+  },
+  "notes": "Single deployable ASP.NET Core Web API (src/PilotUtiltyApi.Web/Program.cs). No Dockerfile, no IaC search (advanced off). TestingShared is a shared test-helper library (no test cases). Bruno folder is an API request collection (4 request files) run manually against a base URL. Committed runtime log files under src/PilotUtiltyApi.Web/logs/."
+}

@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2123-PilotUtilityApi",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "startedAt": "2026-11-09T21:23:03-07:00",
+  "updatedAt": "2026-11-09T21:41:01-07:00",
+  "status": "completed",
+  "subjects": [
+    "review-software-quality",
+    "review-software-lifecycle",
+    "review-twelve-factor",
+    "review-api-design",
+    "review-security-identity-access",
+    "review-security-input-injection",
+    "review-security-web-api",
+    "review-security-operational",
+    "review-testing",
+    "review-observability",
+    "review-dependency-management",
+    "review-reliability",
+    "review-performance",
+    "review-disaster-recovery",
+    "review-monitoring",
+    "review-cost-sustainability",
+    "review-maintainability"
+  ],
+  "flags": {
+    "advanced": false,
+    "analyzers": "auto"
+  },
+  "analyzerApproval": "none",
+  "linkApprovals": {},
+  "steps": {
+    "00-init": "completed",
+    "01-inventory": "completed",
+    "02-analyzers": "skipped",
+    "10-review-software-quality": "completed",
+    "11-review-software-lifecycle": "completed",
+    "12-review-twelve-factor": "completed",
+    "13-review-api-design": "completed",
+    "14-review-security-identity-access": "completed",
+    "15-review-security-input-injection": "completed",
+    "16-review-security-web-api": "completed",
+    "17-review-security-operational": "completed",
+    "19-review-testing": "completed",
+    "20-review-observability": "completed",
+    "21-review-dependency-management": "completed",
+    "22-review-reliability": "completed",
+    "23-review-performance": "completed",
+    "24-review-disaster-recovery": "completed",
+    "25-review-monitoring": "completed",
+    "26-review-cost-sustainability": "completed",
+    "27-review-maintainability": "completed",
+    "90-aggregate": "completed",
+    "99-report": "completed"
+  },
+  "stepNotes": {
+    "02-analyzers": "skipped: advanced usage off"
+  },
+  "reportPath": "docs/reports/PilotUtilityApi-compliance-review-2026-11-09_2123.md"
+}

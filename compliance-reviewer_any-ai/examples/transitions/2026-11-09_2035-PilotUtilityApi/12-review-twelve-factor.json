@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2035-PilotUtilityApi",
+  "stepId": "12-review-twelve-factor",
+  "status": "completed",
+  "startedAt": "2026-11-09T20:35:41-07:00",
+  "completedAt": "2026-11-09T20:48:30-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "batchId": "batch-2",
+  "skill": "review-twelve-factor",
+  "subject": "Twelve-Factor",
+  "findings": [
+    {
+      "id": "TF-11#1",
+      "subject": "Twelve-Factor",
+      "subSubject": "XI. Logs",
+      "checkId": "TF-11",
+      "severity": "Warning",
+      "title": "Production base config writes and rotates log files via the Serilog File sink",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 58, "lineEnd": 65, "excerpt": "\"Name\": \"File\", \"Args\": { \"path\": \"logs/log-.json\", \"rollingInterval\": \"Day\", ..." }
+      ],
+      "standard": "Compliance Reviewer Twelve-Factor Rubric — TFR-19",
+      "url": "../../compliance-reviewer/skills/review-twelve-factor/references/standards/twelve-factor-rubric.md#tfr-19",
+      "recommendation": "Keep only the Console sink (and the OTLP exporter) in appsettings.json and move the File sink to appsettings.Development.json, letting the platform capture and route stdout.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "TF-04#S1",
+      "subject": "Twelve-Factor",
+      "subSubject": "IV. Backing services",
+      "checkId": "TF-04",
+      "title": "Database provider and connection handle are chosen entirely from configuration",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 5, "lineEnd": 13, "excerpt": "\"Active\": true, ... \"DataSourceType\": \"SqlServer\", \"Host\": \"localhost\", ... \"Port\": 1433" },
+        { "file": "src/PilotUtiltyApi.Shared/Configuration/ApplicationConfiguration.cs", "lineStart": 76, "lineEnd": 86, "excerpt": "var activeDataSources = DataSources.Where(ds => ds.Active).ToArray();" }
+      ],
+      "standard": "Compliance Reviewer Twelve-Factor Rubric — TFR-09",
+      "url": "../../compliance-reviewer/skills/review-twelve-factor/references/standards/twelve-factor-rubric.md#tfr-09"
+    },
+    {
+      "id": "TF-02#S1",
+      "subject": "Twelve-Factor",
+      "subSubject": "II. Dependencies",
+      "checkId": "TF-02",
+      "title": "All dependencies declared through central package management",
+      "evidence": [
+        { "file": "Directory.Packages.props", "lineStart": 3, "lineEnd": 3, "excerpt": "<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>" }
+      ],
+      "standard": "Compliance Reviewer Twelve-Factor Rubric — TFR-03",
+      "url": "../../compliance-reviewer/skills/review-twelve-factor/references/standards/twelve-factor-rubric.md#tfr-03"
+    },
+    {
+      "id": "TF-01#S1",
+      "subject": "Twelve-Factor",
+      "subSubject": "I. Codebase",
+      "checkId": "TF-01",
+      "title": "Shared code consumed through project references, not copied source",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/PilotUtilityApi.Web.csproj", "lineStart": 12, "lineEnd": 14, "excerpt": "<ProjectReference Include=\"..\\PilotUtiltyApi.Shared\\PilotUtilityApi.Shared.csproj\" />" }
+      ],
+      "standard": "Compliance Reviewer Twelve-Factor Rubric — TFR-02",
+      "url": "../../compliance-reviewer/skills/review-twelve-factor/references/standards/twelve-factor-rubric.md#tfr-02"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "TF-01", "subject": "Twelve-Factor", "subSubject": "I. Codebase", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-02", "subject": "Twelve-Factor", "subSubject": "II. Dependencies", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-03", "subject": "Twelve-Factor", "subSubject": "III. Config", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-04", "subject": "Twelve-Factor", "subSubject": "IV. Backing services", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-05", "subject": "Twelve-Factor", "subSubject": "V. Build, release, run", "severityIfFailed": "Warning", "result": "N/A", "reason": "No Dockerfile, manifest or deploy step visible; CI only builds and tests.", "findingIds": [] },
+    { "checkId": "TF-06", "subject": "Twelve-Factor", "subSubject": "VI. Processes", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-07", "subject": "Twelve-Factor", "subSubject": "VII. Port binding", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-08", "subject": "Twelve-Factor", "subSubject": "VIII. Concurrency", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-09", "subject": "Twelve-Factor", "subSubject": "IX. Disposability", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TF-10", "subject": "Twelve-Factor", "subSubject": "X. Dev/prod parity", "severityIfFailed": "Warning", "result": "N/A", "reason": "Production backing-service definition not visible.", "findingIds": [] },
+    { "checkId": "TF-11", "subject": "Twelve-Factor", "subSubject": "XI. Logs", "severityIfFailed": "Warning", "result": "fail", "reason": "Serilog File sink with rotation is configured in the production base appsettings.json.", "findingIds": ["TF-11#1"] },
+    { "checkId": "TF-12", "subject": "Twelve-Factor", "subSubject": "XII. Admin processes", "severityIfFailed": "Information", "result": "N/A", "reason": "No admin or migration tasks visible in the subject's files.", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "Deployable: PilotUtilityApi.Web, ASP.NET Core (Microsoft.NET.Sdk.Web) long-running network service on Kestrel via WebApplication.CreateBuilder. TF-03 passes under TFR-06: committed DataSources are local-development values (localhost, DevUser, placeholder password) overridable through configuration layering; base appsettings.json also sets OpenTelemetry Server \"otel-collector\", a deploy-varying host best supplied by environment. launchSettings.json ASPNETCORE_ENVIRONMENT=Development is local-launch only. No Dockerfile or .env.example exists; 13 runtime log files under src/PilotUtiltyApi.Web/logs/ (ignored by .gitignore) reflect the File sink."
+}

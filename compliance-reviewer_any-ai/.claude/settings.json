@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Write(transitions/**)",
+      "Write(docs/reports/**)",
+      "Bash(python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py:*)",
+      "Bash(python compliance-reviewer/scripts/check_source_drift.py lint:*)"
+    ]
+  }
+}

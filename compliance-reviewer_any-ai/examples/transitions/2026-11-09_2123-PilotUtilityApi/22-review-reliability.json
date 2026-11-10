@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2123-PilotUtilityApi",
+  "stepId": "22-review-reliability",
+  "status": "completed",
+  "startedAt": "2026-11-09T21:23:03-07:00",
+  "completedAt": "2026-11-09T21:39:00-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "batchId": "batch-1",
+  "skill": "review-reliability",
+  "subject": "Operations / Reliability",
+  "findings": [
+    {
+      "id": "REL-02#1",
+      "subject": "Operations / Reliability",
+      "subSubject": "Reliability",
+      "checkId": "REL-02",
+      "severity": "Warning",
+      "title": "Database calls in the request path have no transient-fault retry",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 73, "lineEnd": 89, "excerpt": "var connection = CreateConnection(...); connection.Open(); ... result = await connection.QueryFirstOrDefaultAsync<int>(command);" }
+      ],
+      "standard": "Azure Architecture Center — AZRL-05",
+      "url": "https://learn.microsoft.com/azure/architecture/best-practices/transient-faults#check-whether-a-built-in-retry-mechanism-exists",
+      "recommendation": "Add a bounded retry with exponential back-off and jitter for transient DB errors only (e.g. SqlClient configurable retry logic / Npgsql retry, or a Polly pipeline registered once in DI), wrapping the whole transaction.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    },
+    {
+      "id": "REL-04#1",
+      "subject": "Operations / Reliability",
+      "subSubject": "Reliability",
+      "checkId": "REL-04",
+      "severity": "Warning",
+      "title": "No circuit breaker around the synchronous database dependency on the request path",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 89, "lineEnd": 89, "excerpt": "result = await connection.QueryFirstOrDefaultAsync<int>(command);" }
+      ],
+      "standard": "Azure Architecture Center — AZRL-21",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/circuit-breaker#solution",
+      "recommendation": "Register a shared resilience pipeline (retry inside a circuit breaker) once in DI for the active data source and handle BrokenCircuitException with a clear 503-style error.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    },
+    {
+      "id": "REL-06#1",
+      "subject": "Operations / Reliability",
+      "subSubject": "Reliability",
+      "checkId": "REL-06",
+      "severity": "Warning",
+      "title": "No rate or concurrency limiter on the API pipeline; requests aren't shed before reaching the database",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Program.cs", "lineStart": 20, "lineEnd": 29, "excerpt": "webAppBuilder.ApplicationRegistration(); webAppBuilder.ApiWebApplicationBuilder(); ... webApp.ApiWebApplication();" },
+        { "file": "src/PilotUtiltyApi.Shared/Api/Extensions/ApiExtensions.cs", "lineStart": 79, "lineEnd": 85, "excerpt": "webApp.UseMiddleware<UnhandledExceptionMiddleware>(); ... webApp.MapControllers();  (no UseRateLimiter)" }
+      ],
+      "standard": "Azure Architecture Center — AZRL-32",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/throttling#solution",
+      "recommendation": "Add AddRateLimiter/UseRateLimiter early in the pipeline with limits from configuration, at least for the destructive POST /v1/testing/reset endpoint.",
+      "confidence": "Medium",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "S-REL-01#1",
+      "subject": "Operations / Reliability",
+      "subSubject": "Reliability",
+      "checkId": "REL-01",
+      "title": "Explicit, configurable connect timeout on the database connection",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 6, "lineEnd": 6, "excerpt": "\"ConnectTimeout\": 30," }
+      ],
+      "standard": "Azure Architecture Center — AZRL-01",
+      "url": "https://learn.microsoft.com/azure/architecture/best-practices/transient-faults#determine-an-appropriate-retry-count-and-interval"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "REL-01", "subject": "Operations / Reliability", "subSubject": "Reliability", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "REL-02", "subject": "Operations / Reliability", "subSubject": "Reliability", "severityIfFailed": "Warning", "result": "fail", "reason": "Remote DB calls in the request path have no retry (AZRL-05).", "findingIds": ["REL-02#1"] },
+    { "checkId": "REL-03", "subject": "Operations / Reliability", "subSubject": "Reliability", "severityIfFailed": "Error", "result": "N/A", "reason": "No retry logic or redelivery in scope.", "findingIds": [] },
+    { "checkId": "REL-04", "subject": "Operations / Reliability", "subSubject": "Reliability", "severityIfFailed": "Warning", "result": "fail", "reason": "Synchronous DB calls in the request path have no circuit breaker (AZRL-21).", "findingIds": ["REL-04#1"] },
+    { "checkId": "REL-05", "subject": "Operations / Reliability", "subSubject": "Reliability", "severityIfFailed": "Warning", "result": "N/A", "reason": "No deployment config in scope.", "findingIds": [] },
+    { "checkId": "REL-06", "subject": "Operations / Reliability", "subSubject": "Reliability", "severityIfFailed": "Warning", "result": "fail", "reason": "Request endpoints have no rate or concurrency limiter (AZRL-32).", "findingIds": ["REL-06#1"] },
+    { "checkId": "REL-07", "subject": "Operations / Reliability", "subSubject": "Reliability", "severityIfFailed": "Warning", "result": "N/A", "reason": "No message consumers or background jobs in scope.", "findingIds": [] },
+    { "checkId": "REL-08", "subject": "Operations / Reliability", "subSubject": "Reliability", "severityIfFailed": "Information", "result": "N/A", "reason": "No deployment config in scope (IaC not reviewed, advanced usage off).", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "REL-01: relies on library default SqlClient command timeout 30 s (CommandDefinition sets no commandTimeout); connect timeout explicit 30 s. AZRL-02 not judged: no inbound timeout in scope. localized-standard-gap: unrecognized library Npgsql (PostgreSQL provider default command timeout not localized). ApiExtensions.cs read as a closely related file to confirm REL-06."
+}

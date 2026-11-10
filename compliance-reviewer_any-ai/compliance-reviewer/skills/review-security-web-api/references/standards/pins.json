@@ -1,0 +1,151 @@
+{
+  "$comment": "Source pins for check_source_drift.py (maintainers only; never used during a review). Pins copied from the standards file headers must match them; 'baseline' marks values recorded by the script.",
+  "skill": "review-security-web-api",
+  "checks": [
+    {
+      "id": "owasp-csp",
+      "file": "owasp-web-api.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Content_Security_Policy_Cheat_Sheet.md",
+      "pinned": "eaa71fb4",
+      "pinnedDate": "2026-10-04"
+    },
+    {
+      "id": "owasp-hdr",
+      "file": "owasp-web-api.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/HTTP_Headers_Cheat_Sheet.md",
+      "pinned": "056cc10a",
+      "pinnedDate": "2026-10-04"
+    },
+    {
+      "id": "owasp-rst",
+      "file": "owasp-web-api.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/REST_Security_Cheat_Sheet.md",
+      "pinned": "97cb8a3c",
+      "pinnedDate": "2026-10-14"
+    },
+    {
+      "id": "owasp-h5",
+      "file": "owasp-web-api.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/HTML5_Security_Cheat_Sheet.md",
+      "pinned": "3919b1c4",
+      "pinnedDate": "2026-10-04"
+    },
+    {
+      "id": "owasp-hsts",
+      "file": "owasp-web-api.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.md",
+      "pinned": "fa588add",
+      "pinnedDate": "2026-10-04"
+    },
+    {
+      "id": "owasp-tls",
+      "file": "owasp-web-api.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Transport_Layer_Security_Cheat_Sheet.md",
+      "pinned": "d6474de0",
+      "pinnedDate": "2026-11-08"
+    },
+    {
+      "id": "top10-a02",
+      "file": "owasp-web-api.md",
+      "method": "github-commit",
+      "repo": "OWASP/Top10",
+      "path": "2025/docs/en/A02_2025-Security_Misconfiguration.md",
+      "pinned": "d4d000ec",
+      "pinnedDate": "2025-12-24"
+    },
+    {
+      "id": "owasp-njs",
+      "file": "node-web-api.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Nodejs_Security_Cheat_Sheet.md",
+      "pinned": "eeaa1e47",
+      "pinnedDate": "2026-11-05"
+    },
+    {
+      "id": "learn-ms-ssl",
+      "file": "dotnet-web-api.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/aspnet/core/security/enforcing-ssl?view=aspnetcore-10.0",
+      "msDate": "2026-10-27"
+    },
+    {
+      "id": "learn-ms-cors",
+      "file": "dotnet-web-api.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/aspnet/core/security/cors?view=aspnetcore-10.0",
+      "msDate": "2026-05-12"
+    },
+    {
+      "id": "learn-ms-fmt",
+      "file": "dotnet-web-api.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/aspnet/core/web-api/advanced/formatting?view=aspnetcore-10.0",
+      "msDate": "2026-03-22"
+    },
+    {
+      "id": "dotnet-current-major",
+      "method": "json",
+      "url": "https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json",
+      "select": "releases-index[support-phase=active].channel-version",
+      "first": true,
+      "pinned": "10.0",
+      "note": "A new active .NET major means re-pinning view=aspnetcore-NN.0 / net-NN.0 on the Learn pages.",
+      "file": "dotnet-web-api.md"
+    },
+    {
+      "id": "spring-security-current-release",
+      "file": "java-web-api.md",
+      "method": "json",
+      "url": "https://api.spring.io/projects/spring-security/releases",
+      "select": "_embedded.releases[current=true].version",
+      "pinned": "7.1.2",
+      "note": "A new spring-security minor release means re-reading the pinned pages and defaults."
+    },
+    {
+      "id": "spring-framework-docs-version",
+      "file": "java-web-api.md",
+      "method": "regex",
+      "url": "https://docs.spring.io/spring-framework/reference/web/webmvc-cors.html",
+      "pattern": "<meta name=\"version\" content=\"([^\"]+)\"",
+      "pinned": "7.0.10",
+      "note": "Version shown by the pinned docs page (api.spring.io lagged at 7.0.8 on 2026-11-09). A new minor means re-reading JVW-10."
+    },
+    {
+      "id": "django-current-version",
+      "method": "redirect",
+      "url": "https://docs.djangoproject.com/en/stable/",
+      "expect": "/en/6.1/",
+      "note": "A new Django feature release means re-pinning the /en/6.1/ paths.",
+      "file": "python-web-api.md"
+    },
+    {
+      "id": "mdn-trusted-types",
+      "file": "mdn-web-api.md",
+      "method": "regex",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy/require-trusted-types-for",
+      "pattern": "last modified on <time datetime=\"(\\d{4}-\\d{2}-\\d{2})",
+      "pinned": "2025-12-22"
+    },
+    {
+      "id": "express-security-page",
+      "method": "text-hash",
+      "url": "https://expressjs.com/en/advanced/best-practice-security.html",
+      "pinned": "0ae2ce811c4c1637",
+      "file": "node-web-api.md",
+      "baseline": "2026-11-09"
+    }
+  ]
+}

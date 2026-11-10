@@ -1,0 +1,214 @@
+{
+  "$comment": "Source pins for check_source_drift.py (maintainers only; never used during a review). Pins copied from the standards file headers must match them; 'baseline' marks values recorded by the script.",
+  "skill": "review-security-input-injection",
+  "checks": [
+    {
+      "id": "owasp-ivl",
+      "file": "owasp-input-injection.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Input_Validation_Cheat_Sheet.md",
+      "pinned": "b9500094",
+      "pinnedDate": "2026-10-03"
+    },
+    {
+      "id": "owasp-inj",
+      "file": "owasp-input-injection.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Injection_Prevention_Cheat_Sheet.md",
+      "pinned": "9a91ba5a",
+      "pinnedDate": "2026-11-08"
+    },
+    {
+      "id": "owasp-sql",
+      "file": "owasp-input-injection.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.md",
+      "pinned": "9a91ba5a",
+      "pinnedDate": "2026-11-08"
+    },
+    {
+      "id": "owasp-qp",
+      "file": "owasp-input-injection.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Query_Parameterization_Cheat_Sheet.md",
+      "pinned": "9a91ba5a",
+      "pinnedDate": "2026-11-08"
+    },
+    {
+      "id": "owasp-xml",
+      "file": "owasp-input-injection.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/XML_Security_Cheat_Sheet.md",
+      "pinned": "6f207d04",
+      "pinnedDate": "2026-11-08"
+    },
+    {
+      "id": "owasp-fu",
+      "file": "owasp-input-injection.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/File_Upload_Cheat_Sheet.md",
+      "pinned": "89a49d9d",
+      "pinnedDate": "2026-10-04"
+    },
+    {
+      "id": "owasp-xss",
+      "file": "owasp-input-injection.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.md",
+      "pinned": "3b93fa9b",
+      "pinnedDate": "2026-11-01"
+    },
+    {
+      "id": "owasp-des",
+      "file": "owasp-input-injection.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Deserialization_Cheat_Sheet.md",
+      "pinned": "16a0ed80",
+      "pinnedDate": "2026-10-04"
+    },
+    {
+      "id": "owasp-ssrf",
+      "file": "owasp-input-injection.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.md",
+      "pinned": "07656620",
+      "pinnedDate": "2026-11-08"
+    },
+    {
+      "id": "top10-a05",
+      "file": "owasp-input-injection.md",
+      "method": "github-commit",
+      "repo": "OWASP/Top10",
+      "path": "2025/docs/en/A05_2025-Injection.md",
+      "pinned": "d4d000ec",
+      "pinnedDate": "2025-12-24"
+    },
+    {
+      "id": "owasp-dnet",
+      "file": "dotnet-input.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/DotNet_Security_Cheat_Sheet.md",
+      "pinned": "3cfa49de",
+      "pinnedDate": "2026-10-18"
+    },
+    {
+      "id": "owasp-jsec",
+      "file": "java-input.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Java_Security_Cheat_Sheet.md",
+      "pinned": "f1d0311a",
+      "pinnedDate": "2026-10-22"
+    },
+    {
+      "id": "owasp-njs",
+      "file": "node-input.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Nodejs_Security_Cheat_Sheet.md",
+      "pinned": "eeaa1e47",
+      "pinnedDate": "2026-11-05"
+    },
+    {
+      "id": "learn-efsql",
+      "file": "dotnet-input.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/ef/core/querying/sql-queries",
+      "msDate": "2022-09-19"
+    },
+    {
+      "id": "learn-upl",
+      "file": "dotnet-input.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/aspnet/core/mvc/models/file-uploads?view=aspnetcore-10.0",
+      "msDate": "2026-10-03"
+    },
+    {
+      "id": "learn-axss",
+      "file": "dotnet-input.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/aspnet/core/security/cross-site-scripting?view=aspnetcore-10.0",
+      "msDate": "2026-05-13"
+    },
+    {
+      "id": "learn-val",
+      "file": "dotnet-input.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/aspnet/core/mvc/models/validation?view=aspnetcore-10.0",
+      "msDate": "2026-10-26"
+    },
+    {
+      "id": "learn-bf",
+      "file": "dotnet-input.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/dotnet/standard/serialization/binaryformatter-security-guide",
+      "msDate": "2022-03-02"
+    },
+    {
+      "id": "dotnet-current-major",
+      "method": "json",
+      "url": "https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json",
+      "select": "releases-index[support-phase=active].channel-version",
+      "first": true,
+      "pinned": "10.0",
+      "note": "A new active .NET major means re-pinning view=aspnetcore-NN.0 / net-NN.0 on the Learn pages.",
+      "file": "dotnet-input.md"
+    },
+    {
+      "id": "oracle-secure-coding-version",
+      "file": "java-input.md",
+      "method": "regex",
+      "url": "https://www.oracle.com/java/technologies/javase/seccodeguide.html",
+      "pattern": "Document version:\\s*([0-9.]+)",
+      "pinned": "11.0"
+    },
+    {
+      "id": "java-lts-jaxp",
+      "method": "manual",
+      "note": "On each Java LTS release, re-pin the JAXP guide path /javase/25/ (no approved version feed)."
+    },
+    {
+      "id": "spring-data-jpa-version",
+      "file": "java-input.md",
+      "method": "regex",
+      "url": "https://docs.spring.io/spring-data/jpa/reference/jpa/query-methods.html",
+      "pattern": "<meta name=\"version\" content=\"([^\"]+)\"",
+      "pinned": "4.1.2"
+    },
+    {
+      "id": "python-current-version",
+      "method": "regex",
+      "url": "https://docs.python.org/3/",
+      "pattern": "<title>Python (\\d+\\.\\d+)",
+      "pinned": "3.15",
+      "note": "A new Python feature release means re-pinning the /3.15/ paths.",
+      "file": "python-input.md"
+    },
+    {
+      "id": "django-current-version",
+      "method": "redirect",
+      "url": "https://docs.djangoproject.com/en/stable/",
+      "expect": "/en/6.1/",
+      "note": "A new Django feature release means re-pinning the /en/6.1/ paths.",
+      "file": "python-input.md"
+    },
+    {
+      "id": "express-security-page",
+      "method": "text-hash",
+      "url": "https://expressjs.com/en/advanced/best-practice-security.html",
+      "pinned": "0ae2ce811c4c1637",
+      "file": "node-input.md",
+      "baseline": "2026-11-09"
+    }
+  ]
+}

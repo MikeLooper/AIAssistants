@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2123-PilotUtilityApi",
+  "stepId": "19-review-testing",
+  "status": "completed",
+  "startedAt": "2026-11-09T21:23:03-07:00",
+  "completedAt": "2026-11-09T21:30:00-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "batchId": "batch-6",
+  "skill": "review-testing",
+  "subject": "Testing",
+  "findings": [
+    {
+      "id": "TST-02#1",
+      "subject": "Testing",
+      "subSubject": "Coverage",
+      "checkId": "TST-02",
+      "severity": "Warning",
+      "title": "coverlet.collector is referenced but CI never collects or publishes coverage",
+      "evidence": [
+        { "file": "test/PilotUtiltyApi.Web.Tests/PilotUtilityApi.Web.Tests.csproj", "lineStart": 9, "lineEnd": 9, "excerpt": "<PackageReference Include=\"coverlet.collector\">" },
+        { "file": ".github/workflows/dotnet.yml", "lineStart": 27, "lineEnd": 28, "excerpt": "- name: Test\n  run: dotnet test --no-build --verbosity normal" }
+      ],
+      "standard": "Compliance Reviewer Testing Rubric — TSR-04",
+      "url": "../../compliance-reviewer/skills/review-testing/references/standards/testing-rubric.md#tsr-04",
+      "recommendation": "Run `dotnet test --collect:\"XPlat Code Coverage\"` in CI and publish the result (reportgenerator step, coverage artifact or Codecov upload) so untested code is visible; no percentage gate is required.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "TST-03#1",
+      "subject": "Testing",
+      "subSubject": "Assertion Quality",
+      "checkId": "TST-03",
+      "severity": "Warning",
+      "title": "Placeholder Assert.Pass test and tests whose arrange contradicts their name cannot catch the defects they claim to cover (3 tests)",
+      "evidence": [
+        { "file": "test/PilotUtiltyApi.Domain.Tests/ExampleTest.cs", "lineStart": 9, "lineEnd": 14, "excerpt": "public void ExampleClass_ExampleTest_Test() ... Assert.Pass(\"Example Test\");" },
+        { "file": "test/PilotUtiltyApi.Web.Tests/Controllers/TestingControllerTests.cs", "lineStart": 115, "lineEnd": 121, "excerpt": "..._WithErrorAndNullMessage_ReturnsBadRequestWithDefaultWarning_Test() ... .ReturnsAsync(new RetrieveResponse<int>(0, \"test error\"));" },
+        { "file": "test/PilotUtiltyApi.Web.Tests/Controllers/TestingControllerTests.cs", "lineStart": 72, "lineEnd": 75, "excerpt": "..._WithNullResult_ReturnsNoContent_Test() ... expectedResult.Result = 0;" }
+      ],
+      "standard": "Compliance Reviewer Testing Rubric — TSR-07",
+      "url": "../../compliance-reviewer/skills/review-testing/references/standards/testing-rubric.md#tsr-07",
+      "recommendation": "Remove the Assert.Pass placeholder (or replace it with a real test), stub a null ErrorMessage and assert the default Warning value, and either build a null-result response or rename the null-result test.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "TST-09#1",
+      "subject": "Testing",
+      "subSubject": "Integration Tests",
+      "checkId": "TST-09",
+      "severity": "Warning",
+      "title": "Repository data access is never tested against a real database engine",
+      "evidence": [
+        { "file": "test/PilotUtiltyApi.Repositories.Tests/Repositories/TestingRepositoryTests.cs", "lineStart": 17, "lineEnd": 17, "excerpt": "public class TestingRepositoryTests : TestBase" },
+        { "file": "test/PilotUtiltyApi.Repositories.Tests/Repositories/TestingRepositoryTests.cs", "lineStart": 100, "lineEnd": 113, "excerpt": "DataSourceType = \"UnsupportedDb\" ... Assert.ThrowsAsync<UserException>(...ResetTestingAsync())" }
+      ],
+      "standard": "Compliance Reviewer Testing Rubric — TSR-18",
+      "url": "../../compliance-reviewer/skills/review-testing/references/standards/testing-rubric.md#tsr-18",
+      "recommendation": "Add an integration test project that runs TestingRepository.ResetTestingAsync against a containerized SQL Server/PostgreSQL (e.g. Testcontainers) with a fresh database per run.",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "TST-11#1",
+      "subject": "Testing",
+      "subSubject": "Fuzz & DAST",
+      "checkId": "TST-11",
+      "severity": "Information",
+      "title": "No fuzz/property-based tests and no DAST job for the HTTP API",
+      "evidence": [
+        { "file": ".github/workflows/dotnet.yml", "lineStart": 17, "lineEnd": 28, "excerpt": "steps: checkout, setup-dotnet, restore, build, dotnet test (no DAST or fuzz step)" }
+      ],
+      "standard": "Compliance Reviewer Testing Rubric — TSR-23",
+      "url": "../../compliance-reviewer/skills/review-testing/references/standards/testing-rubric.md#tsr-23",
+      "recommendation": "Add an OWASP ZAP API/baseline scan job against the running API in CI, or property-based tests (FsCheck/CsCheck) for input-handling code.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    },
+    {
+      "id": "TST-12#1",
+      "subject": "Testing",
+      "subSubject": "Load Tests",
+      "checkId": "TST-12",
+      "severity": "Information",
+      "title": "Deployable Web API has no automated load or performance tests",
+      "evidence": [
+        { "file": ".github/workflows/dotnet.yml", "lineStart": 27, "lineEnd": 28, "excerpt": "- name: Test\n  run: dotnet test --no-build --verbosity normal" }
+      ],
+      "standard": "Azure Well-Architected Framework — AZT-01",
+      "url": "https://learn.microsoft.com/azure/well-architected/performance-efficiency/performance-test#apply-multiple-performance-test-types",
+      "recommendation": "Add a scripted load test (k6, NBomber or similar) for the API's critical endpoints with pass/fail thresholds, run on a schedule or in the pipeline.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "TST-06#S1",
+      "subject": "Testing",
+      "subSubject": "CI Execution",
+      "checkId": "TST-06",
+      "title": "CI runs the full test suite on every push and pull request to main, failing the build on test failure",
+      "evidence": [
+        { "file": ".github/workflows/dotnet.yml", "lineStart": 6, "lineEnd": 28, "excerpt": "on: push/pull_request branches [\"main\"] ... run: dotnet test --no-build --verbosity normal" }
+      ],
+      "standard": "Compliance Reviewer Testing Rubric — TSR-13",
+      "url": "../../compliance-reviewer/skills/review-testing/references/standards/testing-rubric.md#tsr-13"
+    },
+    {
+      "id": "TST-05#S1",
+      "subject": "Testing",
+      "subSubject": "Isolation & Determinism",
+      "checkId": "TST-05",
+      "title": "Unit tests build their own state per test, with no shared setup, sleeps, clock reads or ordering",
+      "evidence": [
+        { "file": "test/PilotUtiltyApi.Services.Tests/Services/TestingServiceTests.cs", "lineStart": 34, "lineEnd": 51, "excerpt": "var mockRepository = new Mock<ITestingRepository>(); ... var service = new TestingService(...);" }
+      ]
+    },
+    {
+      "id": "TST-08#S1",
+      "subject": "Testing",
+      "subSubject": "Test Code Quality",
+      "checkId": "TST-08",
+      "title": "Consistent Unit_Scenario_Expected naming and clear arrange/act/assert, with thorough validation-path tests",
+      "evidence": [
+        { "file": "test/PilotUtiltyApi.Shared.Tests/Configuration/ApplicationConfigurationTests.cs", "lineStart": 14, "lineEnd": 25, "excerpt": "ApplicationConfiguration_Validate_WithNoDataSources_ThrowsConfigurationException_Test()" }
+      ]
+    }
+  ],
+  "checkResults": [
+    { "checkId": "TST-01", "subject": "Testing", "subSubject": "Test Pyramid", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TST-02", "subject": "Testing", "subSubject": "Coverage", "severityIfFailed": "Warning", "result": "fail", "reason": "Coverage collector is referenced but no collection or report runs in CI or a documented command.", "findingIds": ["TST-02#1"] },
+    { "checkId": "TST-03", "subject": "Testing", "subSubject": "Assertion Quality", "severityIfFailed": "Warning", "result": "fail", "reason": "An Assert.Pass placeholder and two tests whose arrange contradicts their names cannot catch the claimed defects.", "findingIds": ["TST-03#1"] },
+    { "checkId": "TST-04", "subject": "Testing", "subSubject": "Test Doubles", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TST-05", "subject": "Testing", "subSubject": "Isolation & Determinism", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TST-06", "subject": "Testing", "subSubject": "CI Execution", "severityIfFailed": "Error", "result": "pass", "findingIds": [] },
+    { "checkId": "TST-07", "subject": "Testing", "subSubject": "Module Coverage", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TST-08", "subject": "Testing", "subSubject": "Test Code Quality", "severityIfFailed": "Information", "result": "pass", "findingIds": [] },
+    { "checkId": "TST-09", "subject": "Testing", "subSubject": "Integration Tests", "severityIfFailed": "Warning", "result": "fail", "reason": "Repository data access exists but no test runs it against a real database engine.", "findingIds": ["TST-09#1"] },
+    { "checkId": "TST-10", "subject": "Testing", "subSubject": "Security Tests", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "TST-11", "subject": "Testing", "subSubject": "Fuzz & DAST", "severityIfFailed": "Information", "result": "fail", "reason": "Untrusted input reaches HTTP endpoints but there are no fuzz/property tests and no DAST job.", "findingIds": ["TST-11#1"] },
+    { "checkId": "TST-12", "subject": "Testing", "subSubject": "Load Tests", "severityIfFailed": "Information", "result": "fail", "reason": "Deployable Web API has no load or performance tests (signals.loadTests false).", "findingIds": ["TST-12#1"] },
+    { "checkId": "TST-13", "subject": "Testing", "subSubject": "Resilience Tests", "severityIfFailed": "Information", "result": "pass", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "Pyramid from inventory totals (unit 9, integration 0, e2e 0, unclassified 4). Bruno collection (test/Bruno) is manually run and only covers GET healthcheck; left out of ratios. TestingShared/TestBase has no test cases (all members commented out). Domain project is DTO-only (exempt from TSR-15); ServicesInjectionExtensions is a composition root (exempt). TST-10: no access control, so STS-01/02/03/06 and TSR-21 N/A; error paths (repository error -> 400 with Warning header, config validation) are tested. TST-13: no retry/timeout/breaker logic visible, so AZT-06/07 not judged; dependency-failure propagation tested at service/controller level; AZT-09 N/A (no fault-injection definitions). TSR-05 not applicable (no coverage threshold configured)."
+}

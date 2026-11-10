@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2123-PilotUtilityApi",
+  "stepId": "23-review-performance",
+  "status": "completed",
+  "startedAt": "2026-11-09T21:23:03-07:00",
+  "completedAt": "2026-11-09T21:38:00-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "batchId": "batch-1",
+  "skill": "review-performance",
+  "subject": "Operations / Performance",
+  "findings": [
+    {
+      "id": "PERF-02#1",
+      "subject": "Operations / Performance",
+      "subSubject": "Performance",
+      "checkId": "PERF-02",
+      "severity": "Warning",
+      "title": "Synchronous connection Open, BeginTransaction, Commit and Rollback inside an async request path",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 73, "lineEnd": 79, "excerpt": "var connection = CreateConnection(...); if (connection.State != ConnectionState.Open) { connection.Open(); } var transaction = connection.BeginTransaction();" },
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 89, "lineEnd": 94, "excerpt": "result = await connection.QueryFirstOrDefaultAsync<int>(command); transaction.Commit(); ... transaction.Rollback();" }
+      ],
+      "standard": "Azure Architecture Center — AZPE-13",
+      "url": "https://learn.microsoft.com/azure/architecture/antipatterns/synchronous-io/#how-to-fix-the-problem",
+      "recommendation": "Type the connection as DbConnection and use OpenAsync(cancellationToken), BeginTransactionAsync, CommitAsync and RollbackAsync so the ASP.NET Core request thread isn't blocked on network I/O.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "PERF-03#1",
+      "subject": "Operations / Performance",
+      "subSubject": "Performance",
+      "checkId": "PERF-03",
+      "severity": "Warning",
+      "title": "Pooled DB connection isn't released if Open/BeginTransaction fails; connection and transaction never disposed",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 73, "lineEnd": 79, "excerpt": "var connection = CreateConnection(...); ... connection.Open(); ... var transaction = connection.BeginTransaction();  (outside the try/finally)" },
+        { "file": "src/PilotUtiltyApi.Repositories/Repositories/TestingRepository.cs", "lineStart": 104, "lineEnd": 107, "excerpt": "finally { connection.Close(); }" }
+      ],
+      "standard": "Azure Well-Architected Framework — AZPE-22",
+      "url": "https://learn.microsoft.com/azure/well-architected/performance-efficiency/optimize-code-infrastructure#use-connection-pooling",
+      "recommendation": "Wrap the connection and transaction in 'await using' declarations immediately after creation so the connection returns to the pool on every path.",
+      "confidence": "Medium",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "S-PERF-02#1",
+      "subject": "Operations / Performance",
+      "subSubject": "Performance",
+      "checkId": "PERF-02",
+      "title": "Async controller → service → repository chain with CancellationToken passed to the Dapper query; no blocking on task results",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/Controllers/TestingController.cs", "lineStart": 51, "lineEnd": 53, "excerpt": "public async Task<IActionResult> ResetTesting(CancellationToken cancellationToken) { var response = await testingService.ResetTestingAsync(cancellationToken);" }
+      ],
+      "standard": "Azure Architecture Center — AZPE-14",
+      "url": "https://learn.microsoft.com/azure/architecture/antipatterns/synchronous-io/#problem-description"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "PERF-01", "subject": "Operations / Performance", "subSubject": "Performance", "severityIfFailed": "Warning", "result": "N/A", "reason": "No repeated reads or cache in request paths; the only data endpoint is a write (reset).", "findingIds": [] },
+    { "checkId": "PERF-02", "subject": "Operations / Performance", "subSubject": "Performance", "severityIfFailed": "Warning", "result": "fail", "reason": "Synchronous DB Open/transaction calls in an async-first request path (AZPE-13).", "findingIds": ["PERF-02#1"] },
+    { "checkId": "PERF-03", "subject": "Operations / Performance", "subSubject": "Performance", "severityIfFailed": "Warning", "result": "fail", "reason": "DB connection not released on early failure paths and never disposed (AZPE-22).", "findingIds": ["PERF-03#1"] },
+    { "checkId": "PERF-04", "subject": "Operations / Performance", "subSubject": "Performance", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "PERF-05", "subject": "Operations / Performance", "subSubject": "Performance", "severityIfFailed": "Information", "result": "N/A", "reason": "No hot-path loops over unbounded data in the reviewed files.", "findingIds": [] },
+    { "checkId": "PERF-06", "subject": "Operations / Performance", "subSubject": "Performance", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "PERF-07", "subject": "Operations / Performance", "subSubject": "Performance", "severityIfFailed": "Warning", "result": "pass", "findingIds": [] },
+    { "checkId": "PERF-08", "subject": "Operations / Performance", "subSubject": "Performance", "severityIfFailed": "Information", "result": "N/A", "reason": "No hosting/scaling config in scope; no static assets or processing pipelines (AZPE-49…53 not applicable).", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "Concurrency model: ASP.NET Core controllers, async-first. AZPE-07 skipped: no multi-instance evidence in scope. AZPE-11 skipped: HTTP API (judged by review-api-design)."
+}

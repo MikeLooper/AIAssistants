@@ -1,0 +1,262 @@
+{
+  "schemaVersion": 1,
+  "runId": "2026-11-09_2035-PilotUtilityApi",
+  "stepId": "27-review-maintainability",
+  "status": "completed",
+  "startedAt": "2026-11-09T20:35:41-07:00",
+  "completedAt": "2026-11-09T21:05:00-07:00",
+  "targetPath": "C:\\Working\\Storage\\Dev\\GitHub\\PilotUtilityApi",
+  "targetGitHead": "59fedaa36172568260fd667103313ee95af13a16",
+  "inputsHash": "sha256:ec93451924d468cdfb852dc232cb27ca0fa6e0cf6afcf2d3995afe59c4e55131",
+  "batchId": "batch-6",
+  "skill": "review-maintainability",
+  "subject": "Maintainability",
+  "findings": [
+    {
+      "id": "MAINT-01#1",
+      "subject": "Maintainability",
+      "subSubject": "README & Onboarding",
+      "checkId": "MAINT-01",
+      "severity": "Warning",
+      "title": "README does not link to CONTRIBUTING.md or the docs/ folder",
+      "evidence": [
+        { "file": "README.md", "lineStart": 5, "lineEnd": 20, "excerpt": "## Table of Contents ... - [Architecture](#architecture) - [License](#license)" },
+        { "file": "README.md", "lineStart": 75, "lineEnd": 75, "excerpt": "└── docs/                                  # Documentation" }
+      ],
+      "standard": "Compliance Reviewer Maintainability Rubric — MR-06",
+      "url": "../../compliance-reviewer/skills/review-maintainability/references/standards/maintainability-rubric.md#mr-06",
+      "recommendation": "Add a 'Contributing' and 'Further documentation' section to the README linking CONTRIBUTING.md and the docs/ content (OpenAPI spec, history).",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "MAINT-02#1",
+      "subject": "Maintainability",
+      "subSubject": "Repository Layout",
+      "checkId": "MAINT-02",
+      "severity": "Information",
+      "title": "Documented structure names PilotUtilityApi.* folders but actual folders are misspelled PilotUtiltyApi.*",
+      "evidence": [
+        { "file": "README.md", "lineStart": 49, "lineEnd": 49, "excerpt": "│   ├── PilotUtilityApi.Domain/           # DTOs and domain models" },
+        { "file": "PilotUtilityApi.sln", "lineStart": 20, "lineEnd": 20, "excerpt": "\"PilotUtilityApi.Shared\", \"src\\PilotUtiltyApi.Shared\\PilotUtilityApi.Shared.csproj\"" }
+      ],
+      "standard": "Compliance Reviewer Maintainability Rubric — MR-10",
+      "url": "../../compliance-reviewer/skills/review-maintainability/references/standards/maintainability-rubric.md#mr-10",
+      "recommendation": "Rename the src/ and test/ folders to PilotUtilityApi.* to match the project names and the documented structure (updating the .sln paths), or correct the README tree.",
+      "confidence": "High",
+      "effort": "Medium"
+    },
+    {
+      "id": "MAINT-02#2",
+      "subject": "Maintainability",
+      "subSubject": "Repository Layout",
+      "checkId": "MAINT-02",
+      "severity": "Information",
+      "title": "Runtime log output (13 files in src/PilotUtiltyApi.Web/logs/) is kept in the source tree",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/appsettings.json", "lineStart": 59, "lineEnd": 61, "excerpt": "\"Name\": \"File\", \"Args\": { \"path\": \"logs/log-.json\"," }
+      ],
+      "standard": "Compliance Reviewer Maintainability Rubric — MR-11",
+      "url": "../../compliance-reviewer/skills/review-maintainability/references/standards/maintainability-rubric.md#mr-11",
+      "recommendation": "Delete the generated log files from the repository, ignore the logs/ folder, and point the Serilog file sink outside the project directory.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "MAINT-03#1",
+      "subject": "Maintainability",
+      "subSubject": "Prerequisites & Configuration",
+      "checkId": "MAINT-03",
+      "severity": "Warning",
+      "title": "Application.OpenTelemetry config keys are not documented",
+      "evidence": [
+        { "file": "src/PilotUtiltyApi.Web/appsettings.Development.json", "lineStart": 27, "lineEnd": 30, "excerpt": "\"OpenTelemetry\": { \"Server\": \"localhost\", \"Port\": 4318 }" },
+        { "file": "README.md", "lineStart": 130, "lineEnd": 130, "excerpt": "The `Application.DataSources` array defines database connections." }
+      ],
+      "standard": "Compliance Reviewer Maintainability Rubric — MR-14",
+      "url": "../../compliance-reviewer/skills/review-maintainability/references/standards/maintainability-rubric.md#mr-14",
+      "recommendation": "Document the Application.OpenTelemetry section (Server, Port: purpose, defaults, whether a collector is required locally) in the README Configuration section.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "MAINT-03#2",
+      "subject": "Maintainability",
+      "subSubject": "Prerequisites & Configuration",
+      "checkId": "MAINT-03",
+      "severity": "Warning",
+      "title": "No setup steps or local stack for the required SQL Server/PostgreSQL database",
+      "evidence": [
+        { "file": "README.md", "lineStart": 84, "lineEnd": 86, "excerpt": "- One of the following databases: - **SQL Server** ... - **PostgreSQL** (version 12+)" }
+      ],
+      "standard": "Compliance Reviewer Maintainability Rubric — MR-16",
+      "url": "../../compliance-reviewer/skills/review-maintainability/references/standards/maintainability-rubric.md#mr-16",
+      "recommendation": "Add steps (or a docker-compose file) to create the NorthWind database, the DevUser login, the pilot schema and the tables the reset script targets.",
+      "confidence": "Medium",
+      "effort": "Medium"
+    },
+    {
+      "id": "MAINT-06#1",
+      "subject": "Maintainability",
+      "subSubject": "Contributing Guide",
+      "checkId": "MAINT-06",
+      "severity": "Information",
+      "title": "CONTRIBUTING gives no pre-submit build, format or test commands",
+      "evidence": [
+        { "file": "CONTRIBUTING.md", "lineStart": 10, "lineEnd": 11, "excerpt": "1. Ensure any install or build dependencies are removed before the end of the layer when doing a build." }
+      ],
+      "standard": "Compliance Reviewer Maintainability Rubric — MR-25",
+      "url": "../../compliance-reviewer/skills/review-maintainability/references/standards/maintainability-rubric.md#mr-25",
+      "recommendation": "Replace the generic container boilerplate with the required pre-PR steps, e.g. `dotnet format --verify-no-changes`, `dotnet build` and `dotnet test`.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "MAINT-06#2",
+      "subject": "Maintainability",
+      "subSubject": "Contributing Guide",
+      "checkId": "MAINT-06",
+      "severity": "Information",
+      "title": "CONTRIBUTING does not state coding conventions or point to .editorconfig",
+      "evidence": [
+        { "file": "CONTRIBUTING.md", "lineStart": 8, "lineEnd": 18, "excerpt": "## Pull Request Process" }
+      ],
+      "standard": "Compliance Reviewer Maintainability Rubric — MR-26",
+      "url": "../../compliance-reviewer/skills/review-maintainability/references/standards/maintainability-rubric.md#mr-26",
+      "recommendation": "Add a 'Coding conventions' section referencing .editorconfig and the .github/instructions files.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "MAINT-07#1",
+      "subject": "Maintainability",
+      "subSubject": "Change History",
+      "checkId": "MAINT-07",
+      "severity": "Information",
+      "title": "No CHANGELOG or release notes although the project is versioned with SemVer",
+      "evidence": [
+        { "file": "Directory.Build.props", "lineStart": 3, "lineEnd": 3, "excerpt": "<Version>1.0.1</Version>" },
+        { "file": "CONTRIBUTING.md", "lineStart": 15, "lineEnd": 16, "excerpt": "Increase the version numbers ... The versioning scheme we use is [SemVer](http://semver.org/)." }
+      ],
+      "standard": "Compliance Reviewer Maintainability Rubric — MR-27",
+      "url": "../../compliance-reviewer/skills/review-maintainability/references/standards/maintainability-rubric.md#mr-27",
+      "recommendation": "Add a CHANGELOG.md with dated per-version entries (starting at 1.0.1) and link it from the README.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "MAINT-08#1",
+      "subject": "Maintainability",
+      "subSubject": "Architecture Docs",
+      "checkId": "MAINT-08",
+      "severity": "Information",
+      "title": "Significant decisions (Dapper, multi-database, layering) are not recorded with context and consequences",
+      "evidence": [
+        { "file": ".github/instructions/architecture.instructions.md", "lineStart": 35, "lineEnd": 35, "excerpt": "- Use Dapper persistence technology." }
+      ],
+      "standard": "Compliance Reviewer Maintainability Rubric — MR-31",
+      "url": "../../compliance-reviewer/skills/review-maintainability/references/standards/maintainability-rubric.md#mr-31",
+      "recommendation": "Add short ADRs under docs/adr/ for key choices (Dapper over EF, dual SQL Server/PostgreSQL support, layer split) with context and consequences.",
+      "confidence": "Medium",
+      "effort": "Small"
+    },
+    {
+      "id": "MAINT-09#1",
+      "subject": "Maintainability",
+      "subSubject": "Docs Accuracy",
+      "checkId": "MAINT-09",
+      "severity": "Warning",
+      "title": "README paths use src/PilotUtilityApi.Web, but the folder is src/PilotUtiltyApi.Web",
+      "evidence": [
+        { "file": "README.md", "lineStart": 112, "lineEnd": 117, "excerpt": "Configure your database connection in `src/PilotUtilityApi.Web/appsettings.json` ... cd src/PilotUtilityApi.Web" },
+        { "file": "README.md", "lineStart": 126, "lineEnd": 126, "excerpt": "The application configuration is located in `src/PilotUtilityApi.Web/appsettings.json`." },
+        { "file": "README.md", "lineStart": 227, "lineEnd": 227, "excerpt": "1. Open `src/PilotUtilityApi.Web/appsettings.json`" }
+      ],
+      "standard": "Compliance Reviewer Maintainability Rubric — MR-33",
+      "url": "../../compliance-reviewer/skills/review-maintainability/references/standards/maintainability-rubric.md#mr-33",
+      "recommendation": "Fix the paths to src/PilotUtiltyApi.Web (or rename the folder) so the documented `cd` command and file locations work.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "MAINT-09#2",
+      "subject": "Maintainability",
+      "subSubject": "Docs Accuracy",
+      "checkId": "MAINT-09",
+      "severity": "Warning",
+      "title": "Documented URLs/ports (58701, 58401, 7000, https) don't match launchSettings (http://localhost:58301)",
+      "evidence": [
+        { "file": "README.md", "lineStart": 121, "lineEnd": 122, "excerpt": "https://localhost:58701/swagger ... https://localhost:58401/healthcheck" },
+        { "file": "README.md", "lineStart": 258, "lineEnd": 258, "excerpt": "curl -X POST https://localhost:7000/testing/reset" },
+        { "file": "src/PilotUtiltyApi.Web/Properties/launchSettings.json", "lineStart": 12, "lineEnd": 12, "excerpt": "\"applicationUrl\": \"http://localhost:58301\"" }
+      ],
+      "standard": "Compliance Reviewer Maintainability Rubric — MR-33",
+      "url": "../../compliance-reviewer/skills/review-maintainability/references/standards/maintainability-rubric.md#mr-33",
+      "recommendation": "Use the launch profile's URL (http://localhost:58301) consistently in all README examples.",
+      "confidence": "High",
+      "effort": "Small"
+    },
+    {
+      "id": "MAINT-09#3",
+      "subject": "Maintainability",
+      "subSubject": "Docs Accuracy",
+      "checkId": "MAINT-09",
+      "severity": "Warning",
+      "title": "CONTRIBUTING links README.md#copilot-customization, a section that does not exist",
+      "evidence": [
+        { "file": "CONTRIBUTING.md", "lineStart": 14, "lineEnd": 14, "excerpt": "review the customization notes in [README.md](README.md#copilot-customization)." }
+      ],
+      "standard": "Compliance Reviewer Maintainability Rubric — MR-36",
+      "url": "../../compliance-reviewer/skills/review-maintainability/references/standards/maintainability-rubric.md#mr-36",
+      "recommendation": "Add a 'Copilot Customization' README section describing .github/instructions, or repoint the link at .github/copilot-instructions.md.",
+      "confidence": "High",
+      "effort": "Small"
+    }
+  ],
+  "strengths": [
+    {
+      "id": "MAINT-01-S1",
+      "subject": "Maintainability",
+      "subSubject": "README & Onboarding",
+      "checkId": "MAINT-01",
+      "title": "README states purpose and gives fenced, copy-pasteable restore/build/run/test commands",
+      "evidence": [ { "file": "README.md", "lineStart": 100, "lineEnd": 108, "excerpt": "dotnet restore ... dotnet build" } ],
+      "standard": "Compliance Reviewer Maintainability Rubric — MR-03",
+      "url": "../../compliance-reviewer/skills/review-maintainability/references/standards/maintainability-rubric.md#mr-03"
+    },
+    {
+      "id": "MAINT-03-S1",
+      "subject": "Maintainability",
+      "subSubject": "Prerequisites & Configuration",
+      "checkId": "MAINT-03",
+      "title": "DataSources keys documented in a table; sample settings use password placeholders",
+      "evidence": [ { "file": "src/PilotUtiltyApi.Web/appsettings.Development.json", "lineStart": 10, "lineEnd": 10, "excerpt": "\"Password\": \"<DevUser password>\"," } ],
+      "standard": "Compliance Reviewer Maintainability Rubric — MR-15",
+      "url": "../../compliance-reviewer/skills/review-maintainability/references/standards/maintainability-rubric.md#mr-15"
+    },
+    {
+      "id": "MAINT-10-S1",
+      "subject": "Maintainability",
+      "subSubject": "License & Conduct",
+      "checkId": "MAINT-10",
+      "title": "MIT license stated consistently (LICENSE, README, OpenApi config) with a Code of Conduct in CONTRIBUTING",
+      "evidence": [ { "file": "LICENSE", "lineStart": 1, "lineEnd": 1, "excerpt": "MIT License" } ],
+      "standard": "Compliance Reviewer Maintainability Rubric — MR-37",
+      "url": "../../compliance-reviewer/skills/review-maintainability/references/standards/maintainability-rubric.md#mr-37"
+    }
+  ],
+  "checkResults": [
+    { "checkId": "MAINT-01", "subject": "Maintainability", "subSubject": "README & Onboarding", "severityIfFailed": "Warning", "result": "fail", "reason": "README covers purpose, setup, run and test but does not link CONTRIBUTING or docs (MR-06).", "findingIds": ["MAINT-01#1"] },
+    { "checkId": "MAINT-02", "subject": "Maintainability", "subSubject": "Repository Layout", "severityIfFailed": "Information", "result": "fail", "reason": "Folder names diverge from documented/project names (MR-10) and runtime logs sit in the source tree (MR-11).", "findingIds": ["MAINT-02#1", "MAINT-02#2"] },
+    { "checkId": "MAINT-03", "subject": "Maintainability", "subSubject": "Prerequisites & Configuration", "severityIfFailed": "Warning", "result": "fail", "reason": "OpenTelemetry keys undocumented (MR-14) and no database setup steps or local stack (MR-16).", "findingIds": ["MAINT-03#1", "MAINT-03#2"] },
+    { "checkId": "MAINT-04", "subject": "Maintainability", "subSubject": "Technical Debt", "severityIfFailed": "Information", "result": "N/A", "reason": "No debt markers or warning suppressions in the 3 reviewed source files.", "findingIds": [] },
+    { "checkId": "MAINT-05", "subject": "Maintainability", "subSubject": "Deprecated Code", "severityIfFailed": "Information", "result": "N/A", "reason": "No deprecated, legacy-named or versioned copies in the reviewed files.", "findingIds": [] },
+    { "checkId": "MAINT-06", "subject": "Maintainability", "subSubject": "Contributing Guide", "severityIfFailed": "Information", "result": "fail", "reason": "CONTRIBUTING has a PR process but no pre-submit commands (MR-25) or conventions (MR-26).", "findingIds": ["MAINT-06#1", "MAINT-06#2"] },
+    { "checkId": "MAINT-07", "subject": "Maintainability", "subSubject": "Change History", "severityIfFailed": "Information", "result": "fail", "reason": "Versioned (1.0.1, SemVer) but no CHANGELOG or release notes (MR-27).", "findingIds": ["MAINT-07#1"] },
+    { "checkId": "MAINT-08", "subject": "Maintainability", "subSubject": "Architecture Docs", "severityIfFailed": "Information", "result": "fail", "reason": "README architecture overview exists, but no recorded decisions with context (MR-31).", "findingIds": ["MAINT-08#1"] },
+    { "checkId": "MAINT-09", "subject": "Maintainability", "subSubject": "Docs Accuracy", "severityIfFailed": "Warning", "result": "fail", "reason": "Wrong Web project paths and ports (MR-33) and a broken README anchor link (MR-36).", "findingIds": ["MAINT-09#1", "MAINT-09#2", "MAINT-09#3"] },
+    { "checkId": "MAINT-10", "subject": "Maintainability", "subSubject": "License & Conduct", "severityIfFailed": "Information", "result": "pass", "findingIds": [] }
+  ],
+  "urlsFetched": [],
+  "notes": "scope: 3 reviewed source files, not repo-wide. Opened src/PilotUtiltyApi.Web/appsettings.json and Properties/launchSettings.json to confirm documented keys, paths and ports (MAINT-09). Also observed: README example OpenApi Version 0.1.1 vs 1.0.1 in appsettings.json/Directory.Build.props; LICENSE copyright holder 'Mikel' vs author 'Michael Looper'."
+}

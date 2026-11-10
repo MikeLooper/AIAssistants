@@ -1,0 +1,191 @@
+{
+  "$comment": "Source pins for check_source_drift.py (maintainers only; never used during a review). Pins copied from the standards file headers must match them; 'baseline' marks values recorded by the script.",
+  "skill": "review-observability",
+  "checks": [
+    {
+      "id": "learn-oe-check",
+      "file": "azure-well-architected-observability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/operational-excellence/checklist",
+      "msDate": "2026-02-11"
+    },
+    {
+      "id": "learn-re-check",
+      "file": "azure-well-architected-observability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/checklist",
+      "msDate": "2023-11-15"
+    },
+    {
+      "id": "learn-oe-obs",
+      "file": "azure-well-architected-observability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/operational-excellence/observability",
+      "msDate": "2026-10-24"
+    },
+    {
+      "id": "learn-dg-mon",
+      "file": "azure-well-architected-observability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/design-guides/monitoring",
+      "msDate": "2026-02-18"
+    },
+    {
+      "id": "learn-dg-hm",
+      "file": "azure-well-architected-observability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/design-guides/health-modeling",
+      "msDate": "2026-02-11"
+    },
+    {
+      "id": "learn-re-met",
+      "file": "azure-well-architected-observability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/metrics",
+      "msDate": "2024-08-16"
+    },
+    {
+      "id": "learn-re-mon",
+      "file": "azure-well-architected-observability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/monitoring",
+      "msDate": "2026-10-24"
+    },
+    {
+      "id": "learn-pat-hem",
+      "file": "azure-well-architected-observability.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/architecture/patterns/health-endpoint-monitoring",
+      "msDate": "2026-09-24"
+    },
+    {
+      "id": "otel-c-logs",
+      "file": "opentelemetry-observability.md",
+      "method": "regex",
+      "url": "https://opentelemetry.io/docs/concepts/signals/logs/",
+      "pattern": "opentelemetry\\.io/commit/([0-9a-f]{7})",
+      "pinned": "c161165"
+    },
+    {
+      "id": "otel-c-traces",
+      "file": "opentelemetry-observability.md",
+      "method": "regex",
+      "url": "https://opentelemetry.io/docs/concepts/signals/traces/",
+      "pattern": "opentelemetry\\.io/commit/([0-9a-f]{7})",
+      "pinned": "6bf06dd"
+    },
+    {
+      "id": "otel-c-metrics",
+      "file": "opentelemetry-observability.md",
+      "method": "regex",
+      "url": "https://opentelemetry.io/docs/concepts/signals/metrics/",
+      "pattern": "opentelemetry\\.io/commit/([0-9a-f]{7})",
+      "pinned": "6524d48"
+    },
+    {
+      "id": "otel-c-prop",
+      "file": "opentelemetry-observability.md",
+      "method": "regex",
+      "url": "https://opentelemetry.io/docs/concepts/context-propagation/",
+      "pattern": "opentelemetry\\.io/commit/([0-9a-f]{7})",
+      "pinned": "89a269b"
+    },
+    {
+      "id": "otel-c-res",
+      "file": "opentelemetry-observability.md",
+      "method": "regex",
+      "url": "https://opentelemetry.io/docs/concepts/resources/",
+      "pattern": "opentelemetry\\.io/commit/([0-9a-f]{7})",
+      "pinned": "8ada5a9"
+    },
+    {
+      "id": "otel-c-samp",
+      "file": "opentelemetry-observability.md",
+      "method": "regex",
+      "url": "https://opentelemetry.io/docs/concepts/sampling/",
+      "pattern": "opentelemetry\\.io/commit/([0-9a-f]{7})",
+      "pinned": "6b2e90b"
+    },
+    {
+      "id": "otel-c-inst",
+      "file": "opentelemetry-observability.md",
+      "method": "regex",
+      "url": "https://opentelemetry.io/docs/concepts/instrumentation/",
+      "pattern": "opentelemetry\\.io/commit/([0-9a-f]{7})",
+      "pinned": "58e6847"
+    },
+    {
+      "id": "otel-c-code",
+      "file": "opentelemetry-observability.md",
+      "method": "regex",
+      "url": "https://opentelemetry.io/docs/concepts/instrumentation/code-based/",
+      "pattern": "opentelemetry\\.io/commit/([0-9a-f]{7})",
+      "pinned": "8d7aa29"
+    },
+    {
+      "id": "otel-c-zero",
+      "file": "opentelemetry-observability.md",
+      "method": "regex",
+      "url": "https://opentelemetry.io/docs/concepts/instrumentation/zero-code/",
+      "pattern": "opentelemetry\\.io/commit/([0-9a-f]{7})",
+      "pinned": "d1ef521"
+    },
+    {
+      "id": "otel-c-semconv",
+      "file": "opentelemetry-observability.md",
+      "method": "regex",
+      "url": "https://opentelemetry.io/docs/concepts/semantic-conventions/",
+      "pattern": "opentelemetry\\.io/commit/([0-9a-f]{7})",
+      "pinned": "6b6b228"
+    },
+    {
+      "id": "otel-sdk-gen",
+      "file": "opentelemetry-observability.md",
+      "method": "regex",
+      "url": "https://opentelemetry.io/docs/languages/sdk-configuration/general/",
+      "pattern": "opentelemetry\\.io/commit/([0-9a-f]{7})",
+      "pinned": "c8d0756"
+    },
+    {
+      "id": "otel-sdk-otlp",
+      "file": "opentelemetry-observability.md",
+      "method": "regex",
+      "url": "https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/",
+      "pattern": "opentelemetry\\.io/commit/([0-9a-f]{7})",
+      "pinned": "2cde6bd"
+    },
+    {
+      "id": "otel-col",
+      "file": "opentelemetry-observability.md",
+      "method": "regex",
+      "url": "https://opentelemetry.io/docs/collector/",
+      "pattern": "opentelemetry\\.io/commit/([0-9a-f]{7})",
+      "pinned": "17662c2"
+    },
+    {
+      "id": "otel-sec",
+      "file": "opentelemetry-observability.md",
+      "method": "regex",
+      "url": "https://opentelemetry.io/docs/security/handling-sensitive-data/",
+      "pattern": "opentelemetry\\.io/commit/([0-9a-f]{7})",
+      "pinned": "4edfbfc"
+    },
+    {
+      "id": "otel-semconv-version",
+      "file": "opentelemetry-observability.md",
+      "method": "regex",
+      "url": "https://opentelemetry.io/docs/specs/semconv/",
+      "pattern": "semantic conventions (\\d+\\.\\d+\\.\\d+)",
+      "pinned": "1.45.0",
+      "note": "Read the changelog for HTTP, database, messaging, exception and resource conventions."
+    },
+    {
+      "id": "otel-spec-version",
+      "file": "opentelemetry-observability.md",
+      "method": "regex",
+      "url": "https://opentelemetry.io/docs/specs/otel/",
+      "pattern": "OpenTelemetry Specification (\\d+\\.\\d+\\.\\d+)",
+      "pinned": "1.62.0"
+    }
+  ]
+}

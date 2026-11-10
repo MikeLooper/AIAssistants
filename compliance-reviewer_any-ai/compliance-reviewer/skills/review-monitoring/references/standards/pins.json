@@ -1,0 +1,99 @@
+{
+  "$comment": "Source pins for check_source_drift.py (maintainers only; never used during a review). Pins copied from the standards file headers must match them; 'baseline' marks values recorded by the script.",
+  "skill": "review-monitoring",
+  "checks": [
+    {
+      "id": "learn-oe-check",
+      "file": "azure-well-architected-monitoring.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/operational-excellence/checklist",
+      "msDate": "2026-02-11"
+    },
+    {
+      "id": "learn-re-check",
+      "file": "azure-well-architected-monitoring.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/checklist",
+      "msDate": "2023-11-15"
+    },
+    {
+      "id": "learn-oe-obs",
+      "file": "azure-well-architected-monitoring.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/operational-excellence/observability",
+      "msDate": "2026-10-24"
+    },
+    {
+      "id": "learn-re-mon",
+      "file": "azure-well-architected-monitoring.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/reliability/monitoring",
+      "msDate": "2026-10-24"
+    },
+    {
+      "id": "learn-dg-mon",
+      "file": "azure-well-architected-monitoring.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/design-guides/monitoring",
+      "msDate": "2026-02-18"
+    },
+    {
+      "id": "learn-dg-hm",
+      "file": "azure-well-architected-monitoring.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/design-guides/health-modeling",
+      "msDate": "2026-02-11"
+    },
+    {
+      "id": "learn-pe-mon",
+      "file": "azure-well-architected-monitoring.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/performance-efficiency/monitoring",
+      "msDate": "2026-04-20"
+    },
+    {
+      "id": "learn-se-mon",
+      "file": "azure-well-architected-monitoring.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/well-architected/security/monitor-threats",
+      "msDate": "2024-02-13",
+      "gitCommit": "bb2e40b7f88c"
+    },
+    {
+      "id": "sre-mds",
+      "file": "google-sre-monitoring-alerting.md",
+      "method": "text-hash",
+      "extract": "ids",
+      "url": "https://sre.google/sre-book/monitoring-distributed-systems/",
+      "pinned": "c7e2d968702bf067",
+      "baseline": "2026-11-09"
+    },
+    {
+      "id": "sre-pa",
+      "file": "google-sre-monitoring-alerting.md",
+      "method": "text-hash",
+      "extract": "ids",
+      "url": "https://sre.google/sre-book/practical-alerting/",
+      "pinned": "6c8b09e57ed0311d",
+      "baseline": "2026-11-09"
+    },
+    {
+      "id": "sre-wb-mon",
+      "file": "google-sre-monitoring-alerting.md",
+      "method": "text-hash",
+      "extract": "ids",
+      "url": "https://sre.google/workbook/monitoring/",
+      "pinned": "a5ceceac4658690b",
+      "baseline": "2026-11-09"
+    },
+    {
+      "id": "sre-wb-slo",
+      "file": "google-sre-monitoring-alerting.md",
+      "method": "text-hash",
+      "extract": "ids",
+      "url": "https://sre.google/workbook/alerting-on-slos/",
+      "pinned": "b8de06b3a5a043d9",
+      "baseline": "2026-11-09"
+    }
+  ]
+}
