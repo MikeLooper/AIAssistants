@@ -38,6 +38,11 @@ TOOLS = ("claude", "copilot")
 LANGS = ("dotNET", "java", "python")
 KINDS = ("apis", "uis")
 BUILD_OUTPUT_DIRS = ("bin", "obj", "target", "__pycache__", ".venv")
+# test/Directory.Build.props sends MSBuild output for every project under test/ here, outside the apps.
+MSBUILD_OUTPUT_ROOT = TEST_DIR / ".build-output"
+# preflight(): IDE tooling can recreate build output right after it is deleted, so clean and re-check.
+PREFLIGHT_ATTEMPTS = 5
+PREFLIGHT_SETTLE_SECONDS = 2.0
 
 EXIT_PASS, EXIT_FAIL, EXIT_ERROR = 0, 1, 2
 
@@ -253,14 +258,133 @@ class Invocation:
     command: list[str] = field(default_factory=list)
 
 
-def preflight(key: AppKey, allow_build_output: bool) -> str | None:
+def find_build_output(app_dir: Path) -> list[Path]:
+    """Build-output folders under app_dir, outermost first (nested ones inside them are left out)."""
+    found = sorted({p for d in BUILD_OUTPUT_DIRS for p in app_dir.rglob(d) if p.is_dir()}, key=lambda p: len(p.parts))
+    outer: list[Path] = []
+    for p in found:
+        if not any(o in p.parents for o in outer):
+            outer.append(p)
+    return outer
+
+
+def clean_build_output(app_dir: Path) -> list[str]:
+    """Delete every build-output folder under app_dir; return their paths relative to app_dir.
+
+    Folders that can't be deleted right now (for example, locked by an IDE) are left for preflight()."""
+    removed = []
+    for p in find_build_output(app_dir):
+        shutil.rmtree(p, ignore_errors=True)
+        if not p.exists():
+            removed.append(p.relative_to(app_dir).as_posix())
+    return removed
+
+
+def redirected_output_dir(project_dir: Path) -> Path | None:
+    """Where test/Directory.Build.props sends MSBuild output for project_dir (None outside test/)."""
+    try:
+        return MSBUILD_OUTPUT_ROOT / project_dir.resolve().relative_to(TEST_DIR)
+    except ValueError:
+        return None
+
+
+def build_steps(key: AppKey) -> list[list[str]]:
+    """Commands that build the app from scratch, run in the app directory."""
+    if key.lang == "dotNET":
+        return [["dotnet", "build", "--nologo", "-v", "q"]]
+    if key.lang == "java":
+        return [["mvn", "-B", "-q", "clean", "package", "-DskipTests"]]
+    # Python has no build step: byte-compile every file so syntax errors stop the test.
+    return [[sys.executable, "-m", "compileall", "-q", "."]]
+
+
+def _build_env() -> dict:
+    env = dict(os.environ)
+    # Behind a TLS-inspecting proxy Maven fails with "PKIX path building failed" unless Java trusts the
+    # Windows certificate store. Default to it on Windows; an explicit MAVEN_OPTS setting wins.
+    if os.name == "nt" and "trustStoreType" not in env.get("MAVEN_OPTS", ""):
+        env["MAVEN_OPTS"] = (env.get("MAVEN_OPTS", "") + " -Djavax.net.ssl.trustStoreType=Windows-ROOT").strip()
+    return env
+
+
+def fresh_build(key: AppKey, log_file: Path, timeout_min: float, work_dir: Path) -> tuple[str | None, dict]:
+    """Delete old build output in the app, then build a fresh copy of its source in work_dir.
+
+    The build runs in a copy so its output never lands in the app directory the reviewer reads (an in-place
+    .NET build also makes IDE tooling regenerate bin/obj there). The copy is deleted afterwards.
+    Returns (error or None, build info for the result file)."""
+    info: dict = {"removedBefore": clean_build_output(key.app_dir), "commands": [], "log": str(log_file)}
+    started = time.time()
+    log = []
+    error = None
+    if work_dir.exists():
+        shutil.rmtree(work_dir)
+    shutil.copytree(key.app_dir, work_dir, ignore=shutil.ignore_patterns(*BUILD_OUTPUT_DIRS))
+    for step in build_steps(key):
+        exe = shutil.which(step[0])
+        if not exe:
+            error = (f"'{step[0]}' not found on PATH, so {key.app_rel} can't be built "
+                     "(see the prerequisites in test/README.md, or pass --no-build).")
+            break
+        info["commands"].append(subprocess.list2cmdline(step))
+        try:
+            proc = subprocess.run([exe] + step[1:], cwd=work_dir, env=_build_env(), capture_output=True, text=True,
+                                  encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL,
+                                  timeout=timeout_min * 60)
+            rc, out, err = proc.returncode, proc.stdout, proc.stderr
+        except subprocess.TimeoutExpired as e:
+            rc, out, err = None, e.stdout or "", f"timed out after {timeout_min} min"
+        log.append(f"$ {subprocess.list2cmdline(step)}\n# exit code: {rc}\n\n## stdout\n{out}\n\n## stderr\n{err}\n")
+        if rc != 0:
+            error = f"build failed ({subprocess.list2cmdline(step)}, exit code {rc}); see {log_file}"
+            break
+    info["durationSeconds"] = round(time.time() - started, 1)
+    shutil.rmtree(work_dir, ignore_errors=True)
+    redirected = redirected_output_dir(work_dir)
+    if redirected:
+        shutil.rmtree(redirected, ignore_errors=True)
+        for parent in redirected.parents:  # drop the now-empty folders up to .build-output
+            if parent == MSBUILD_OUTPUT_ROOT or MSBUILD_OUTPUT_ROOT not in parent.parents:
+                break
+            try:
+                parent.rmdir()
+            except OSError:
+                break
+    try:
+        work_dir.parent.rmdir()  # only succeeds once it's empty (the last app of a test_all session)
+    except OSError:
+        pass
+    log_file.write_text("\n".join(log) or "(no build command ran)\n", encoding="utf-8")
+    info["status"] = "failed" if error else "succeeded"
+    return error, info
+
+
+def preflight(key: AppKey, attempts: int = PREFLIGHT_ATTEMPTS,
+              settle_seconds: float = PREFLIGHT_SETTLE_SECONDS) -> str | None:
+    """Make sure the app holds no build output just before the review starts.
+
+    IDE tooling (VS Code's C# extension) can restore a project in place as soon as its obj/ folder is
+    deleted. test/Directory.Build.props sends that output elsewhere, and as a second line of defence this
+    deletes whatever reappears, waits for things to settle and checks again, so no person has to step in."""
     if not key.app_dir.is_dir():
         return f"app directory not found: {key.app_dir}"
-    present = [str(p.relative_to(key.app_dir)) for d in BUILD_OUTPUT_DIRS for p in key.app_dir.rglob(d) if p.is_dir()]
-    if present and not allow_build_output:
-        return ("build output present (would add findings outside the answer key; see test/README.md): "
-                + ", ".join(sorted(present)) + ". Delete it or pass --allow-build-output.")
-    return None
+    present: list[str] = []
+    for attempt in range(max(1, attempts)):
+        present = [p.relative_to(key.app_dir).as_posix() for p in find_build_output(key.app_dir)]
+        if not present:
+            if attempt == 0:
+                return None
+            time.sleep(settle_seconds)  # it was recreated before: confirm it stays gone
+            if not find_build_output(key.app_dir):
+                return None
+            continue
+        print(f"{key.name}: build output reappeared ({', '.join(present)}); deleting it "
+              f"(attempt {attempt + 1}/{attempts}) ...", flush=True)
+        clean_build_output(key.app_dir)
+        time.sleep(settle_seconds)
+    present = [p.relative_to(key.app_dir).as_posix() for p in find_build_output(key.app_dir)] or present
+    return (f"build output kept reappearing in {key.app_rel} after {attempts} clean-ups (would add findings "
+            "outside the answer key; see test/README.md): " + ", ".join(present) + ".")
 
 
 def build_command(tool: str, key: AppKey, out_file: Path, model: str | None, extra: list[str]) -> list[str]:
@@ -460,6 +584,11 @@ def render_markdown(r: dict) -> str:
               f"- Run: `{r.get('runId')}`" + (f" — report: {r['reportFile']}" if r.get("reportFile") else ""),
               f"- Reviewer score: {r.get('overallScore')} ({r.get('overallBand')})",
               f"- Duration: {r.get('durationSeconds', 0):.0f} s" + (f", cost ${r['costUsd']:.2f}" if r.get("costUsd") else "")]
+    if r.get("build"):
+        b = r["build"]
+        lines.append(f"- Fresh build: {b['status']}"
+                     + (f" ({'; '.join(b['commands'])}, {b['durationSeconds']:.0f} s)" if b.get("commands") else "")
+                     + (f"; old build output deleted: {', '.join(b['removedBefore'])}" if b.get("removedBefore") else ""))
     if r.get("error"):
         lines += ["", f"**Error:** {r['error']}"]
     if s:
@@ -507,8 +636,10 @@ def add_common_args(p: argparse.ArgumentParser) -> None:
                                        "heartbeat every SEC seconds (default 30; 0 = quiet).")
     p.add_argument("--model", help="Model passed to the AI tool's --model option.")
     p.add_argument("--results-dir", type=Path, default=DEFAULT_RESULTS_DIR, help="Where results are written.")
-    p.add_argument("--allow-build-output", action="store_true",
-                   help="Run even if bin/obj/target/__pycache__/.venv exist in the app.")
+    p.add_argument("--no-build", action="store_true",
+                   help="Skip the fresh build. Old build output (bin/obj/target/__pycache__/.venv) is still deleted.")
+    p.add_argument("--build-timeout", type=float, default=float(os.environ.get("COMPLIANCE_TEST_BUILD_TIMEOUT_MIN", 15)),
+                   metavar="MIN", help="Time limit for each build command, in minutes (default 15).")
     p.add_argument("--dry-run", action="store_true", help="Print the command that would run and exit.")
     p.add_argument("--tool-arg", action="append", default=[], metavar="ARG",
                    help="Extra argument for the AI tool CLI (repeatable), e.g. --tool-arg=--max-budget-usd --tool-arg=5")
@@ -525,12 +656,18 @@ def run_test(kind: str, lang: str, args: argparse.Namespace, session_dir: Path |
         tool, reason = "n/a", "--score-only"
     else:
         tool, reason = detect_tool(args.tool)
-    out_dir = (session_dir or (args.results_dir / f"{stamp}-{tool}")).resolve()
+    folder_tag = "score-only" if getattr(args, "score_only", None) else tool  # "n/a" would nest folders
+    out_dir = (session_dir or (args.results_dir / f"{stamp}-{folder_tag}")).resolve()
     result = {"app": key.name, "target": key.app_rel, "tool": tool, "toolReason": reason,
               "minFoundPct": min_found, "startedAt": dt.datetime.now().isoformat(timespec="seconds")}
 
     if args.dry_run:
         cmd = build_command(tool, key, out_dir / f"{key.name}-report.md", args.model, args.tool_arg)
+        print(f"{key.name}: delete build output ({', '.join(BUILD_OUTPUT_DIRS)}) in {key.app_dir}")
+        if not args.no_build:
+            for step in build_steps(key):
+                print(f"{key.name}: build a copy of the source in {out_dir / 'build' / key.name}\n  "
+                      + subprocess.list2cmdline(step))
         print(f"{key.name}: tool={tool} ({reason})\n  cwd: {REPO_ROOT}\n  " + subprocess.list2cmdline(cmd))
         return {**result, "verdict": "dry-run"}
 
@@ -543,7 +680,18 @@ def run_test(kind: str, lang: str, args: argparse.Namespace, session_dir: Path |
             a = json.loads(agg.read_text(encoding="utf-8-sig"))
             inv.overall_score, inv.overall_band = a.get("overallScore"), a.get("overallBand")
     else:
-        problem = preflight(key, args.allow_build_output)
+        problem = None
+        if not key.app_dir.is_dir():
+            problem = f"app directory not found: {key.app_dir}"
+        elif args.no_build:
+            result["build"] = {"status": "skipped (--no-build)", "removedBefore": clean_build_output(key.app_dir)}
+        else:
+            print(f"{key.name}: deleting old build output and building {key.app_rel} ...", flush=True)
+            problem, result["build"] = fresh_build(key, out_dir / f"{key.name}-build.log", args.build_timeout,
+                                                   out_dir / "build" / key.name)
+            if not problem:
+                print(f"{key.name}: build succeeded in {result['build']['durationSeconds']:.0f} s", flush=True)
+        problem = problem or preflight(key)
         if problem:
             result.update(verdict="error", error=problem)
             return _finish(result, out_dir, key)

@@ -27,8 +27,8 @@ The orchestrator marks this subject N/A when `iacFound` is false.
 ## Procedure
 
 1. Load `references/checklist.md`, `references/sources.md` and the three standards files.
-2. Note whether the IaC is Azure (`*.bicep`, ARM deploymentTemplate JSON, or Terraform `azurerm` provider). Scope `A`
-   elements apply only to Azure IaC; otherwise skip them ("Azure-specific element; target IaC is not Azure").
+2. Every active element is generic and applies to any cloud, Kubernetes or on-premises IaC; judge each one by the
+   cloud-neutral requirement, using the target's own resource types as evidence. Retired rows are not evaluated.
 3. For each active check (COST-01…COST-03, COST-05…COST-10; COST-04 is retired and is not written to
    `checkResults`), evaluate only the elements it lists whose "Applies when" condition holds in the subject's files.
    If none apply, mark the check N/A with that reason (e.g. COST-08 when no backup/replication config exists;

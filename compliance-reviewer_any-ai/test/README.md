@@ -45,7 +45,7 @@ curl -X DELETE "http://localhost:5100/todos/1?key=todo-api-key-7f3c9e2a1b"
 
 If Maven fails with `PKIX path building failed` on a machine behind a TLS-inspecting proxy, set `MAVEN_OPTS=-Djavax.net.ssl.trustStoreType=Windows-ROOT` so Java uses the Windows certificate store.
 
-The [.gitignore](.gitignore) here excludes `bin/`, `obj/`, `target/`, `__pycache__/`, `.venv/` and `*.log`. Delete those folders before a review: the reviewer judges working files, so build output would add findings (for example SL-12) that aren't part of the answer key.
+The [.gitignore](.gitignore) here excludes `bin/`, `obj/`, `target/`, `__pycache__/`, `.venv/` and `*.log`. Delete those folders before a manual review: the reviewer judges working files, so build output would add findings (for example SL-12) that aren't part of the answer key. The automated tests do this for you (see [Fresh build](#fresh-build)).
 
 ## Reviewing an app
 
@@ -85,9 +85,28 @@ The shared logic is in [logic/harness.py](logic/harness.py). [logic/answer_key.j
 - The CLI of the AI tool you test with, signed in:
   - **Claude Code**: `claude`.
   - **GitHub Copilot CLI**: `copilot` (`npm install -g @github/copilot`). The `copilot` shim that VS Code puts on the path isn't enough on its own.
-- No build output in the apps (`bin/`, `obj/`, `target/`, `__pycache__/`, `.venv/`). A test stops before reviewing if it finds any, because those folders add findings outside the answer key. Delete them, or pass `--allow-build-output` to run anyway.
+- The app's build tools on the path, because each test builds its app first (see [Fresh build](#fresh-build)): the .NET SDK (`dotnet`) for the C# apps and Maven (`mvn`) with a JDK for the Java apps. The Python apps need only the Python that runs the test. Pass `--no-build` to skip the build when a tool isn't installed.
 
-The app SDKs (.NET, JDK, Maven) aren't needed: the reviewer only reads the files.
+### Fresh build
+
+Before each review, a test:
+
+1. deletes any old build output in the app (`bin/`, `obj/`, `target/`, `__pycache__/`, `.venv/`), because the reviewer would otherwise report findings on it that aren't in the answer key,
+2. copies the app's source to `build/<app>` in the results folder and builds that copy from scratch, so the review is of code that compiles as it is now:
+   - C#: `dotnet build --nologo -v q`
+   - Java: `mvn -B -q clean package -DskipTests`. On Windows, if `MAVEN_OPTS` doesn't already set a trust store, the test adds `-Djavax.net.ssl.trustStoreType=Windows-ROOT` (see the proxy note above).
+   - Python: `python -m compileall -q .` (a syntax check; Python has no build step),
+3. deletes the copy.
+
+The build runs in a copy so that no build output lands in the folder being reviewed.
+
+The process needs no person to step in, even with the apps open in an IDE:
+
+- [Directory.Build.props](Directory.Build.props) sends the MSBuild output (`bin/`, `obj/`) of every C# project under `test/` to `test/.build-output/<project path>/`, which is git-ignored and outside every app. This covers builds by the test, by you, and by IDE tooling. VS Code's C# extension restores a project as soon as its `obj/` folder is deleted, and before this redirect that put `obj/` back in the app mid-test.
+- Just before the review starts, the test checks the app again. If build output has come back anyway, the test deletes it, waits 2 seconds and checks again, up to 5 times. Only output that keeps coming back stops the test with an error.
+- The test deletes the copy's redirected output once the build is done.
+
+If the build fails, the test stops with an error (exit code 2) before any AI cost. The build's output is in `<app>-build.log` next to the result, and the result file shows the build commands, their duration and the old folders it deleted. With `--no-build`, step 1 still runs and steps 2 and 3 are skipped.
 
 ### Running the tests
 
@@ -116,7 +135,8 @@ Common options (every script; run any script with `--help` for the full list):
 | `--model NAME` | tool default | Model, passed to the tool's `--model` option. |
 | `--tool-arg ARG` | none | Extra argument for the AI tool's CLI; repeat it for more, e.g. `--tool-arg=--max-budget-usd --tool-arg=5`. |
 | `--results-dir DIR` | `test/logic/results` | Where results are written. |
-| `--allow-build-output` | off | Review even if build output is present. |
+| `--no-build` | off | Skip the fresh build. Old build output is still deleted. |
+| `--build-timeout MIN` | `15` | Time limit for each build command, in minutes. Also `COMPLIANCE_TEST_BUILD_TIMEOUT_MIN`. |
 | `--dry-run` | off | Print the command that would run, then stop. |
 | `--score-only RUN_DIR` | — | Single-app scripts only: skip the review and score an existing `transitions/<runId>` folder. |
 | `--parallel`, `--only APPS` | serial, all six | `test_all.py` only. App names are `apis-dotNET`, `apis-java`, `apis-python`, `uis-dotNET`, `uis-java`, `uis-python`. |
@@ -144,7 +164,7 @@ The test reads the run's transition files (`transitions/<runId>/`), not the Mark
   - **Related:** it cites one of a flaw's expected checks, but in a different file. Reported only.
   - **Unexpected:** everything else. An unexpected **Error** fails the test; unexpected Warnings and Information findings are reported only.
 - **A test passes** when the review completed, it found at least `--min-found` percent of the 12 flaws, and it has no unexpected Error findings. Missed flaws are always listed, but they fail the test only when they push the share found below the threshold.
-- **Exit codes:** `0` pass, `1` fail, `2` error: the AI tool is missing, the review failed or timed out, build output was present, or the run couldn't be scored. `test_all.py` returns the worst code of the tests it ran.
+- **Exit codes:** `0` pass, `1` fail, `2` error: the AI tool is missing, the app's build failed, the review failed or timed out, or the run couldn't be scored. `test_all.py` returns the worst code of the tests it ran.
 
 ### Results
 
@@ -210,10 +230,15 @@ These come from keeping the apps minimal rather than from seeded flaws. Expect t
 
 - **Maintainability:** no per-app README, contributing guide, change log, license or architecture docs (MAINT-01, 03, 06, 07, 08, 10).
 - **Software Lifecycle:** no CI pipeline, release automation, branch protection, `SECURITY.md` or static analysis (SL-01, 02, 04, 05, 07, 11).
-- **Dependency Management:** no lock file, SBOM or automated update configuration (DEP-02, DEP-05, DEP-07), in every app, including the UIs.
+- **Dependency Management:** no lock file, SBOM or automated update configuration (DEP-02, DEP-05, DEP-07), in every app, including the UIs. The APIs also have no package-source configuration (`nuget.config`, Maven mirror settings, pip index or hash pinning) (DEP-08).
 - **Observability:** no correlation IDs, tracing, metrics, telemetry export or SLOs (OBS-02 to OBS-08). The APIs' `/health` endpoint is shallow, and the UIs have none.
-- **Security, web:** no HTTPS enforcement or HSTS (SEC-WA-02, SEC-WA-06), and default `Server` headers (SEC-WA-07).
-- **API design (APIs only):** no committed OpenAPI file (the spec is generated at run time), no versioning, no pagination, no ETags and no correlation headers (API-01, 06, 07, 14, 15). The UIs should be N/A for API design, or reviewed only for their form endpoints.
+- **Security, web:** no HTTPS enforcement or HSTS (SEC-WA-02, SEC-WA-06), and default `Server` headers (SEC-WA-07). The APIs also don't send `X-Content-Type-Options: nosniff` (SEC-WA-03); in the UIs that is part of U11.
+- **Security, APIs only:** these follow from seeded flaws but use other checks:
+  - the DELETE key check has no throttling, lockout or failure logging (SEC-IA-09, next to A3);
+  - the error handler returns the exception without logging it server-side (SEC-OP-02, next to A5);
+  - unbounded, user-supplied titles are written to the log (SEC-OP-09, next to A4 and A7).
+- **Coding standards:** public types and members have no documentation comments (CS-04).
+- **API design (APIs only):** no committed OpenAPI file (the spec is generated at run time), no versioning, no pagination, sequential integer IDs rather than opaque ones, no ETags and no correlation headers (API-01, 06, 07, 11, 14, 15). The UIs should be N/A for API design, or reviewed only for their form endpoints.
 - **Reliability and Performance:** mostly N/A, because the apps have no remote dependencies. The in-memory store and single instance may show up under REL-05 and PERF-08.
 - **Disaster Recovery, Monitoring, Cost & Sustainability:** N/A, because there is no infrastructure as code.
 

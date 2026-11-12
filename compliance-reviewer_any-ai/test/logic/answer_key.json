@@ -5,10 +5,12 @@
       "incidentalChecks": [
         "MAINT-01", "MAINT-03", "MAINT-06", "MAINT-07", "MAINT-08", "MAINT-10",
         "SL-01", "SL-02", "SL-04", "SL-05", "SL-07", "SL-11",
-        "DEP-02", "DEP-05", "DEP-07",
+        "DEP-02", "DEP-05", "DEP-07", "DEP-08",
         "OBS-02", "OBS-03", "OBS-04", "OBS-05", "OBS-06", "OBS-07", "OBS-08",
-        "SEC-WA-02", "SEC-WA-06", "SEC-WA-07",
-        "API-01", "API-06", "API-07", "API-14", "API-15",
+        "SEC-WA-02", "SEC-WA-03", "SEC-WA-06", "SEC-WA-07",
+        "SEC-IA-09", "SEC-OP-02", "SEC-OP-09",
+        "CS-04",
+        "API-01", "API-06", "API-07", "API-11", "API-14", "API-15",
         "REL-05", "PERF-08",
         "DR-*", "MON-*", "COST-*"
       ],

@@ -3,10 +3,10 @@
 - Source site: learn.microsoft.com (azure/well-architected)
 - Pinned pages: see the page table below (path + `ms.date` at retrieval)
 - Citation base: https://learn.microsoft.com/azure/well-architected/
-- Localized: 2026-11-07 · Elements: 51 (cap 100)
+- Localized: 2026-11-07 · Generalized: 2026-11-12 · Elements: 51 (cap 100)
 - Source name for `Finding.standard`: `Azure Well-Architected Framework`
 - Level: every element is `REVIEW` (the source uses no normative keywords); severity is the owning check's default.
-- Scope column: G = generic (any cloud / Kubernetes); A = Azure-only (apply only when Azure IaC is detected).
+- Scope column: G = generic (any cloud / Kubernetes). Every element is Scope G; the only Azure-only element (WAF-51) was generalized on 2026-11-12. Azure product names appear only as examples.
 - CO column: the WAF Cost Optimization checklist code the element implements (traceability only).
 - Anchor(s): `<page key>#<section anchor>`, primary first. Recommendation-table rows have no anchors of their own, so the anchor is the section that holds the row.
 - Citation URL: citation base + page path + `#` + primary anchor, with no locale segment.
@@ -126,4 +126,4 @@
 | WAF-48 | REVIEW | G | Reuse central shared services (log workspace, firewall, gateway) instead of deploying duplicates per workload. | platform IaC | CO:14 | co-consol#use-external-centralized-resources |
 | WAF-49 | REVIEW | G | Use spot or preemptible capacity only for work that tolerates interruption, and handle eviction. | compute | CO:05 | su-co#reduce-idle-and-baseline-platform-waste, su-rel#factor-in-sustainability-into-platform-choices, co-flow#optimize-independent-flows |
 | WAF-50 | REVIEW | G | Billing model fits usage: consumption pricing for ephemeral or variable use, commitments only for steady permanent components, and usage aligned with billing increments. | compute | CO:05, CO:06 | co-rates#determine-the-right-billing-model, co-billing#align-usage-to-maximize-resource-value, su-co#reduce-idle-and-baseline-platform-waste |
-| WAF-51 | REVIEW | A | Apply Azure Hybrid Benefit and Azure dev/test pricing where licenses and subscriptions allow (e.g. `licenseType` set on eligible VMs or SQL). | Azure IaC | CO:05 | co-rates#optimize-licensing-costs, co-rates#evaluate-and-commit-to-available-discounts |
+| WAF-51 | REVIEW | G | Apply the licensing benefits and non-production pricing the provider offers where licenses and environments allow (bring-your-own-license, dev/test pricing; e.g. Azure Hybrid Benefit `licenseType`, AWS `license_model = "bring-your-own-license"`). | licensed VMs or databases in IaC | CO:05 | co-rates#optimize-licensing-costs, co-rates#evaluate-and-commit-to-available-discounts |

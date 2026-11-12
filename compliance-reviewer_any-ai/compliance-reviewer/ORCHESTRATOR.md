@@ -91,7 +91,7 @@ In an interview run, ask the user to confirm `all` or select one or more skill n
 | `review-software-quality` | ISO/IEC 25010:2023-classified code quality, design-pattern fit, layering/coupling/architecture-style constraints and coding standards (C#, Java, Python, JavaScript/TypeScript) |
 | `review-software-lifecycle` | CI on every change, release automation, SemVer, branch-protection enforcement, provenance/signing, security policy, CI/CD hardening, SAST gates and committed binaries |
 | `review-twelve-factor` | Twelve-Factor application design: codebase, dependencies, config, backing services, build/release/run, stateless processes, port binding, concurrency, disposability, dev/prod parity, logs and admin processes |
-| `review-api-design` | API contracts and Azure REST API guidance; N/A when no API is found |
+| `review-api-design` | API contracts and generic REST API design guidance (any host or framework); N/A when no API is found |
 | `review-security-identity-access` | Authentication, authorization (incl. object-level), JWT/OAuth/OIDC, sessions and CSRF for cookie auth, password storage and policy, auth failure handling, client-side token handling |
 | `review-security-input-injection` | Input validation, SQL/ORM and other injection, XML parsers, uploads, XSS output encoding, unsafe deserialization and SSRF |
 | `review-security-web-api` | HTTP security headers, CSP, HSTS/HTTPS/TLS enforcement, CORS and API transport hygiene (response headers, methods and content types, credentials in URLs) |

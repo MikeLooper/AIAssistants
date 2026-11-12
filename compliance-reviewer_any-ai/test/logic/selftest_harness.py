@@ -114,6 +114,71 @@ class ProgressTests(unittest.TestCase):
         self.assertEqual(harness._fmt_elapsed(3725), "1h02m05s")
 
 
+class BuildOutputTests(unittest.TestCase):
+    def test_clean_removes_outermost_build_folders_only(self):
+        with tempfile.TemporaryDirectory() as d:
+            app = Path(d)
+            for sub in ("bin/Debug", "obj", "src/__pycache__", "target/classes/obj"):
+                (app / sub).mkdir(parents=True)
+            (app / "Program.cs").write_text("x", encoding="utf-8")
+            self.assertEqual(sorted(harness.clean_build_output(app)), ["bin", "obj", "src/__pycache__", "target"])
+            self.assertEqual(harness.find_build_output(app), [])
+            self.assertTrue((app / "Program.cs").exists() and (app / "src").is_dir())
+
+    def test_preflight_deletes_output_that_reappears(self):
+        # Simulates IDE tooling restoring the project in place once, right after the first clean-up.
+        with tempfile.TemporaryDirectory() as d:
+            key = harness.AppKey("apis", "dotNET", [], [])
+            app = Path(d)
+            (app / "obj").mkdir()
+            recreated = []
+            real_clean = harness.clean_build_output
+
+            def clean_then_ide_restores(p):
+                removed = real_clean(p)
+                if not recreated:
+                    recreated.append(True)
+                    (p / "obj").mkdir()
+                return removed
+
+            orig_dir, harness.clean_build_output = harness.AppKey.app_dir, clean_then_ide_restores
+            harness.AppKey.app_dir = property(lambda self: app)
+            try:
+                self.assertIsNone(harness.preflight(key, attempts=3, settle_seconds=0))
+                self.assertEqual(harness.find_build_output(app), [])
+            finally:
+                harness.AppKey.app_dir, harness.clean_build_output = orig_dir, real_clean
+
+    def test_preflight_gives_up_when_output_keeps_coming_back(self):
+        with tempfile.TemporaryDirectory() as d:
+            key = harness.AppKey("apis", "dotNET", [], [])
+            app = Path(d)
+            (app / "bin").mkdir()
+            orig_dir, real_clean = harness.AppKey.app_dir, harness.clean_build_output
+            harness.AppKey.app_dir = property(lambda self: app)
+            harness.clean_build_output = lambda p: []  # nothing can be removed
+            try:
+                err = harness.preflight(key, attempts=2, settle_seconds=0)
+                self.assertIn("kept reappearing", err)
+                self.assertIn("bin", err)
+            finally:
+                harness.AppKey.app_dir, harness.clean_build_output = orig_dir, real_clean
+
+    def test_msbuild_output_is_redirected_out_of_the_apps(self):
+        props = (harness.TEST_DIR / "Directory.Build.props").read_text(encoding="utf-8")
+        self.assertIn("<BaseIntermediateOutputPath>", props)
+        self.assertIn("<BaseOutputPath>", props)
+        self.assertIn(".build-output", props)
+        self.assertEqual(harness.redirected_output_dir(harness.TEST_DIR / "logic" / "results" / "build" / "apis-dotNET"),
+                         harness.MSBUILD_OUTPUT_ROOT / "logic" / "results" / "build" / "apis-dotNET")
+        self.assertIsNone(harness.redirected_output_dir(Path(tempfile.gettempdir())))
+
+    def test_every_language_has_a_build_step(self):
+        for lang in harness.LANGS:
+            key = harness.AppKey("apis", lang, [], [])
+            self.assertTrue(harness.build_steps(key), lang)
+
+
 class ToolDetectionTests(unittest.TestCase):
     def test_order(self):
         self.assertEqual(harness.detect_tool("copilot", {"CLAUDECODE": "1"})[0], "copilot")

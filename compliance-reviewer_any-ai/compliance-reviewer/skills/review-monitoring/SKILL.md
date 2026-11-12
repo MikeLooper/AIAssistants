@@ -21,7 +21,7 @@ settings, and telemetry-store IaC, per `compliance-inventory`.
 
 ## Standards (local, authoritative)
 
-- `references/standards/azure-well-architected-monitoring.md` — WAFM-01…WAFM-40. Always load.
+- `references/standards/azure-well-architected-monitoring.md` — WAFM-01…WAFM-44 (WAFM-31, WAFM-34, WAFM-44 retired). Always load.
 - `references/standards/google-sre-monitoring-alerting.md` — SREM-01…SREM-28. Always load.
 - Do **not** fetch any URL for this skill. Do not load `references/standards/MAINTENANCE.md`.
 - If no element covers a situation: apply the closest element if it clearly fits; otherwise mark the check N/A
@@ -32,9 +32,8 @@ settings, and telemetry-store IaC, per `compliance-inventory`.
 1. Load `references/checklist.md`, `references/sources.md`, `references/monitoring-iac-signals.md` and the two
    standards files.
 2. Classify each file against `monitoring-iac-signals.md` (alert rule, notification target, dashboard, probe,
-   diagnostic routing, platform-health alert, SLO definition, telemetry store). Note whether the IaC is Azure
-   (`*.bicep`, ARM deploymentTemplate JSON, or Terraform `azurerm` provider). Scope `A` elements apply only to Azure
-   IaC; otherwise skip them ("Azure-specific element; target IaC is not Azure").
+   diagnostic routing, platform-health alert, SLO definition, telemetry store). Every active element is generic and
+   applies to any cloud, Kubernetes or SaaS monitoring stack; retired rows are not evaluated.
 3. No monitoring-as-code: if no file defines an alert rule or a dashboard, fail MON-02 (confidence `high`) and MON-01
    (confidence `low`; note that alerting configured only in a portal can't be seen from the repo), mark MON-03,
    MON-04 and MON-05 N/A ("no monitoring-as-code in scope"), and still evaluate MON-06.

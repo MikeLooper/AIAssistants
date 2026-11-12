@@ -12,7 +12,9 @@ Use the source's own wording first:
 | SHOULD NOT / YOU SHOULD NOT / NOT RECOMMENDED | Warning |
 | MAY / YOU MAY / OPTIONAL | Information |
 
-### Microsoft Azure API Guidelines (explicit mapping)
+### Microsoft REST API Guidelines wording (explicit mapping)
+
+Applies to the `AZ-*` and `SDK-*` elements of `review-api-design`. Those elements are generic REST rules: none requires an Azure-specific mechanism (see that skill's standards file header).
 
 - `DO` items → **Error** if not implemented.
 - `DO NOT` items → **Error** if violated.

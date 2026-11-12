@@ -18,7 +18,7 @@ The cap is counted per skill per website (plan DEC-1).
 
 - IDs are stable forever. Retire an element by marking its row `(retired)`; never reuse the ID. Prefixes are skill-specific (`WAFR-`, `SP34-`, `OSM-`; plan DEC-7) so they can't be confused with the cost skill's `WAF-xx` IDs or NIST SP 800-53 control IDs.
 - Level: WAF elements are `REVIEW` (no normative keywords). NIST elements carry the source keyword of the summarized sentence (`SHOULD`, `MUST`) or `REVIEW`. The level never changes severity (plan DEC-8; `SKILL.md` step 8).
-- Scope (WAF): `G` generic, `A` Azure-only. Keep wording cloud-neutral for `G` elements. Every `A` element needs a `G` counterpart (today: WAFR-05 → WAFR-01; WAFR-19 → WAFR-16/WAFR-28; WAFR-20 → WAFR-16; WAFR-41 → WAFR-38).
+- Scope (WAF): `G` generic only. Keep wording cloud-neutral; name a provider's product only as an example. Don't add Azure-only (`A`) elements: map the source's Azure facilitation to the G element it illustrates, or leave it unmapped. On 2026-11-12 the former `A` elements were retired in favour of their G counterparts (WAFR-05 → WAFR-01; WAFR-19 → WAFR-16/WAFR-28; WAFR-20 → WAFR-16; WAFR-41 → WAFR-38).
 - Primary anchor (or section) first; list every absorbed anchor so coverage stays auditable.
 - NIST PDF page = physical page (printed page + 14 for chapters 1–5), as used in `#page=<n>`.
 - Keep rows to one line (≈ 200 characters where possible).
