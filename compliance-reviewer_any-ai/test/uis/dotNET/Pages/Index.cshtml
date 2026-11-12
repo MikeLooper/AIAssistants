@@ -1,0 +1,39 @@
+@page
+@model TodoUi.Pages.IndexModel
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Todo List</title>
+</head>
+<body>
+    <h1>Todo List</h1>
+
+    <form method="post" action="?handler=Add">
+        <input type="text" name="title" placeholder="What needs doing?" />
+        <input type="text" name="priority" placeholder="Priority (1-5)" />
+        <input type="hidden" name="returnUrl" value="@Request.Query["returnUrl"]" />
+        <button type="submit">Add</button>
+    </form>
+
+    <ul>
+        @foreach (var item in TodoUi.Pages.IndexModel.Items)
+        {
+            <li>
+                @if (item.IsComplete)
+                {
+                    <s>@Html.Raw(item.Title)</s>
+                }
+                else
+                {
+                    @Html.Raw(item.Title)
+                    <form method="post" action="?handler=Complete&id=@item.Id" style="display:inline">
+                        <button type="submit">Done</button>
+                    </form>
+                }
+                (priority @item.Priority)
+            </li>
+        }
+    </ul>
+</body>
+</html>
