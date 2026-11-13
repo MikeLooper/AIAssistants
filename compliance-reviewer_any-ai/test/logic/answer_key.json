@@ -6,12 +6,12 @@
         "MAINT-01", "MAINT-03", "MAINT-06", "MAINT-07", "MAINT-08", "MAINT-10",
         "SL-01", "SL-02", "SL-04", "SL-05", "SL-07", "SL-11",
         "DEP-02", "DEP-05", "DEP-07", "DEP-08",
-        "OBS-02", "OBS-03", "OBS-04", "OBS-05", "OBS-06", "OBS-07", "OBS-08",
+        "OBS-02", "OBS-03", "OBS-04", "OBS-05", "OBS-06", "OBS-07", "OBS-08", "OBS-10",
         "SEC-WA-02", "SEC-WA-03", "SEC-WA-06", "SEC-WA-07",
         "SEC-IA-09", "SEC-OP-02", "SEC-OP-09",
-        "CS-04",
-        "API-01", "API-06", "API-07", "API-11", "API-14", "API-15",
-        "REL-05", "PERF-08",
+        "CS-04", "AP-06",
+        "API-01", "API-06", "API-07", "API-10", "API-11", "API-14", "API-15",
+        "REL-05", "PERF-05", "PERF-08",
         "DR-*", "MON-*", "COST-*"
       ],
       "flaws": [
@@ -28,7 +28,7 @@
         {
           "id": "A2",
           "title": "API key sent in the query string (?key=)",
-          "checks": ["SEC-WA-10"],
+          "checks": ["SEC-WA-10", "SEC-IA-11"],
           "locations": {
             "dotNET": ["Program.cs"],
             "java": ["src/main/java/com/example/todoapi/TodoController.java"],
@@ -140,6 +140,8 @@
         "DEP-02", "DEP-05", "DEP-07",
         "OBS-02", "OBS-03", "OBS-04", "OBS-05", "OBS-06", "OBS-07", "OBS-08",
         "SEC-WA-02", "SEC-WA-06", "SEC-WA-07",
+        "SEC-OP-08",
+        "CS-04", "CS-05", "AP-06",
         "API-*",
         "REL-05", "PERF-08",
         "DR-*", "MON-*", "COST-*"
@@ -178,9 +180,9 @@
         {
           "id": "U4",
           "title": "Admin password in query string to a state-changing GET; plain-text compare; no auth/throttling/audit",
-          "checks": ["SEC-WA-10", "SEC-IA-01", "SEC-IA-07", "SEC-IA-09", "API-09"],
+          "checks": ["SEC-WA-10", "SEC-IA-01", "SEC-IA-02", "SEC-IA-07", "SEC-IA-09", "API-09"],
           "locations": {
-            "dotNET": ["Pages/Index.cshtml.cs", "Pages/Index.cshtml"],
+            "dotNET": ["Pages/Index.cshtml.cs", "Pages/Index.cshtml", "Program.cs"],
             "java": ["src/main/java/com/example/todoui/TodoController.java", "src/main/resources/templates/index.html"],
             "python": ["app.py", "templates/index.html"]
           }
@@ -188,7 +190,7 @@
         {
           "id": "U5",
           "title": "Open redirect: user-supplied return URL redirected to without validation",
-          "checks": ["SEC-IA-04"],
+          "checks": ["SEC-IA-04", "SEC-II-01"],
           "locations": {
             "dotNET": ["Pages/Index.cshtml.cs"],
             "java": ["src/main/java/com/example/todoui/TodoController.java"],

@@ -195,7 +195,7 @@ The flaws are numbered so that the same number means the same flaw in every lang
 | # | Flaw | Expected checks | C# ([apis/dotNET](apis/dotNET)) | Java ([apis/java](apis/java)) | Python ([apis/python](apis/python)) |
 |---|------|-----------------|------|------|--------|
 | A1 | Hard-coded API key in configuration in the source tree | SEC-OP-05, SEC-OP-06, TF-03 | `appsettings.json` `ApiKey` | `application.properties` `api.key` | `config.py` `API_KEY` |
-| A2 | API key sent in the query string (`?key=`) | SEC-WA-10 | `Program.cs` `MapDelete` | `TodoController.delete` | `main.py` `delete_todo` |
+| A2 | API key sent in the query string (`?key=`), over plain HTTP | SEC-WA-10, SEC-IA-11 | `Program.cs` `MapDelete` | `TodoController.delete` | `main.py` `delete_todo` |
 | A3 | No authentication on create/read/update; only DELETE checks the key, and that check is hand-rolled (not deny-by-default) | SEC-IA-01, SEC-IA-02, SEC-IA-07 | `Program.cs` endpoints | `TodoController` | `main.py` endpoints |
 | A4 | No input validation (null, empty, unbounded title); the whole model is bound, including `id` (over-posting) | SEC-II-01 | `Program.cs` `MapPost`/`MapPut`, `TodoItem.cs` | `TodoController.create`/`update` | `main.py` `TodoItem`, `create_todo`/`update_todo` |
 | A5 | Exception details and stack traces returned to the client (a null title causes a 500 with the full trace) | SEC-OP-01, SEC-OP-07, OBS-09 | `Program.cs` inline middleware writes `ex.ToString()` | `ErrorHandler.java`; `server.error.include-stacktrace=always` | `main.py` `handle_error`; `FastAPI(debug=True)` |
@@ -214,8 +214,8 @@ The flaws are numbered so that the same number means the same flaw in every lang
 | U1 | Stored XSS: to-do titles rendered without encoding | SEC-II-08 | `Pages/Index.cshtml` `@Html.Raw(item.Title)` | `templates/index.html` `th:utext` | `templates/index.html` `\|safe` |
 | U2 | No CSRF protection on state-changing forms | SEC-IA-05 | `Pages/Index.cshtml.cs` `[IgnoreAntiforgeryToken]` | no CSRF protection configured (no Spring Security) | no CSRF protection (no Flask-WTF or equivalent) |
 | U3 | Hard-coded admin password (and, in Python, a hard-coded Flask `SECRET_KEY`) | SEC-OP-05, SEC-OP-06, TF-03 | `appsettings.json` `AdminPassword` | `application.properties` `admin.password` | `app.py` `ADMIN_PASSWORD`, `SECRET_KEY` |
-| U4 | Admin password sent in the query string to a state-changing GET, compared in plain text, with no authentication, throttling or audit | SEC-WA-10, SEC-IA-01, SEC-IA-07, SEC-IA-09, API-09 | `Index.cshtml.cs` `OnGetClear` | `TodoController.clear` | `app.py` `clear` |
-| U5 | Open redirect: the user-supplied return URL is redirected to without validation | SEC-IA-04 | `Index.cshtml.cs` `OnPostAdd` `Redirect(returnUrl)` | `TodoController.add` `"redirect:" + returnUrl` | `app.py` `add` `redirect(request.form.get("return_url"))` |
+| U4 | Admin password sent in the query string to a state-changing GET, compared in plain text, with no authentication, authorization, throttling or audit | SEC-WA-10, SEC-IA-01, SEC-IA-02, SEC-IA-07, SEC-IA-09, API-09 | `Index.cshtml.cs` `OnGetClear`; `Program.cs` (no authentication or authorization configured) | `TodoController.clear` | `app.py` `clear` |
+| U5 | Open redirect: the user-supplied return URL is redirected to without validation | SEC-IA-04, SEC-II-01 | `Index.cshtml.cs` `OnPostAdd` `Redirect(returnUrl)` | `TodoController.add` `"redirect:" + returnUrl` | `app.py` `add` `redirect(request.form.get("return_url"))` |
 | U6 | Detailed error pages / debug mode always on | SEC-OP-01, SEC-OP-07 | `Program.cs` `UseDeveloperExceptionPage()` unconditionally; no HTTPS redirection or HSTS | `server.error.include-stacktrace=always` | `app.run(debug=True, host="0.0.0.0")` (Werkzeug debugger) |
 | U7 | Unsynchronized static/global mutable state used as the data store | DP-01, TF-06, REL-05 | `IndexModel` static `Items`/`nextId` | `TodoController` static `items`/`nextId` | `app.py` global `items`/`next_id` |
 | U8 | Exception silently swallowed (invalid priority ignored) | SEC-OP-02, SQ-06 | `OnPostAdd` empty `catch { }` | `add` empty `catch (Exception e)` | `add` `except Exception: pass` |
@@ -231,15 +231,17 @@ These come from keeping the apps minimal rather than from seeded flaws. Expect t
 - **Maintainability:** no per-app README, contributing guide, change log, license or architecture docs (MAINT-01, 03, 06, 07, 08, 10).
 - **Software Lifecycle:** no CI pipeline, release automation, branch protection, `SECURITY.md` or static analysis (SL-01, 02, 04, 05, 07, 11).
 - **Dependency Management:** no lock file, SBOM or automated update configuration (DEP-02, DEP-05, DEP-07), in every app, including the UIs. The APIs also have no package-source configuration (`nuget.config`, Maven mirror settings, pip index or hash pinning) (DEP-08).
-- **Observability:** no correlation IDs, tracing, metrics, telemetry export or SLOs (OBS-02 to OBS-08). The APIs' `/health` endpoint is shallow, and the UIs have none.
+- **Observability:** no correlation IDs, tracing, metrics, telemetry export or SLOs (OBS-02 to OBS-08). The APIs' `/health` endpoint is shallow, and the UIs have none. In the APIs, the log level may be hard-coded rather than configurable (OBS-10).
 - **Security, web:** no HTTPS enforcement or HSTS (SEC-WA-02, SEC-WA-06), and default `Server` headers (SEC-WA-07). The APIs also don't send `X-Content-Type-Options: nosniff` (SEC-WA-03); in the UIs that is part of U11.
 - **Security, APIs only:** these follow from seeded flaws but use other checks:
   - the DELETE key check has no throttling, lockout or failure logging (SEC-IA-09, next to A3);
   - the error handler returns the exception without logging it server-side (SEC-OP-02, next to A5);
   - unbounded, user-supplied titles are written to the log (SEC-OP-09, next to A4 and A7).
-- **Coding standards:** public types and members have no documentation comments (CS-04).
-- **API design (APIs only):** no committed OpenAPI file (the spec is generated at run time), no versioning, no pagination, sequential integer IDs rather than opaque ones, no ETags and no correlation headers (API-01, 06, 07, 11, 14, 15). The UIs should be N/A for API design, or reviewed only for their form endpoints.
-- **Reliability and Performance:** mostly N/A, because the apps have no remote dependencies. The in-memory store and single instance may show up under REL-05 and PERF-08.
+- **Security, UIs only:** the admin clear-all action and added to-dos are logged with raw file writes rather than through the logging framework (SEC-OP-08, next to U4 and U9).
+- **Coding standards:** public types and members have no documentation comments (CS-04). In the UIs, log lines may be flagged for string concatenation instead of the language's preferred formatting, such as C# interpolation (CS-05, next to U9).
+- **Architecture patterns:** in the APIs, each handler builds its own "not found" response instead of using a shared helper or central error mapping (AP-06, next to A9); in the UIs, each handler writes the log file itself instead of using a shared logger (AP-06, next to U9).
+- **API design (APIs only):** no committed OpenAPI file (the spec is generated at run time), no versioning, no pagination, sequential integer IDs rather than opaque ones, no request-ID header or machine-readable error code, no ETags and no correlation headers (API-01, 06, 07, 10, 11, 14, 15). The UIs should be N/A for API design, or reviewed only for their form endpoints.
+- **Reliability and Performance:** mostly N/A, because the apps have no remote dependencies. The in-memory store and single instance may show up under REL-05 and PERF-08, and the APIs' linear scans of the in-memory list for get, update and delete under PERF-05.
 - **Disaster Recovery, Monitoring, Cost & Sustainability:** N/A, because there is no infrastructure as code.
 
 ### Checking the flaws by hand

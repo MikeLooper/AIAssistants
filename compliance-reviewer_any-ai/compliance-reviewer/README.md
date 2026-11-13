@@ -30,6 +30,7 @@ flowchart TD
 | `compliance-reviewer/PROMPT.md` | Paste-in prompt for chat tools with no repo integration |
 | `compliance-reviewer/STANDARDS-MAINTENANCE.md` | Maintainer guide: how the localized standards are kept current (cadence, triggers, refresh steps, drift checker, AI-tool usage) |
 | `compliance-reviewer/REFRESH.md` | Neutral procedure for the maintainer-only standards refresh command |
+| `scripts/run_review.py` | Runs a review headlessly against an application directory, prints the report, then the run's duration, cost and token costs ([details](#running-a-review-from-a-script)) |
 | `compliance-reviewer/scripts/check_source_drift.py` | Maintainer-only drift checker: compares each skill's `references/standards/pins.json` with the live sources (never run during a review) |
 | `.claude/skills/refresh-standards/SKILL.md`, `.github/prompts/refresh-standards.prompt.md` | Refresh command adapters (Claude Code, GitHub Copilot) |
 | `compliance-reviewer/skills/compliance-review-core/` | Schemas, scoring rubric, maintainer-only source registry, resume rules |
@@ -108,6 +109,73 @@ claude -p "/compliance-reviewer --readme --programmatic"
 ```
 
 Other tools: pass the same text to the tool's non-interactive mode (for example a Codex `exec` prompt) as "Run a compliance review: `<target> --programmatic …`"; `AGENTS.md` routes it to the orchestrator.
+
+## Running a review from a script
+
+[`scripts/run_review.py`](../scripts/run_review.py) runs a complete review headlessly against an application directory that you name, then shows the report and a summary of the run's duration and cost. It wraps the programmatic-mode commands above, so you don't need to work out the `--add-dir`, `--allowedTools` and `--out-file` arguments yourself.
+
+**Prerequisites.** Python 3.10+ (standard library only), and the CLI of the AI tool you use, signed in: Claude Code (`claude`) or GitHub Copilot CLI (`copilot`, from `npm install -g @github/copilot`; the `copilot` shim that VS Code puts on the path isn't enough on its own).
+
+**Usage.** Run it from any folder; the review always runs with `compliance-reviewer_any-ai` as the working directory.
+
+```powershell
+python scripts/run_review.py C:\src\myapp                                   # all subjects, AI tool chosen automatically
+python scripts/run_review.py C:\src\myapp --tool copilot --model gpt-5      # a given tool and model
+python scripts/run_review.py ..\myapp --subjects review-testing,review-maintainability
+python scripts/run_review.py C:\src\myapp --out-file C:\out\myapp-review.md --no-report
+python scripts/run_review.py C:\src\myapp --summary-json C:\out\myapp-run.json
+python scripts/run_review.py C:\src\myapp --dry-run                         # show the command, don't run it
+```
+
+**What it does.**
+
+1. Picks the AI tool. The first rule that applies wins: `--tool claude|copilot`; the `COMPLIANCE_REVIEW_TOOL` environment variable; started from Claude Code: Claude; started from elsewhere in VS Code (such as Copilot Chat or a VS Code terminal): Copilot; otherwise Claude.
+2. Runs `/compliance-reviewer <target> --subjects … --programmatic --output file --out-file …` with that tool. A target outside this workspace is passed with `--add-dir`. Claude runs with a fixed `--allowedTools` list (read, write, subagents, `git -C` and the report script); Copilot runs with `--allow-all-tools`. The reviewer's own rules keep the target read-only.
+3. While the review runs, prints a progress line to stderr each time the reviewer finishes a step (read from `transitions/<runId>/state.json`), and a heartbeat every `--progress` seconds.
+4. Prints the report (Markdown) to stdout. The report is also saved under `docs/reports/` as usual, and at `--out-file` if you gave one.
+5. Prints a **run summary**: status, run ID, overall score and band, report path, wall-clock duration, and cost:
+   - **Claude:** the `total_cost_usd` reported by Claude Code, API time, turns and subagent count. The cost is at API list prices; on a subscription plan you're billed differently.
+   - **Copilot:** the premium requests Copilot CLI reports, an estimated dollar cost at `--copilot-request-usd` per request (default `0.04`), and Copilot's own usage block. Requests included in your plan cost nothing extra. If the tool doesn't report usage, the summary says so.
+6. Prints the **token costs**: for each model the run used, a table of the four token types (input, output, cache read, cache write) with the token count, the price per million tokens, the cost and its share of the model's cost, then a total.
+   - Prices come from a table of Anthropic API list prices in the script (`MODEL_PRICES`, dated in a comment). Model names are matched by prefix, so `claude-opus-4-8[1m]` and `claude-sonnet-4.5` are found. Replace or add prices with `--prices FILE`.
+   - **Cache writes** cost more for a 1-hour cache than for a 5-minute one, and neither tool reports which was used. With Claude, the script takes the cache-write cost as the part of the model's reported cost that input, output and cache reads don't explain, provided it lies between the all-5-minute and all-1-hour cost, and marks it `*`. Otherwise it uses the 5-minute price and marks it `+`. The total row shows the reported cost when the two differ.
+   - **Copilot** bills premium requests, not tokens, so its token costs are what the same tokens would cost at API list prices, for comparing runs and tools. A model with no price on file (for example a GPT model) is listed with its token counts only.
+
+A `--prices` file is JSON keyed by model name, in USD per million tokens. Cache prices you leave out default to 0.1× (read), 1.25× (5-minute write) and 2× (1-hour write) the input price:
+
+```json
+{
+  "claude-opus-5-5": { "input": 4, "output": 20, "cacheRead": 0.2, "cacheWrite5m": 5, "cacheWrite1h": 8 },
+  "gpt-5": { "input": 1.25, "output": 10 }
+}
+```
+
+**Options.**
+
+| Option | Default | What it does |
+|--------|---------|--------------|
+| `target` | required | Application code directory to review. Read-only; may be outside this workspace, but must not be or contain this workspace. |
+| `--tool auto\|claude\|copilot` | `auto` | AI tool that runs the review (see step 1). |
+| `--model NAME` | tool default | Passed to the tool's `--model` option. |
+| `--subjects`, `--advanced`, `--analyzers` | `all`, off, `auto` | Passed to the reviewer as the [operational flags](#operational-flags) of the same name. |
+| `--out-file PATH` | none | Also keep the report at this path (not inside the target). Without it, the report is kept only under `docs/reports/`. |
+| `--no-report` | off | Don't print the report; print only the run summary. |
+| `--summary-json PATH` | none | Also write the run summary (status, duration, cost, tokens, token costs) as JSON. |
+| `--prices FILE` | built-in table | JSON file of per-million-token prices that replace or extend the built-in table (see above). |
+| `--timeout MIN` | `60` | Time limit for the review. Also `COMPLIANCE_REVIEW_TIMEOUT_MIN`. |
+| `--progress SEC` | `30` | Heartbeat interval for progress lines; `0` turns progress output off. |
+| `--copilot-request-usd USD` | `0.04` | Price per Copilot premium request, used for the cost estimate. |
+| `--allow-tool RULE` | none | Claude only: add a rule to the allowed-tools list, e.g. `"Bash(dotnet list:*)"`; repeat for more. |
+| `--tool-arg ARG` | none | Extra argument for the AI tool's CLI; repeat for more, e.g. `--tool-arg=--max-budget-usd --tool-arg=5`. |
+| `--dry-run` | off | Print the tool, working directory and command, then stop. |
+
+**Exit codes:** `0` the review completed, `1` the reviewer reported a failure, `2` the review couldn't run (tool not found, invalid target, timeout, or no status line from the tool). On `1` or `2` the summary names the error and the log file holding the tool's raw output (under the system temp folder, `compliance-review-runs/`). If a run is interrupted, resume it in the AI tool with `resume run <id>`.
+
+**Notes.**
+
+- A review takes several minutes and uses model credit, roughly the same as running `/compliance-reviewer` yourself.
+- With `--advanced` under Claude, the CLI analyzers need shell commands that the fixed `--allowedTools` list doesn't include, so they're denied. Allow the ones you want with `--allow-tool`, for example `--allow-tool "Bash(dotnet list:*)"`.
+- The test harness in [`test/logic/`](../test/README.md#automated-validation) uses the same approach to run and score the reviewer against the sample apps.
 
 ## Resuming After an Interruption
 
