@@ -260,6 +260,137 @@
           "locations": { "dotNET": [], "java": [], "python": [] }
         }
       ]
+    },
+    "mcps": {
+      "incidentalChecks": [
+        "MAINT-01", "MAINT-03", "MAINT-06", "MAINT-07", "MAINT-08", "MAINT-10",
+        "SL-01", "SL-02", "SL-04", "SL-05", "SL-07", "SL-11",
+        "DEP-02", "DEP-05", "DEP-07", "DEP-08",
+        "OBS-01", "OBS-02", "OBS-03", "OBS-04", "OBS-05", "OBS-06", "OBS-07", "OBS-08", "OBS-09", "OBS-10",
+        "SEC-OP-02", "SEC-OP-04", "SEC-OP-08",
+        "CS-04", "CS-05", "AP-06", "SQ-06",
+        "MCP-03", "MCP-13", "MCP-14", "MCP-16",
+        "REL-02", "REL-05", "REL-06", "PERF-02", "PERF-05", "PERF-06", "PERF-08",
+        "DR-*", "MON-*", "COST-*"
+      ],
+      "flaws": [
+        {
+          "id": "M1",
+          "title": "Diagnostic output written to stdout, corrupting the stdio protocol stream",
+          "checks": ["MCP-01"],
+          "locations": {
+            "dotNET": ["Program.cs", "TodoTools.cs"],
+            "java": ["src/main/java/com/example/todomcp/TodoMcpServer.java", "src/main/java/com/example/todomcp/TodoTools.java"],
+            "python": ["server.py"]
+          }
+        },
+        {
+          "id": "M2",
+          "title": "Tool poisoning: hidden instructions in a tool description",
+          "checks": ["MCP-05"],
+          "locations": {
+            "dotNET": ["TodoTools.cs"],
+            "java": ["src/main/java/com/example/todomcp/TodoMcpServer.java"],
+            "python": ["server.py"]
+          }
+        },
+        {
+          "id": "M3",
+          "title": "Export tool writes to any caller-supplied path (no root confinement)",
+          "checks": ["MCP-09", "MCP-06", "SEC-II-01"],
+          "locations": {
+            "dotNET": ["TodoTools.cs"],
+            "java": ["src/main/java/com/example/todomcp/TodoTools.java", "src/main/java/com/example/todomcp/TodoMcpServer.java"],
+            "python": ["server.py"]
+          }
+        },
+        {
+          "id": "M4",
+          "title": "OS command injection: archive name concatenated into a shell command",
+          "checks": ["SEC-II-04", "MCP-09"],
+          "locations": {
+            "dotNET": ["TodoTools.cs"],
+            "java": ["src/main/java/com/example/todomcp/TodoTools.java"],
+            "python": ["server.py"]
+          }
+        },
+        {
+          "id": "M5",
+          "title": "Untyped tool input schema and no argument validation",
+          "checks": ["MCP-04", "MCP-06", "SEC-II-01"],
+          "locations": {
+            "dotNET": ["TodoTools.cs"],
+            "java": ["src/main/java/com/example/todomcp/TodoMcpServer.java", "src/main/java/com/example/todomcp/TodoTools.java"],
+            "python": ["server.py"]
+          }
+        },
+        {
+          "id": "M6",
+          "title": "Destructive tool annotated read-only, with no confirmation",
+          "checks": ["MCP-10"],
+          "locations": {
+            "dotNET": ["TodoTools.cs"],
+            "java": ["src/main/java/com/example/todomcp/TodoMcpServer.java", "src/main/java/com/example/todomcp/TodoTools.java"],
+            "python": ["server.py"]
+          }
+        },
+        {
+          "id": "M7",
+          "title": "Hard-coded sync token, returned to the model by a tool",
+          "checks": ["MCP-11", "MCP-08", "SEC-OP-05", "SEC-OP-06", "TF-03"],
+          "locations": {
+            "dotNET": ["TodoTools.cs"],
+            "java": ["src/main/java/com/example/todomcp/TodoTools.java"],
+            "python": ["server.py"]
+          }
+        },
+        {
+          "id": "M8",
+          "title": "Stack traces returned as successful tool results (no isError)",
+          "checks": ["MCP-07", "SEC-OP-01"],
+          "locations": {
+            "dotNET": ["TodoTools.cs"],
+            "java": ["src/main/java/com/example/todomcp/TodoTools.java", "src/main/java/com/example/todomcp/TodoMcpServer.java"],
+            "python": ["server.py"]
+          }
+        },
+        {
+          "id": "M9",
+          "title": "Import tool fetches any URL (SSRF) with no timeout and returns the raw content",
+          "checks": ["SEC-II-10", "MCP-09", "MCP-13", "MCP-08", "REL-01"],
+          "locations": {
+            "dotNET": ["TodoTools.cs"],
+            "java": ["src/main/java/com/example/todomcp/TodoTools.java"],
+            "python": ["server.py"]
+          }
+        },
+        {
+          "id": "M10",
+          "title": "Floating MCP SDK version",
+          "checks": ["DEP-01", "DEP-02"],
+          "locations": {
+            "dotNET": ["TodoMcp.csproj"],
+            "java": ["pom.xml"],
+            "python": ["requirements.txt"]
+          }
+        },
+        {
+          "id": "M11",
+          "title": "Unsynchronized static/global mutable state used as the data store",
+          "checks": ["DP-01", "TF-06", "REL-05", "MCP-12"],
+          "locations": {
+            "dotNET": ["TodoStore.cs", "TodoTools.cs"],
+            "java": ["src/main/java/com/example/todomcp/TodoStore.java", "src/main/java/com/example/todomcp/TodoTools.java"],
+            "python": ["server.py"]
+          }
+        },
+        {
+          "id": "M12",
+          "title": "No automated tests",
+          "checks": ["TST-*"],
+          "locations": { "dotNET": [], "java": [], "python": [] }
+        }
+      ]
     }
   }
 }

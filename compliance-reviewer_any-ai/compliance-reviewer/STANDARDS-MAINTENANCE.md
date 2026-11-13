@@ -41,6 +41,7 @@ Each skill's `MAINTENANCE.md` is authoritative for its cadence; this table is th
 | review-dependency-management | OWASP A03:2025 and supply-chain cheat sheets; .NET, Java, Python, Spring, Node.js lifecycle data | Lifecycle files quarterly; OWASP quarterly | Within 2 weeks of vendor GA events (.NET Nov, Java Mar/Sep, Python Oct, Spring May/Nov, Node.js Apr/Oct); dates in "Refresh due"; any stale note |
 | review-disaster-recovery | Azure WAF Reliability (DR); NIST SP 800-34 Rev. 1; OWASP secrets backup | Quarterly | New NIST revision or withdrawal |
 | review-maintainability | Local rubric only (no website) | Every 6 months | A disputed finding |
+| review-mcp-server | MCP specification revision 2026-07-28 (stdio, tools; commit SHAs); MCP Security Best Practices and Local Server Security; modelcontextprotocol.info best practices; CSA Agentic MCP guide v1 (draft); The New Stack (partial, manual) | Quarterly | New MCP specification revision; official SDK major version; CSA final version |
 | review-monitoring | Azure WAF monitoring/alerting; Google SRE books | Quarterly | — |
 | review-observability | OpenTelemetry (semconv v1.45.0, spec v1.62.0); Azure WAF observability | Quarterly | Semconv minor release touching HTTP, DB, messaging, exception or resource conventions |
 | review-performance | Azure WAF Performance Efficiency; Architecture Center antipatterns and caching | Quarterly | — |

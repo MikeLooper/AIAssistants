@@ -1,6 +1,7 @@
 """Offline self-tests for harness.py (no AI tool is run). python -m unittest selftest_harness (from test/logic)."""
 
 import json
+import re
 import tempfile
 import unittest
 from pathlib import Path
@@ -39,6 +40,33 @@ class AnswerKeyTests(unittest.TestCase):
                 for f in key.flaws:
                     for loc in f.locations:
                         self.assertTrue((key.app_dir / loc).is_file(), f"{key.name} {f.id}: {loc}")
+
+    def test_expected_checks_exist_in_the_checklists(self):
+        skills = harness.REPO_ROOT / "compliance-reviewer" / "skills"
+        known = set()
+        for checklist in skills.glob("review-*/references/checklist.md"):
+            for line in checklist.read_text(encoding="utf-8").splitlines():
+                m = re.match(r"^\|\s*([A-Z]+(?:-[A-Z]+)*-\d+)\s*\|", line)
+                if m:
+                    known.add(m.group(1))
+        self.assertIn("MCP-01", known)
+        for kind in harness.KINDS:
+            key = harness.load_app_key(kind, "dotNET")
+            patterns = [c for f in key.flaws for c in f.checks] + key.incidental
+            for p in patterns:
+                self.assertTrue(any(harness.check_matches(k, [p]) for k in known), f"{kind}: unknown check {p}")
+
+    def test_mcp_apps_use_stdio_only(self):
+        signals = {"dotNET": ("TodoMcp.csproj", "Program.cs", "WithStdioServerTransport", "WithHttpTransport"),
+                   "java": ("pom.xml", "src/main/java/com/example/todomcp/TodoMcpServer.java",
+                            "StdioServerTransportProvider", "Streamable"),
+                   "python": ("requirements.txt", "server.py", "mcp.run()", "streamable-http")}
+        for lang, (manifest, entry, stdio, http) in signals.items():
+            app = harness.TEST_DIR / "mcps" / lang
+            self.assertTrue((app / manifest).is_file(), lang)
+            source = (app / entry).read_text(encoding="utf-8")
+            self.assertIn(stdio, source, lang)
+            self.assertNotIn(http, source, lang)
 
 
 class MatchingTests(unittest.TestCase):

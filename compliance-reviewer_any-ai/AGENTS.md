@@ -2,7 +2,7 @@
 
 ## Compliance review
 
-When the user asks to review, audit or assess a codebase for architecture, coding standards, security or compliance (OWASP, ISO/IEC 25010, Twelve-Factor, REST API guidelines), or to resume a previous compliance review run:
+When the user asks to review, audit or assess a codebase for architecture, coding standards, security or compliance (OWASP, ISO/IEC 25010, Twelve-Factor, REST API guidelines, MCP server best practices), or to resume a previous compliance review run:
 
 1. Read `compliance-reviewer/ORCHESTRATOR.md` and follow it exactly. It is tool-neutral and includes a capability mapping and a no-subagent fallback.
 2. The worker procedure is `compliance-reviewer/WORKER.md`; subject checklists live under `compliance-reviewer/skills/`.

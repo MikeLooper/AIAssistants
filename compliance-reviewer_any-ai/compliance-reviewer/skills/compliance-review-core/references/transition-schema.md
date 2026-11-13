@@ -20,7 +20,7 @@ All transition files for one run live in `transitions/<runId>/`.
 | 15 | review-security-input-injection | 25 | review-monitoring |
 | 16 | review-security-web-api | 26 | review-cost-sustainability |
 | 17 | review-security-operational | 27 | review-maintainability |
-| 19 | review-testing | | |
+| 19 | review-testing | 28 | review-mcp-server |
 - Superseded files (from a `resume ... from step NN`) move to `transitions/<runId>/superseded/` keeping their original names.
 - `state.json` lives at `transitions/<runId>/state.json`.
 

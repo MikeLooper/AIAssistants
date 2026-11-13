@@ -10,6 +10,20 @@
 - A maintainer who adds a page to this registry records it under the owning subject's section, as an exact page. Site-wide prefixes aren't allowed.
 - `linkApprovals` in `state.json` and `urlsFetched` in transition files stay in the schemas for compatibility with older runs. New runs leave them empty.
 
+## MCP Server
+
+**Maintenance-only** since 2026-11-13: `review-mcp-server` declares local standards. Workers don't fetch these during a review.
+
+- https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/stdio
+- https://modelcontextprotocol.io/specification/2026-07-28/server/tools
+- https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices
+- https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/local-server-security
+- https://modelcontextprotocol.io/specification (new-revision check)
+- https://modelcontextprotocol.info/docs/best-practices/
+- https://labs.cloudsecurityalliance.org/agentic/agentic-mcp-security-best-practices-v1/
+- https://thenewstack.io/15-best-practices-for-building-mcp-servers-in-production/ (manual refresh: the site refuses automated retrieval)
+- Drift checks (maintainers): https://api.github.com/repos/modelcontextprotocol/modelcontextprotocol/commits
+
 ## API Design
 
 **Maintenance-only** since 2026-11-07: `review-api-design` declares local standards. Workers don't fetch these during a review.

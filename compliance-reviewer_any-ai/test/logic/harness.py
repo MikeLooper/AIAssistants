@@ -1,6 +1,8 @@
 """Shared harness for the Compliance Reviewer validation tests (Python 3.10+, stdlib only).
 
-Each test script (test_api_dotnet.py, ...) calls ``main(kind, lang)``. The harness:
+Each test script (test_api_dotnet.py, test_ui_java.py, test_mcp_python.py, ...) calls ``main(kind, lang)`` with a
+kind from KINDS (apis, uis, mcps). The MCP servers go through the same review pipeline (plus the review-mcp-server
+subject) and the same flaw-matching rules, so all three kinds share this harness. The harness:
 
 1. resolves the AI tool (``--tool``, ``COMPLIANCE_TEST_TOOL``, the VS Code chat that started it, or Claude),
 2. runs the reviewer headlessly against one app in programmatic mode,
@@ -36,7 +38,7 @@ TRANSITIONS_DIR = REPO_ROOT / "transitions"
 
 TOOLS = ("claude", "copilot")
 LANGS = ("dotNET", "java", "python")
-KINDS = ("apis", "uis")
+KINDS = ("apis", "uis", "mcps")
 BUILD_OUTPUT_DIRS = ("bin", "obj", "target", "__pycache__", ".venv")
 # test/Directory.Build.props sends MSBuild output for every project under test/ here, outside the apps.
 MSBUILD_OUTPUT_ROOT = TEST_DIR / ".build-output"

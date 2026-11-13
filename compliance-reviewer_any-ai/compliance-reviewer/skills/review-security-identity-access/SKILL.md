@@ -37,6 +37,11 @@ tokens, per `compliance-inventory`.
 2. For each check SEC-IA-01…SEC-IA-11, evaluate the elements it lists against the subject's files, using the
    signal files to find evidence. Mark the check N/A with a reason when no element applies (e.g. SEC-IA-04 when
    no OAuth/OIDC is used; SEC-IA-06/-10 when the target stores no passwords; SEC-IA-03 when no JWTs are handled).
+   A **stdio-only MCP server** (the inventory's `mcpServers` with transport `stdio` and no HTTP surface) runs as a
+   subprocess of its MCP client in one trust domain, and the MCP specification says stdio servers don't use HTTP
+   authorization: mark the checks about authenticating or authorizing callers, sessions and CSRF N/A ("stdio MCP
+   server: no caller authentication boundary"). What its tools may reach is judged by `review-mcp-server` (MCP-09),
+   and its credentials for downstream services by MCP-11 and `review-security-operational`.
 3. Evidence rule: fail an element only on concrete evidence in the files. Explicit insecure settings always count;
    a missing setting counts only when a localized element states the insecure default. For frameworks without a
    localized file (Flask, FastAPI, Express, Quarkus, …), a missing setting is not a finding: add

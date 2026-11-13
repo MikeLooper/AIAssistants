@@ -1,8 +1,8 @@
 # Compliance Reviewer test targets
 
-Six very small to-do applications (three APIs and three server-rendered UIs, in C#, Java and Python) that serve as review targets for the Compliance Reviewer. Each one contains a **known set of deliberate flaws**. This README is the answer key, so you can check what a review found, what it missed and how consistent the results are across languages and AI tools.
+Nine very small to-do applications (three APIs, three server-rendered UIs and three Model Context Protocol (MCP) servers, each in C#, Java and Python) that serve as review targets for the Compliance Reviewer. Each one contains a **known set of deliberate flaws**. This README is the answer key, so you can check what a review found, what it missed and how consistent the results are across languages and AI tools.
 
-> **Warning: these apps are insecure on purpose.** They contain hard-coded secrets, XSS, open redirects, stack-trace leaks and similar flaws. Run them only on localhost and never deploy them. The secrets in them are fake values.
+> **Warning: these apps are insecure on purpose.** They contain hard-coded secrets, XSS, open redirects, stack-trace leaks, command injection, tool poisoning and similar flaws. Run them only on localhost, never deploy them, and never add the MCP servers to an MCP client you use for real work: their tool descriptions try to make the model leak data, and their tools write files anywhere and run shell commands. The secrets in them are fake values.
 
 ## Layout
 
@@ -14,13 +14,17 @@ Six very small to-do applications (three APIs and three server-rendered UIs, in 
 | C# UI | [uis/dotNET](uis/dotNET) | .NET 10, ASP.NET Core Razor Pages | 5200 |
 | Java UI | [uis/java](uis/java) | Java 25, Spring Boot 4.1.2 (Web MVC + Thymeleaf), Maven | 8081 |
 | Python UI | [uis/python](uis/python) | Python 3.12+, Flask 3.1.3 + Jinja | 5000 |
+| C# MCP server | [mcps/dotNET](mcps/dotNET) | .NET 10 console app, `ModelContextProtocol` C# SDK (floating version), stdio | — |
+| Java MCP server | [mcps/java](mcps/java) | Java 25, MCP Java SDK `io.modelcontextprotocol.sdk:mcp` (floating range), Maven shaded jar, stdio | — |
+| Python MCP server | [mcps/python](mcps/python) | Python 3.12+, MCP Python SDK `mcp` 2.x (`MCPServer`), stdio | — |
 
-All six use the same domain and store their data in memory only. Each app runs on its own: the UIs don't call the APIs.
+All nine use the same domain and store their data in memory only. Each app runs on its own: the UIs don't call the APIs, and the MCP servers don't call either. The MCP servers use the **stdio** transport only (their MCP client launches them as a subprocess), so they listen on no port; an HTTP-transport MCP test app can be added later.
 
 The [logic/](logic) folder holds the automated tests that run the reviewer against these apps and score the results against the answer key below; see [Automated validation](#automated-validation).
 
 - **APIs:** `GET /health`, `GET /todos`, `GET /todos/{id}`, `POST /todos`, `PUT /todos/{id}`, `DELETE /todos/{id}?key=<api key>`. A to-do has `id`, `title` and a completed flag.
 - **UIs:** one page that lists to-dos, with forms to add a to-do (title, priority, optional return URL) and to mark one done, plus an admin action `/admin/clear?password=…` (C#: `/?handler=Clear&password=…`) that deletes every to-do.
+- **MCP servers:** eight tools with the same names in every language: `list_todos`, `add_todo` (an object with a title and priority), `complete_todo` (C#/Java: `id`; Python: `todo_id`), `delete_all_todos`, `export_todos` (a file path), `archive_todos` (an archive name), `import_todos` (a URL) and `get_status`.
 
 ## Running the apps
 
@@ -34,6 +38,11 @@ Prerequisites: .NET SDK 10, JDK 25 with Maven 3.9+, and Python 3.12+.
 | C# UI | `dotnet run`, then open `http://localhost:5200` |
 | Java UI | `mvn spring-boot:run`, then open `http://localhost:8081` |
 | Python UI | `python -m venv .venv`, activate it, `pip install -r requirements.txt`, `python app.py`, then open `http://localhost:5000` |
+| C# MCP server | `dotnet build`; the client launches `dotnet run --project <path>/test/mcps/dotNET` |
+| Java MCP server | `mvn -q package`; the client launches `java -jar <path>/test/mcps/java/target/todo-mcp-0.0.1-SNAPSHOT.jar` |
+| Python MCP server | `python -m venv .venv`, activate it, `pip install -r requirements.txt`; the client launches `<path>/test/mcps/python/.venv/Scripts/python server.py` (`bin/python` on Linux and macOS) |
+
+An MCP server started from a terminal just waits for JSON-RPC on stdin. To try one, launch it from the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector) (`npx @modelcontextprotocol/inspector <command from the table>`), which lists the tools and calls them without a model in the loop. Don't add these servers to an AI assistant's MCP configuration (see the warning above).
 
 Example API calls:
 
@@ -54,6 +63,7 @@ Point the reviewer at **one app directory**, not at `test/`. That keeps this ans
 ```
 /compliance-reviewer test/apis/dotNET
 /compliance-reviewer test/uis/python --subjects all --programmatic --output file --out-file docs/reports/test-uis-python.md
+/compliance-reviewer test/mcps/java --subjects all
 ```
 
 To compare languages, review all three apps of one kind with the same flags and AI tool. To compare AI tools, review the same app with the same flags in each tool.
@@ -74,10 +84,15 @@ The scripts in [logic/](logic) do the review-and-compare work for you. Each test
 | [logic/test_ui_java.py](logic/test_ui_java.py) | Java UI ([uis/java](uis/java)) | U1–U12 |
 | [logic/test_api_python.py](logic/test_api_python.py) | Python API ([apis/python](apis/python)) | A1–A12 |
 | [logic/test_ui_python.py](logic/test_ui_python.py) | Python UI ([uis/python](uis/python)) | U1–U12 |
-| [logic/test_all.py](logic/test_all.py) | All six, one after another (default) or at the same time (`--parallel`) | all |
+| [logic/test_mcp_dotnet.py](logic/test_mcp_dotnet.py) | C# MCP server ([mcps/dotNET](mcps/dotNET)) | M1–M12 |
+| [logic/test_mcp_java.py](logic/test_mcp_java.py) | Java MCP server ([mcps/java](mcps/java)) | M1–M12 |
+| [logic/test_mcp_python.py](logic/test_mcp_python.py) | Python MCP server ([mcps/python](mcps/python)) | M1–M12 |
+| [logic/test_all.py](logic/test_all.py) | All nine, one after another (default) or at the same time (`--parallel`) | all |
 | [logic/selftest_harness.py](logic/selftest_harness.py) | No app: offline checks of the scoring logic and the answer-key file (no AI run, no cost) | — |
 
-The shared logic is in [logic/harness.py](logic/harness.py). [logic/answer_key.json](logic/answer_key.json) is the machine-readable copy of the answer-key tables: when you change a flaw, its expected checks or its location here, change that file too and run the self-test, which checks that every file it names exists.
+The shared logic is in [logic/harness.py](logic/harness.py). [logic/answer_key.json](logic/answer_key.json) is the machine-readable copy of the answer-key tables: when you change a flaw, its expected checks or its location here, change that file too and run the self-test, which checks that every file it names exists and that every check ID it names exists in a subject checklist.
+
+**Why the MCP tests share the harness.** An MCP server goes through the same review as the APIs and UIs: the same orchestrator, inventory, subjects and report, plus one extra subject (`review-mcp-server`). The run produces the same transition files, and a seeded MCP flaw is matched the same way, by check ID and file. Only the apps, their answer-key section (`mcps` in `answer_key.json`, M1–M12 below) and their test scripts are separate. A separate harness would duplicate the build, invoke and scoring code without testing anything new. The one MCP-specific part is the review-side gating: for a stdio-only server the inventory marks API Design and Security — Web & API N/A, so findings from those subjects show up as unexpected.
 
 ### Prerequisites
 
@@ -85,7 +100,7 @@ The shared logic is in [logic/harness.py](logic/harness.py). [logic/answer_key.j
 - The CLI of the AI tool you test with, signed in:
   - **Claude Code**: `claude`.
   - **GitHub Copilot CLI**: `copilot` (`npm install -g @github/copilot`). The `copilot` shim that VS Code puts on the path isn't enough on its own.
-- The app's build tools on the path, because each test builds its app first (see [Fresh build](#fresh-build)): the .NET SDK (`dotnet`) for the C# apps and Maven (`mvn`) with a JDK for the Java apps. The Python apps need only the Python that runs the test. Pass `--no-build` to skip the build when a tool isn't installed.
+- The app's build tools on the path, because each test builds its app first (see [Fresh build](#fresh-build)): the .NET SDK (`dotnet`) for the C# apps and Maven (`mvn`) with a JDK for the Java apps. The Python apps need only the Python that runs the test. Pass `--no-build` to skip the build when a tool isn't installed. The C# and Java MCP builds download the MCP SDK from NuGet and Maven Central.
 
 ### Fresh build
 
@@ -116,9 +131,11 @@ Run from the `compliance-reviewer_any-ai` folder:
 python test/logic/test_api_dotnet.py                          # one app, AI tool chosen automatically
 python test/logic/test_ui_java.py --tool copilot              # one app with GitHub Copilot
 python test/logic/test_api_python.py --min-found 80           # require only 80% of the flaws
-python test/logic/test_all.py                                 # all six, one after another
-python test/logic/test_all.py --parallel --tool claude        # all six at the same time
+python test/logic/test_mcp_python.py                          # one MCP server
+python test/logic/test_all.py                                 # all nine, one after another
+python test/logic/test_all.py --parallel --tool claude        # all nine at the same time (staggered by kind)
 python test/logic/test_all.py --only apis-java,uis-python     # a subset
+python test/logic/test_all.py --only mcps-dotNET,mcps-java,mcps-python   # the three MCP servers
 python test/logic/test_api_java.py --dry-run                  # show the command, don't run it
 python test/logic/test_api_java.py --score-only transitions/<runId>   # score an existing run (no AI cost)
 cd test/logic; python -m unittest selftest_harness            # offline self-tests
@@ -139,7 +156,7 @@ Common options (every script; run any script with `--help` for the full list):
 | `--build-timeout MIN` | `15` | Time limit for each build command, in minutes. Also `COMPLIANCE_TEST_BUILD_TIMEOUT_MIN`. |
 | `--dry-run` | off | Print the command that would run, then stop. |
 | `--score-only RUN_DIR` | — | Single-app scripts only: skip the review and score an existing `transitions/<runId>` folder. |
-| `--parallel`, `--only APPS` | serial, all six | `test_all.py` only. App names are `apis-dotNET`, `apis-java`, `apis-python`, `uis-dotNET`, `uis-java`, `uis-python`. |
+| `--parallel`, `--only APPS` | serial, all nine | `test_all.py` only. App names are `apis-dotNET`, `apis-java`, `apis-python`, `uis-dotNET`, `uis-java`, `uis-python`, `mcps-dotNET`, `mcps-java`, `mcps-python`. |
 
 **Which AI tool runs the review.** The first rule that applies wins:
 
@@ -158,7 +175,7 @@ Common options (every script; run any script with `--help` for the full list):
 
 The test reads the run's transition files (`transitions/<runId>/`), not the Markdown report.
 
-- **A flaw is found** when a finding cites one of the flaw's expected checks with evidence in one of the flaw's files, the same rule as the answer key below. "Whole app" flaws (A12, U11, U12) accept any location, and for A12/U12 any Testing check (`TST-*`) counts. Findings are matched in the per-subject files (`NN-review-*.json`), before the reviewer merges duplicates across subjects, so a merged finding still counts.
+- **A flaw is found** when a finding cites one of the flaw's expected checks with evidence in one of the flaw's files, the same rule as the answer key below. "Whole app" flaws (A12, U11, U12, M12) accept any location, and for A12/U12/M12 any Testing check (`TST-*`) counts. Findings are matched in the per-subject files (`NN-review-*.json`), before the reviewer merges duplicates across subjects, so a merged finding still counts.
 - **Every other finding** in the final, deduplicated list (`90-aggregate.json`) is put in one of three groups:
   - **Incidental:** its check is listed under [Expected incidental findings](#expected-incidental-findings). Counted, not scored.
   - **Related:** it cites one of a flaw's expected checks, but in a different file. Reported only.
@@ -182,7 +199,7 @@ The console shows the same result, ending with a one-line summary per app, for e
 
 ### Notes
 
-- **Running in parallel.** The reviewer names a run after the minute it started and the app's folder name, so `apis/dotNET` and `uis/dotNET` started in the same minute could get the same run ID. `test_all.py --parallel` therefore starts the three UI reviews 120 seconds after the three API reviews, and every test checks that its run reviewed its own app. Parallel runs also use model credit faster and may hit the tool's rate limits.
+- **Running in parallel.** The reviewer names a run after the minute it started and the app's folder name, so `apis/dotNET`, `uis/dotNET` and `mcps/dotNET` started in the same minute could get the same run ID. `test_all.py --parallel` therefore starts each kind 120 seconds after the previous one (the UIs 120 seconds after the APIs, the MCP servers 120 seconds after the UIs), and every test checks that its run reviewed its own app. Parallel runs also use model credit faster and may hit the tool's rate limits.
 - **Comparing AI tools or languages.** Run `test_all.py` once per tool with the same `--min-found` and compare the two `summary.md` files, or compare the three apps of one kind within a single summary.
 - **Re-scoring.** After you change the answer key or the scoring rules, use `--score-only transitions/<runId>` to score earlier runs again without another review.
 
@@ -224,6 +241,27 @@ The flaws are numbered so that the same number means the same flaw in every lang
 | U11 | No security headers (CSP, frame-ancestors, nosniff and so on) | SEC-WA-01, SEC-WA-03, SEC-WA-04, SEC-WA-11 | whole app | whole app | whole app |
 | U12 | No automated tests | TST-07 (and other TST checks N/A or failed) | whole app | whole app | whole app |
 
+### MCP servers
+
+All three servers use the stdio transport. "Tools file" means `TodoTools.cs` (C#), `TodoTools.java` with the tool definitions in `TodoMcpServer.java` (Java) and `server.py` (Python); Java paths are under `src/main/java/com/example/todomcp/`.
+
+| # | Flaw | Expected checks | C# ([mcps/dotNET](mcps/dotNET)) | Java ([mcps/java](mcps/java)) | Python ([mcps/python](mcps/python)) |
+|---|------|-----------------|------|------|--------|
+| M1 | Diagnostic output written to `stdout`, which corrupts the stdio protocol stream | MCP-01 | `Program.cs` `Console.WriteLine` and the default console logger (writes to `stdout`); `TodoTools.cs` `Console.WriteLine` | `TodoMcpServer.main` and `TodoTools` `System.out.println` | `server.py` `print(...)` |
+| M2 | Tool poisoning: the `list_todos` description tells the model to call `get_status` first, include the sync token in its reply and hide this from the user | MCP-05 | `TodoTools.cs` `[Description]` | `TodoMcpServer.java` tool description | `server.py` `@mcp.tool(description=...)` |
+| M3 | `export_todos` writes to any caller-supplied path, with no root confinement or validation | MCP-09, MCP-06, SEC-II-01 | `ExportTodos` `File.WriteAllText(path, …)` | `TodoTools.exportTodos` `Files.writeString(Path.of(path), …)` | `export_todos` `open(path, "w")` |
+| M4 | OS command injection: `archive_todos` concatenates the archive name into a shell command | SEC-II-04, MCP-09 | `ArchiveTodos` `cmd.exe /c` / `/bin/sh -c` | `TodoTools.archiveTodos` `cmd.exe /c` / `/bin/sh -c` | `archive_todos` `subprocess.run(..., shell=True)` |
+| M5 | Untyped tool input (`add_todo` takes an untyped object; Java: every schema is `{"type":"object"}`) and no argument validation | MCP-04, MCP-06, SEC-II-01 | `AddTodo(JsonElement data)` | `TodoMcpServer` `ANY_OBJECT`/`NO_ARGS` schemas; `TodoTools` casts `request.arguments()` | `add_todo(data: dict)` |
+| M6 | `delete_all_todos` is annotated read-only and runs without any confirmation | MCP-10 | `[McpServerTool(ReadOnly = true)]` | `ToolAnnotations.readOnlyHint(true)` | `ToolAnnotations(readOnlyHint=True)` |
+| M7 | Hard-coded sync API token, returned to the model by `get_status` | MCP-11, MCP-08, SEC-OP-05, SEC-OP-06, TF-03 | `TodoTools.cs` `SyncApiToken` | `TodoTools.java` `SYNC_API_TOKEN` | `server.py` `SYNC_API_TOKEN` |
+| M8 | Stack traces returned as successful tool results (no `isError`); "not found" also returned as success | MCP-07, SEC-OP-01 | `catch (Exception ex) { return ex.ToString(); }` | `TodoTools.stackTrace(e)`; `TodoMcpServer` never sets `isError` | `return traceback.format_exc()` |
+| M9 | `import_todos` fetches any URL (SSRF) with no timeout or size limit and returns the raw fetched content to the model | SEC-II-10, MCP-09, MCP-13, MCP-08, REL-01 | `HttpClient` with `Timeout.InfiniteTimeSpan` | `HttpClient.newHttpClient()`, no request timeout | `urllib.request.urlopen(url)` |
+| M10 | Floating MCP SDK version | DEP-01, DEP-02 | `TodoMcp.csproj` `ModelContextProtocol Version="*"` | `pom.xml` `[2.0.0,)` (resolves to a milestone release) | `requirements.txt` `mcp` (no version) |
+| M11 | Unsynchronized static/global mutable state used as the data store | DP-01, TF-06, REL-05, MCP-12 | `TodoStore.cs` static `Items`/`NextId` | `TodoStore.java` static `items`/`nextId` | `server.py` global `todos`/`next_id` |
+| M12 | No automated tests | TST-07 (and other TST checks N/A or failed) | whole app | whole app | whole app |
+
+For the stdio MCP servers, expect API Design and Security — Web & API to be N/A (no HTTP surface), MCP-15 (remote transport security) to be N/A, and the Identity & Access checks about authenticating callers to be N/A (a stdio server shares its client's trust domain).
+
 ### Expected incidental findings
 
 These come from keeping the apps minimal rather than from seeded flaws. Expect them in every review; don't score them as false positives:
@@ -243,6 +281,12 @@ These come from keeping the apps minimal rather than from seeded flaws. Expect t
 - **API design (APIs only):** no committed OpenAPI file (the spec is generated at run time), no versioning, no pagination, sequential integer IDs rather than opaque ones, no request-ID header or machine-readable error code, no ETags and no correlation headers (API-01, 06, 07, 10, 11, 14, 15). The UIs should be N/A for API design, or reviewed only for their form endpoints.
 - **Reliability and Performance:** mostly N/A, because the apps have no remote dependencies. The in-memory store and single instance may show up under REL-05 and PERF-08, the APIs' linear scans of the in-memory list for get, update and delete under PERF-05, and the UIs' linear scan to find the to-do to mark done under PERF-05 too.
 - **Disaster Recovery, Monitoring, Cost & Sustainability:** N/A, because there is no infrastructure as code.
+- **MCP servers only:**
+  - the general incidentals above for Maintainability, Software Lifecycle, Dependency Management (DEP-02, 05, 07, 08), Observability (OBS-02 to OBS-10, plus OBS-01 for unstructured `stdout` lines, next to M1, and OBS-09 for exceptions turned into text, next to M8), CS-04, CS-05 and AP-06;
+  - no rate limiting of tool calls (MCP-13), no per-invocation audit log (MCP-14), no documented deployment shape (MCP-16), and the transport-fit check flagging the hard-coded token instead of an environment variable (MCP-03, next to M7);
+  - exceptions caught and not logged (SEC-OP-02), user input concatenated into the `stdout` lines (SEC-OP-04, next to M1), no security-event logging (SEC-OP-08), and broad `catch (Exception)` blocks (SQ-06, next to M8);
+  - blocking I/O in tools (PERF-02), linear scans of the list (PERF-05), `list_todos` and `export_todos` returning the whole list with no cap (PERF-06), and the single in-memory instance (REL-05, PERF-08);
+  - no retry on the `import_todos` fetch (REL-02, next to M9) and no concurrency or load limit on the expensive tools, `archive_todos` and `import_todos` (REL-06, next to M4 and M9).
 
 ### Checking the flaws by hand
 
@@ -251,3 +295,12 @@ Every flaw above was checked by running the apps:
 - Each API creates, lists and deletes to-dos. DELETE without the key returns 401, and with `?key=todo-api-key-7f3c9e2a1b` it succeeds. A missing to-do returns 200 with an `error` body. `POST /todos` with `{}` returns 500 with a stack trace.
 - Each UI posts `title=<b>hi</b>` and renders it as live HTML, ignores an invalid priority, and redirects to an external `returnUrl` / `return_url`.
 - The C# and Java Swagger UIs return 200.
+- Each MCP server was driven over stdio by a raw JSON-RPC client (`initialize`, `tools/list`, `tools/call` for every tool). Each one answered and exited when stdin closed, and each one showed M1 to M9 in the traffic:
+  - Lines on `stdout` that aren't JSON-RPC: the `print`/`Console.WriteLine`/`System.out` messages, and in C# also the console logger's `info:` lines.
+  - The poisoned `list_todos` description.
+  - An untyped `add_todo` schema (Java: every schema is `{"type":"object"}`).
+  - `readOnlyHint: true` on `delete_all_todos`.
+  - `get_status` returning the token.
+  - `export_todos` writing to `../probe-export.json`.
+  - Stack traces from `add_todo` with a null object and from `import_todos` with an unreachable URL, each with `isError: false`.
+  - The Java SDK's `[2.0.0,)` range resolving to `2.2.0-M2`.

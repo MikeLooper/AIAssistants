@@ -1,7 +1,7 @@
-"""Run all six Compliance Reviewer validation tests, serially (default) or in parallel.
+"""Run all nine Compliance Reviewer validation tests (APIs, UIs and MCP servers), serially (default) or in parallel.
 
 Usage:
-  python test/logic/test_all.py [--parallel] [--tool claude|copilot] [--min-found 90] [--only apis-java,uis-python]
+  python test/logic/test_all.py [--parallel] [--tool claude|copilot] [--min-found 90] [--only apis-java,uis-python,mcps-dotNET]
 
 Exit code: 0 all passed, 1 at least one failed, 2 at least one could not be scored.
 """
@@ -19,16 +19,16 @@ import harness
 
 APPS = [(kind, lang) for kind in harness.KINDS for lang in harness.LANGS]
 
-# The reviewer names runs `<YYYY-MM-DD_HHmm>-<short-target-name>`, so apis/X and uis/X started in the
-# same minute could get the same runId. In parallel mode the UIs start this many seconds after the APIs.
+# The reviewer names runs `<YYYY-MM-DD_HHmm>-<short-target-name>`, so apis/X, uis/X and mcps/X started in the
+# same minute could get the same runId. In parallel mode each kind starts this many seconds after the previous one.
 STAGGER_SECONDS = 120
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(description="Run all six Compliance Reviewer validation tests.")
+    p = argparse.ArgumentParser(description="Run all nine Compliance Reviewer validation tests.")
     harness.add_common_args(p)
-    p.add_argument("--parallel", action="store_true", help="Run the six reviews concurrently (staggered).")
-    p.add_argument("--only", help="Comma-separated subset, e.g. apis-dotNET,uis-java.")
+    p.add_argument("--parallel", action="store_true", help="Run the nine reviews concurrently (staggered by kind).")
+    p.add_argument("--only", help="Comma-separated subset, e.g. apis-dotNET,uis-java,mcps-python.")
     args = p.parse_args(argv)
 
     apps = APPS
