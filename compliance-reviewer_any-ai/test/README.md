@@ -213,7 +213,7 @@ The flaws are numbered so that the same number means the same flaw in every lang
 |---|------|-----------------|------|------|--------|
 | U1 | Stored XSS: to-do titles rendered without encoding | SEC-II-08 | `Pages/Index.cshtml` `@Html.Raw(item.Title)` | `templates/index.html` `th:utext` | `templates/index.html` `\|safe` |
 | U2 | No CSRF protection on state-changing forms | SEC-IA-05 | `Pages/Index.cshtml.cs` `[IgnoreAntiforgeryToken]` | no CSRF protection configured (no Spring Security) | no CSRF protection (no Flask-WTF or equivalent) |
-| U3 | Hard-coded admin password (and, in Python, a hard-coded Flask `SECRET_KEY`) | SEC-OP-05, SEC-OP-06, TF-03 | `appsettings.json` `AdminPassword` | `application.properties` `admin.password` | `app.py` `ADMIN_PASSWORD`, `SECRET_KEY` |
+| U3 | Hard-coded admin password (and, in Python, a hard-coded Flask `SECRET_KEY`), stored in plain text as a sample-style default | SEC-OP-05, SEC-OP-06, TF-03, SEC-IA-06, SEC-IA-10 | `appsettings.json` `AdminPassword` | `application.properties` `admin.password` | `app.py` `ADMIN_PASSWORD`, `SECRET_KEY` |
 | U4 | Admin password sent in the query string to a state-changing GET, compared in plain text, with no authentication, authorization, throttling or audit | SEC-WA-10, SEC-IA-01, SEC-IA-02, SEC-IA-07, SEC-IA-09, API-09 | `Index.cshtml.cs` `OnGetClear`; `Program.cs` (no authentication or authorization configured) | `TodoController.clear` | `app.py` `clear` |
 | U5 | Open redirect: the user-supplied return URL is redirected to without validation | SEC-IA-04, SEC-II-01 | `Index.cshtml.cs` `OnPostAdd` `Redirect(returnUrl)` | `TodoController.add` `"redirect:" + returnUrl` | `app.py` `add` `redirect(request.form.get("return_url"))` |
 | U6 | Detailed error pages / debug mode always on | SEC-OP-01, SEC-OP-07 | `Program.cs` `UseDeveloperExceptionPage()` unconditionally; no HTTPS redirection or HSTS | `server.error.include-stacktrace=always` | `app.run(debug=True, host="0.0.0.0")` (Werkzeug debugger) |
@@ -237,11 +237,11 @@ These come from keeping the apps minimal rather than from seeded flaws. Expect t
   - the DELETE key check has no throttling, lockout or failure logging (SEC-IA-09, next to A3);
   - the error handler returns the exception without logging it server-side (SEC-OP-02, next to A5);
   - unbounded, user-supplied titles are written to the log (SEC-OP-09, next to A4 and A7).
-- **Security, UIs only:** the admin clear-all action and added to-dos are logged with raw file writes rather than through the logging framework (SEC-OP-08, next to U4 and U9).
+- **Security, UIs only:** the admin clear-all action and added to-dos are logged with raw file writes rather than through the logging framework (SEC-OP-08, next to U4 and U9), and the log file has no rotation or size cap (SEC-OP-09, next to U9).
 - **Coding standards:** public types and members have no documentation comments (CS-04). In the UIs, log lines may be flagged for string concatenation instead of the language's preferred formatting, such as C# interpolation (CS-05, next to U9).
 - **Architecture patterns:** in the APIs, each handler builds its own "not found" response instead of using a shared helper or central error mapping (AP-06, next to A9); in the UIs, each handler writes the log file itself instead of using a shared logger (AP-06, next to U9).
 - **API design (APIs only):** no committed OpenAPI file (the spec is generated at run time), no versioning, no pagination, sequential integer IDs rather than opaque ones, no request-ID header or machine-readable error code, no ETags and no correlation headers (API-01, 06, 07, 10, 11, 14, 15). The UIs should be N/A for API design, or reviewed only for their form endpoints.
-- **Reliability and Performance:** mostly N/A, because the apps have no remote dependencies. The in-memory store and single instance may show up under REL-05 and PERF-08, and the APIs' linear scans of the in-memory list for get, update and delete under PERF-05.
+- **Reliability and Performance:** mostly N/A, because the apps have no remote dependencies. The in-memory store and single instance may show up under REL-05 and PERF-08, the APIs' linear scans of the in-memory list for get, update and delete under PERF-05, and the UIs' linear scan to find the to-do to mark done under PERF-05 too.
 - **Disaster Recovery, Monitoring, Cost & Sustainability:** N/A, because there is no infrastructure as code.
 
 ### Checking the flaws by hand

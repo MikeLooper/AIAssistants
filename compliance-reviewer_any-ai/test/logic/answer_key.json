@@ -140,10 +140,10 @@
         "DEP-02", "DEP-05", "DEP-07",
         "OBS-02", "OBS-03", "OBS-04", "OBS-05", "OBS-06", "OBS-07", "OBS-08",
         "SEC-WA-02", "SEC-WA-06", "SEC-WA-07",
-        "SEC-OP-08",
+        "SEC-OP-08", "SEC-OP-09",
         "CS-04", "CS-05", "AP-06",
         "API-*",
-        "REL-05", "PERF-08",
+        "REL-05", "PERF-05", "PERF-08",
         "DR-*", "MON-*", "COST-*"
       ],
       "flaws": [
@@ -170,7 +170,7 @@
         {
           "id": "U3",
           "title": "Hard-coded admin password (Python: also hard-coded SECRET_KEY)",
-          "checks": ["SEC-OP-05", "SEC-OP-06", "TF-03"],
+          "checks": ["SEC-OP-05", "SEC-OP-06", "TF-03", "SEC-IA-06", "SEC-IA-10"],
           "locations": {
             "dotNET": ["appsettings.json"],
             "java": ["src/main/resources/application.properties"],
