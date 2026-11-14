@@ -1,0 +1,190 @@
+{
+  "$comment": [
+    "Machine-readable copy of the answer key in test/README.md. Keep the two in sync and run selftest_harness.py after a change.",
+    "apps.<lang>.units: how to recognize each source unit in the reviewer's tables. 'pattern' is a regex matched against the",
+    "lower-cased text with underscores removed (so todo_service.py, TodoService.cs and TodoService.java all read 'todoservice').",
+    "'methods' are the method names (same normalization) the scorer looks for to tell which method a table row belongs to.",
+    "gaps: seeded coverage gaps. A gap is FOUND when a stage-3 audit row belongs to its unit and method, its row text matches",
+    "every 'match' regex (lower-cased, underscores kept) and not 'exclude', and its classification is one of 'accept'.",
+    "'mappingFallback': also found when the stage-1 mapping marks the unit as having no test suite.",
+    "controls: paths that ARE covered by strong tests. Matched the same way; one classified Uncovered (and never Covered)",
+    "is a false positive and fails the test.",
+    "files: the source and test file of each entry, relative to the app directory (checked by the self-test)."
+  ],
+  "apps": {
+    "dotNET": {
+      "units": {
+        "service": {"pattern": "todoservice", "methods": ["createtodo", "completetodo", "listtodos", "deletetodo", "renametodo", "prioritylabel"]},
+        "repository": {"pattern": "todorepository", "methods": ["findbyid"]},
+        "api": {"pattern": "program\\.cs|\\bprogram\\b|mapget|mappost|mapput|mapdelete", "methods": []}
+      },
+      "source": {"service": "TodoApi/TodoService.cs", "repository": "TodoApi/InMemoryTodoRepository.cs", "api": "TodoApi/Program.cs"},
+      "tests": {"service": "TodoApi.Tests/TodoServiceTests.cs", "repository": "TodoApi.Tests/InMemoryTodoRepositoryTests.cs"}
+    },
+    "java": {
+      "units": {
+        "service": {"pattern": "todoservice", "methods": ["createtodo", "completetodo", "listtodos", "deletetodo", "renametodo", "prioritylabel"]},
+        "repository": {"pattern": "todorepository", "methods": ["findbyid"]},
+        "api": {"pattern": "todocontroller", "methods": []}
+      },
+      "source": {
+        "service": "src/main/java/com/example/todoapi/TodoService.java",
+        "repository": "src/main/java/com/example/todoapi/InMemoryTodoRepository.java",
+        "api": "src/main/java/com/example/todoapi/TodoController.java"
+      },
+      "tests": {
+        "service": "src/test/java/com/example/todoapi/TodoServiceTest.java",
+        "repository": "src/test/java/com/example/todoapi/InMemoryTodoRepositoryTest.java"
+      }
+    },
+    "python": {
+      "units": {
+        "service": {"pattern": "todoservice", "methods": ["createtodo", "completetodo", "listtodos", "deletetodo", "renametodo", "prioritylabel"]},
+        "repository": {"pattern": "todorepository", "methods": ["findbyid"]},
+        "api": {"pattern": "main\\.py|\\bmain\\b|fastapi", "methods": []}
+      },
+      "source": {"service": "todo_service.py", "repository": "todo_repository.py", "api": "main.py"},
+      "tests": {"service": "tests/test_todo_service.py", "repository": "tests/test_todo_repository.py"}
+    }
+  },
+  "gaps": [
+    {
+      "id": "G1",
+      "title": "CreateTodo: title longer than 100 characters is never tested",
+      "category": "Boundary",
+      "unit": "service", "method": "createtodo",
+      "match": ["(100|too long|length|len\\(|max.?title|exceed|characters)"],
+      "accept": ["uncovered", "partial"]
+    },
+    {
+      "id": "G2",
+      "title": "CreateTodo: only the priority < 1 half of 'priority < 1 || priority > 5' is tested",
+      "category": "Compound decision",
+      "unit": "service", "method": "createtodo",
+      "match": ["priority", "(>|greater|above|over|exceed|high|upper|\\b6\\b|range|outside|invalid|\\bor\\b|\\|\\|)"],
+      "accept": ["uncovered", "partial"]
+    },
+    {
+      "id": "G3",
+      "title": "CompleteTodo: the 'id not found' error branch is never tested",
+      "category": "Error branch",
+      "unit": "service", "method": "completetodo",
+      "match": ["(not found|notfound|missing|unknown|does ?n.?t exist|no such|non-?exist|null|none|empty)"],
+      "exclude": "(already|blank|whitespace)",
+      "accept": ["uncovered", "partial"]
+    },
+    {
+      "id": "G4",
+      "title": "CompleteTodo: the 'already completed' test only asserts the result is not null (weak assertion)",
+      "category": "Weak assertion",
+      "unit": "service", "method": "completetodo",
+      "match": ["(already|idempot|== ?true|is true|=true|completed (→|->|=>) ?return)"],
+      "exclude": "(not found|notfound|\\bfalse\\b|not completed|incomplete|\\bopen\\b)",
+      "accept": ["partial", "uncovered"]
+    },
+    {
+      "id": "G5",
+      "title": "ListTodos: the minPriority filter is never tested",
+      "category": "Decision branch",
+      "unit": "service", "method": "listtodos",
+      "match": ["(min.?priority|minimum priority|priority ?>=|priority filter|threshold)"],
+      "exclude": "(is null|== ?null|is none|not given|not supplied|omitted|no filter|not set|unset)",
+      "accept": ["uncovered", "partial"]
+    },
+    {
+      "id": "G6",
+      "title": "DeleteTodo: the successful delete is executed by a test with no assertion",
+      "category": "Absent assertion",
+      "unit": "service", "method": "deletetodo",
+      "match": ["(found|exist|present|remov|success|happy|\\btrue\\b|valid|delete)"],
+      "exclude": "(not found|notfound|missing|unknown|does ?n.?t exist|no such|\\bfalse\\b|throws)",
+      "accept": ["uncovered", "partial"]
+    },
+    {
+      "id": "G7",
+      "title": "PriorityLabel: the 'medium' (priority 3) arm is never tested",
+      "category": "Decision branch",
+      "unit": "service", "method": "prioritylabel",
+      "match": ["(medium|== ?3|\\b3\\b)"],
+      "exclude": "(\\blow\\b|\\bhigh\\b|unknown|default)",
+      "accept": ["uncovered", "partial"]
+    },
+    {
+      "id": "G8",
+      "title": "PriorityLabel: the default 'unknown' arm (out-of-range priority) is never tested",
+      "category": "Boundary",
+      "unit": "service", "method": "prioritylabel",
+      "match": ["(default|unknown|\\bother\\b|\\belse\\b|out of range|outside|invalid|case _|< ?1|> ?5|\\b0\\b|\\b6\\b)"],
+      "exclude": "(medium)",
+      "accept": ["uncovered", "partial"]
+    },
+    {
+      "id": "G9",
+      "title": "RenameTodo: the 'id not found' branch is hidden by a mock that returns an item for any id (mock bypass)",
+      "category": "Mock bypass",
+      "unit": "service", "method": "renametodo",
+      "match": ["(not found|notfound|missing|unknown|does ?n.?t exist|no such|null|none|empty|orelsethrow)"],
+      "exclude": "(blank|whitespace|isnullorwhitespace|isblank|new.?title.{0,6}(none|null|empty)|title (is )?(none|null|empty))",
+      "accept": ["uncovered", "partial"]
+    },
+    {
+      "id": "G10",
+      "title": "API layer (endpoints and their error mapping) has no unit tests",
+      "category": "Unmapped unit",
+      "unit": "api", "method": null,
+      "match": [],
+      "accept": ["uncovered"],
+      "mappingFallback": true
+    }
+  ],
+  "controls": [
+    {
+      "id": "C1",
+      "title": "CreateTodo: blank title (null, empty, whitespace) throws a validation error",
+      "unit": "service", "method": "createtodo",
+      "match": ["(blank|empty|whitespace|null|none|missing|isnullorwhitespace|isblank|not title)"],
+      "exclude": "(length|100|long|priority|exceed)"
+    },
+    {
+      "id": "C2",
+      "title": "CreateTodo: valid input stores and returns the trimmed item",
+      "unit": "service", "method": "createtodo",
+      "match": ["(valid|success|happy|trim|strip|stor|add|persist|return)"],
+      "exclude": "(blank|empty|whitespace|null|none|length|100|too long|exceed|invalid|out of range|< ?1\\b|> ?5|throw|raise|error|exception)"
+    },
+    {
+      "id": "C3",
+      "title": "CompleteTodo: an open item is marked completed",
+      "unit": "service", "method": "completetodo",
+      "match": ["(not (yet )?completed|incomplete|uncompleted|\\bopen\\b|pending|== ?false|is false|!item|!iscompleted|not item\\.completed|mark|set.*true|happy|success)"],
+      "exclude": "(already|not found|notfound|missing|unknown|null|none|does ?n.?t exist|no such)"
+    },
+    {
+      "id": "C4",
+      "title": "ListTodos: completed items are hidden unless includeCompleted is true",
+      "unit": "service", "method": "listtodos",
+      "match": ["(include.?completed|completed)"],
+      "exclude": "(min.?priority|minimum|threshold)"
+    },
+    {
+      "id": "C5",
+      "title": "DeleteTodo: a missing id throws a not-found error",
+      "unit": "service", "method": "deletetodo",
+      "match": ["(not found|notfound|missing|unknown|does ?n.?t exist|no such|\\bfalse\\b|throw|raise)"],
+      "exclude": "(\\btrue\\b|succe|happy|no (exception|throw)|without|does ?n.?t (throw|raise)|returns normally)"
+    },
+    {
+      "id": "C6",
+      "title": "PriorityLabel: priority 4 and 5 return 'high'",
+      "unit": "service", "method": "prioritylabel",
+      "match": ["(high|\\b4\\b|\\b5\\b)"],
+      "exclude": "(medium|unknown|default|\\bother\\b|\\belse\\b|out of range|invalid|\\b[0-3]\\b|\\b6\\b|< ?\\d|> ?\\d)"
+    },
+    {
+      "id": "C7",
+      "title": "Repository FindById: a missing id returns null / empty / None",
+      "unit": "repository", "method": "findbyid",
+      "match": ["(missing|not found|notfound|null|none|empty|unknown|does ?n.?t exist|no such|not present|not in)"]
+    }
+  ]
+}
