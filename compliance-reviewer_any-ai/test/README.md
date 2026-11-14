@@ -284,7 +284,8 @@ These come from keeping the apps minimal rather than from seeded flaws. Expect t
 - **MCP servers only:**
   - the general incidentals above for Maintainability, Software Lifecycle, Dependency Management (DEP-02, 05, 07, 08), Observability (OBS-02 to OBS-10, plus OBS-01 for unstructured `stdout` lines, next to M1, and OBS-09 for exceptions turned into text, next to M8), CS-04, CS-05 and AP-06;
   - no rate limiting of tool calls (MCP-13), no per-invocation audit log (MCP-14), no documented deployment shape (MCP-16), and the transport-fit check flagging the hard-coded token instead of an environment variable (MCP-03, next to M7);
-  - exceptions caught and not logged (SEC-OP-02), user input concatenated into the `stdout` lines (SEC-OP-04, next to M1), no security-event logging (SEC-OP-08), and broad `catch (Exception)` blocks (SQ-06, next to M8);
+  - exceptions caught and not logged (SEC-OP-02), user input concatenated into the `stdout` lines (SEC-OP-04, next to M1), no security-event logging (SEC-OP-08), broad `catch (Exception)` blocks (SQ-06, next to M8), and the `archive_todos` child process and its output stream not released on the exception path (SEC-OP-10, next to M4);
+  - the to-do item is a behaviorless data class whose state the tools mutate directly, such as setting `done` in `complete_todo` (SQ-04);
   - blocking I/O in tools (PERF-02), linear scans of the list (PERF-05), `list_todos` and `export_todos` returning the whole list with no cap (PERF-06), and the single in-memory instance (REL-05, PERF-08);
   - no retry on the `import_todos` fetch (REL-02, next to M9) and no concurrency or load limit on the expensive tools, `archive_todos` and `import_todos` (REL-06, next to M4 and M9).
 

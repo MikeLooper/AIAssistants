@@ -1,0 +1,234 @@
+{
+  "app": "mcps-dotNET",
+  "target": "test/mcps/dotNET",
+  "tool": "claude",
+  "toolReason": "--tool",
+  "minFoundPct": 90.0,
+  "startedAt": "2026-11-13T11:04:40",
+  "build": {
+    "removedBefore": [],
+    "commands": [
+      "dotnet build --nologo -v q"
+    ],
+    "log": "C:\\Working\\Storage\\Dev\\GitHub\\AIAssistants\\compliance-reviewer_any-ai\\test\\logic\\results\\2026-11-13_110440-claude\\mcps-dotNET-build.log",
+    "durationSeconds": 4.1,
+    "status": "succeeded"
+  },
+  "runId": "2026-11-13_1806-dotnet",
+  "runDir": "C:\\Working\\Storage\\Dev\\GitHub\\AIAssistants\\compliance-reviewer_any-ai\\transitions\\2026-11-13_1806-dotnet",
+  "reportFile": "C:/Working/Storage/Dev/GitHub/AIAssistants/compliance-reviewer_any-ai/test/logic/results/2026-11-13_110440-claude/mcps-dotNET-report.md",
+  "overallScore": 25.4,
+  "overallBand": "Poor",
+  "durationSeconds": 987.1,
+  "costUsd": 5.4155716,
+  "command": [
+    "C:\\Users\\Michael\\.local\\bin\\claude.EXE",
+    "-p",
+    "/compliance-reviewer test/mcps/dotNET --subjects all --programmatic --output file --out-file C:/Working/Storage/Dev/GitHub/AIAssistants/compliance-reviewer_any-ai/test/logic/results/2026-11-13_110440-claude/mcps-dotNET-report.md",
+    "--output-format",
+    "json",
+    "--allowedTools",
+    "Read,Grep,Glob,Write,Edit,Agent,Task,Skill,TodoWrite,Bash(git -C:*),Bash(python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py:*)",
+    "--add-dir",
+    "C:\\Working\\Storage\\Dev\\GitHub\\AIAssistants\\compliance-reviewer_any-ai\\test\\logic\\results\\2026-11-13_110440-claude"
+  ],
+  "score": {
+    "total": 12,
+    "found": [
+      {
+        "flaw": "M1",
+        "title": "Diagnostic output written to stdout, corrupting the stdio protocol stream",
+        "findingIds": [
+          "MCP-01#1"
+        ]
+      },
+      {
+        "flaw": "M2",
+        "title": "Tool poisoning: hidden instructions in a tool description",
+        "findingIds": [
+          "MCP-05#1"
+        ]
+      },
+      {
+        "flaw": "M3",
+        "title": "Export tool writes to any caller-supplied path (no root confinement)",
+        "findingIds": [
+          "MCP-06#1",
+          "MCP-09#1",
+          "SEC-II-01#1"
+        ]
+      },
+      {
+        "flaw": "M4",
+        "title": "OS command injection: archive name concatenated into a shell command",
+        "findingIds": [
+          "MCP-09#1",
+          "SEC-II-04#1"
+        ]
+      },
+      {
+        "flaw": "M5",
+        "title": "Untyped tool input schema and no argument validation",
+        "findingIds": [
+          "MCP-04#1",
+          "MCP-06#1",
+          "SEC-II-01#1"
+        ]
+      },
+      {
+        "flaw": "M6",
+        "title": "Destructive tool annotated read-only, with no confirmation",
+        "findingIds": [
+          "MCP-10#1"
+        ]
+      },
+      {
+        "flaw": "M7",
+        "title": "Hard-coded sync token, returned to the model by a tool",
+        "findingIds": [
+          "MCP-08#1",
+          "MCP-11#1",
+          "SEC-OP-05#1"
+        ]
+      },
+      {
+        "flaw": "M8",
+        "title": "Stack traces returned as successful tool results (no isError)",
+        "findingIds": [
+          "MCP-07#1",
+          "SEC-OP-01#1"
+        ]
+      },
+      {
+        "flaw": "M9",
+        "title": "Import tool fetches any URL (SSRF) with no timeout and returns the raw content",
+        "findingIds": [
+          "MCP-08#1",
+          "MCP-09#1",
+          "MCP-13#1",
+          "REL-01#1",
+          "SEC-II-10#1"
+        ]
+      },
+      {
+        "flaw": "M10",
+        "title": "Floating MCP SDK version",
+        "findingIds": [
+          "DEP-01#1",
+          "DEP-01#2",
+          "DEP-02#1"
+        ]
+      },
+      {
+        "flaw": "M11",
+        "title": "Unsynchronized static/global mutable state used as the data store",
+        "findingIds": [
+          "DP-01#1"
+        ]
+      },
+      {
+        "flaw": "M12",
+        "title": "No automated tests",
+        "findingIds": [
+          "TST-01#1",
+          "TST-02#1",
+          "TST-06#1",
+          "TST-07#1",
+          "TST-11#1",
+          "TST-12#1",
+          "TST-13#1"
+        ]
+      }
+    ],
+    "missed": [],
+    "foundPct": 100.0,
+    "required": 11,
+    "minFoundPct": 90.0,
+    "coverageOk": true,
+    "unexpectedErrors": [],
+    "unexpectedOther": [
+      {
+        "id": "REL-02#1",
+        "checkId": "REL-02",
+        "severity": "Warning",
+        "title": "No retry for transient faults on the outbound import call",
+        "location": "test/mcps/dotNET/TodoTools.cs:110"
+      },
+      {
+        "id": "REL-06#1",
+        "checkId": "REL-06",
+        "severity": "Warning",
+        "title": "No load shedding or rate limiting on resource-intensive tool calls",
+        "location": "test/mcps/dotNET/TodoTools.cs:86"
+      },
+      {
+        "id": "PERF-06#1",
+        "checkId": "PERF-06",
+        "severity": "Warning",
+        "title": "list_todos and export_todos return the entire unbounded todo list",
+        "location": "test/mcps/dotNET/TodoTools.cs:21"
+      }
+    ],
+    "related": [],
+    "incidental": [
+      {
+        "id": "AP-06#1",
+        "checkId": "AP-06",
+        "severity": "Warning",
+        "title": "Identical exception-to-string error mapping is repeated in four tool handlers [ISO 25010:2023 Maintainability \u203a Modifiability, ISO-30]",
+        "location": "test/mcps/dotNET/TodoTools.cs:40"
+      },
+      {
+        "id": "CS-04#1",
+        "checkId": "CS-04",
+        "severity": "Information",
+        "title": "Public tool and data classes have no XML documentation comments",
+        "location": "test/mcps/dotNET/TodoTools.cs:9"
+      },
+      {
+        "id": "SL-01#1",
+        "checkId": "SL-01",
+        "severity": "Error",
+        "title": "No CI pipeline builds changes before merge",
+        "location": "test/mcps/dotNET/TodoMcp.csproj:1"
+      },
+      {
+        "id": "SL-11#1",
+        "checkId": "SL-11",
+        "severity": "Warning",
+        "title": "No static analysis / SAST runs on changes",
+        "location": "test/mcps/dotNET/TodoMcp.csproj:1"
+      },
+      {
+        "id": "OBS-04#1",
+        "checkId": "OBS-04",
+        "severity": "Warning",
+        "title": "No request-rate, latency or error metrics are emitted for tool invocations",
+        "location": "test/mcps/dotNET/Program.cs:7"
+      },
+      {
+        "id": "DEP-08#1",
+        "checkId": "DEP-08",
+        "severity": "Warning",
+        "title": "No package signature validation is enforced",
+        "location": "test/mcps/dotNET/TodoMcp.csproj:1"
+      },
+      {
+        "id": "MAINT-03#1",
+        "checkId": "MAINT-03",
+        "severity": "Warning",
+        "title": "Required toolchain version is not documented or pinned",
+        "location": "test/mcps/dotNET/TodoMcp.csproj:5"
+      },
+      {
+        "id": "MCP-14#1",
+        "checkId": "MCP-14",
+        "severity": "Warning",
+        "title": "Tool invocations aren't consistently or properly audit-logged",
+        "location": "test/mcps/dotNET/TodoTools.cs:20"
+      }
+    ]
+  },
+  "verdict": "pass",
+  "finishedAt": "2026-11-13T11:21:11"
+}
