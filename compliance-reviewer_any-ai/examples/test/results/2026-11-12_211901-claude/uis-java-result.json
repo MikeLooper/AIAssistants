@@ -10,12 +10,12 @@
     "commands": [
       "mvn -B -q clean package -DskipTests"
     ],
-    "log": "C:\\Working\\Storage\\Dev\\GitHub\\AIAssistants\\compliance-reviewer_any-ai\\test\\logic\\results\\2026-11-12_211901-claude\\uis-java-build.log",
+    "log": ".\\test\\logic\\results\\2026-11-12_211901-claude\\uis-java-build.log",
     "durationSeconds": 4.3,
     "status": "succeeded"
   },
   "runId": "2026-11-13_0422-java-ui",
-  "runDir": "C:\\Working\\Storage\\Dev\\GitHub\\AIAssistants\\compliance-reviewer_any-ai\\transitions\\2026-11-13_0422-java-ui",
+  "runDir": ".\\transitions\\2026-11-13_0422-java-ui",
   "reportFile": "C:/Working/Storage/Dev/GitHub/AIAssistants/compliance-reviewer_any-ai/test/logic/results/2026-11-12_211901-claude/uis-java-report.md",
   "overallScore": 36.65,
   "overallBand": "Poor",
@@ -30,7 +30,7 @@
     "--allowedTools",
     "Read,Grep,Glob,Write,Edit,Agent,Task,Skill,TodoWrite,Bash(git -C:*),Bash(python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py:*)",
     "--add-dir",
-    "C:\\Working\\Storage\\Dev\\GitHub\\AIAssistants\\compliance-reviewer_any-ai\\test\\logic\\results\\2026-11-12_211901-claude"
+    ".\\test\\logic\\results\\2026-11-12_211901-claude"
   ],
   "score": {
     "total": 12,

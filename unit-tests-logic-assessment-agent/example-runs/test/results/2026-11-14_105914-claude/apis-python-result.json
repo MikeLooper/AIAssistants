@@ -11,7 +11,7 @@
       "C:\\Users\\Michael\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe -m compileall -q .",
       "C:\\Users\\Michael\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe -m unittest discover -s tests"
     ],
-    "log": "C:\\Working\\Storage\\Dev\\GitHub\\AIAssistants\\unit-tests-logic-assessment-agent\\test\\logic\\results\\2026-11-14_105914-claude\\apis-python-build.log",
+    "log": ".\\test\\logic\\results\\2026-11-14_105914-claude\\apis-python-build.log",
     "durationSeconds": 1.0,
     "status": "succeeded"
   },
@@ -27,13 +27,13 @@
     "--allowedTools",
     "Read,Grep,Glob,Write,Edit,TodoWrite,Task,Agent"
   ],
-  "reportFile": "C:\\Working\\Storage\\Dev\\GitHub\\AIAssistants\\unit-tests-logic-assessment-agent\\docs\\coverage-review-20261114-105915.md",
+  "reportFile": ".\\docs\\coverage-review-20261114-105915.md",
   "artifacts": [
-    "C:\\Working\\Storage\\Dev\\GitHub\\AIAssistants\\unit-tests-logic-assessment-agent\\transitions\\run-20261114-105915.md",
-    "C:\\Working\\Storage\\Dev\\GitHub\\AIAssistants\\unit-tests-logic-assessment-agent\\transitions\\01-test-mapping-20261114-105915.md",
-    "C:\\Working\\Storage\\Dev\\GitHub\\AIAssistants\\unit-tests-logic-assessment-agent\\transitions\\02-control-flow-20261114-105915.md",
-    "C:\\Working\\Storage\\Dev\\GitHub\\AIAssistants\\unit-tests-logic-assessment-agent\\transitions\\03-assertion-audit-20261114-105915.md",
-    "C:\\Working\\Storage\\Dev\\GitHub\\AIAssistants\\unit-tests-logic-assessment-agent\\docs\\coverage-review-20261114-105915.md"
+    ".\\transitions\\run-20261114-105915.md",
+    ".\\transitions\\01-test-mapping-20261114-105915.md",
+    ".\\transitions\\02-control-flow-20261114-105915.md",
+    ".\\transitions\\03-assertion-audit-20261114-105915.md",
+    ".\\docs\\coverage-review-20261114-105915.md"
   ],
   "metrics": {
     "totalPaths": "47",

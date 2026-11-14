@@ -1,4 +1,4 @@
-$ C:\Users\Michael\.local\bin\claude.EXE -p /compliance-reviewer test/mcps/dotNET --subjects all --programmatic --output file --out-file C:/Working/Storage/Dev/GitHub/AIAssistants/compliance-reviewer_any-ai/test/logic/results/2026-11-13_110440-claude/mcps-dotNET-report.md --output-format json --allowedTools Read,Grep,Glob,Write,Edit,Agent,Task,Skill,TodoWrite,Bash(git -C:*),Bash(python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py:*) --add-dir C:\Working\Storage\Dev\GitHub\AIAssistants\compliance-reviewer_any-ai\test\logic\results\2026-11-13_110440-claude
+$ C:\Users\Michael\.local\bin\claude.EXE -p /compliance-reviewer test/mcps/dotNET --subjects all --programmatic --output file --out-file C:/Working/Storage/Dev/GitHub/AIAssistants/compliance-reviewer_any-ai/test/logic/results/2026-11-13_110440-claude/mcps-dotNET-report.md --output-format json --allowedTools Read,Grep,Glob,Write,Edit,Agent,Task,Skill,TodoWrite,Bash(git -C:*),Bash(python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py:*) --add-dir .\test\logic\results\2026-11-13_110440-claude
 # exit code: 0
 
 ## stdout

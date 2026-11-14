@@ -10,12 +10,12 @@
     "commands": [
       "dotnet build --nologo -v q"
     ],
-    "log": "C:\\Working\\Storage\\Dev\\GitHub\\AIAssistants\\compliance-reviewer_any-ai\\test\\logic\\results\\2026-11-13_110440-claude\\mcps-dotNET-build.log",
+    "log": ".\\test\\logic\\results\\2026-11-13_110440-claude\\mcps-dotNET-build.log",
     "durationSeconds": 4.1,
     "status": "succeeded"
   },
   "runId": "2026-11-13_1806-dotnet",
-  "runDir": "C:\\Working\\Storage\\Dev\\GitHub\\AIAssistants\\compliance-reviewer_any-ai\\transitions\\2026-11-13_1806-dotnet",
+  "runDir": ".\\transitions\\2026-11-13_1806-dotnet",
   "reportFile": "C:/Working/Storage/Dev/GitHub/AIAssistants/compliance-reviewer_any-ai/test/logic/results/2026-11-13_110440-claude/mcps-dotNET-report.md",
   "overallScore": 25.4,
   "overallBand": "Poor",
@@ -30,7 +30,7 @@
     "--allowedTools",
     "Read,Grep,Glob,Write,Edit,Agent,Task,Skill,TodoWrite,Bash(git -C:*),Bash(python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py:*)",
     "--add-dir",
-    "C:\\Working\\Storage\\Dev\\GitHub\\AIAssistants\\compliance-reviewer_any-ai\\test\\logic\\results\\2026-11-13_110440-claude"
+    ".\\test\\logic\\results\\2026-11-13_110440-claude"
   ],
   "score": {
     "total": 12,

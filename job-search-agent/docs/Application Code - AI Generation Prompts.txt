@@ -15,7 +15,7 @@ It may be necessary to interact with the website to cause each job description t
 - Progamming Language (examples: .NET, C#, Java, Python)
 - Salary Range (examples: $100,000 - $200,000, 100K - 200K)
 
-3. Store this agent, and any related files, in this directory: `C:\Working\Storage\Dev\GitHub\AIAssistants\job-search`.
+3. Store this agent, and any related files, in this directory: `.\job-search`.
 
 4. The agent will accept/expect the following information:
 	A. The path to a local file that contains a list of search URLs.
@@ -40,6 +40,6 @@ It may be necessary to interact with the website to cause each job description t
 			- A percentage of how well the discovered search attributes matches the target attribute values.
 			- If the percentage is greater than the 'Match percentage', mark this job description as recommended for follow-up.
 
-6. The agent's report will be written to the `C:\Working\Storage\Dev\GitHub\AIAssistants\job-search` directory, under a sub-directory named for the current date and time.  The name of the sub-directory will be in the format `YYYY-MM-DD HH-MM`.
+6. The agent's report will be written to the `.\job-search` directory, under a sub-directory named for the current date and time.  The name of the sub-directory will be in the format `YYYY-MM-DD HH-MM`.
 
 If some other AI tool, or AI model, could do this job better (or execute the agent better) list the tool or model and how it could be used.

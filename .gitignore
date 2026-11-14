@@ -2,3 +2,4 @@
 !/*/secrets/*.env.example
 __pycache__
 /.vscode
+/compliance-reviewer_any-ai/examples/test/results/2026-11-13_110440-claude/.hashinput.tmp
