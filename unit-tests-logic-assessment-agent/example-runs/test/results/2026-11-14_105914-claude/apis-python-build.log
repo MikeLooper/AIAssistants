@@ -1,0 +1,22 @@
+$ C:\Users\Michael\AppData\Local\Python\pythoncore-3.14-64\python.exe -m compileall -q .
+# exit code: 0
+
+## stdout
+
+
+## stderr
+
+
+$ C:\Users\Michael\AppData\Local\Python\pythoncore-3.14-64\python.exe -m unittest discover -s tests
+# exit code: 0
+
+## stdout
+
+
+## stderr
+..................
+----------------------------------------------------------------------
+Ran 18 tests in 0.001s
+
+OK
+

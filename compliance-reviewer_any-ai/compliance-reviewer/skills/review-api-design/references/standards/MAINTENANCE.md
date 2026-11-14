@@ -9,8 +9,8 @@ Cross-skill strategy, cadence overview and AI-tool usage: `compliance-reviewer/S
 | Website | Local file | Elements | Cap | Note |
 |---|---|---|---|---|
 | spec.openapis.org | openapi-specification.md | 43 | 100 | — |
-| github.com/microsoft/api-guidelines | azure-rest-api-guidelines.md | 110 | 100 | Approved exception (DEC-3, 2026-11-07); covers 201 of 227 source anchors |
-| azure.github.io/azure-sdk | azure-sdk-telemetry.md | 5 | 100 | Covers 11 of 12 anchors in the two sections |
+| github.com/microsoft/api-guidelines | azure-rest-api-guidelines.md | 110 IDs (107 active) | 100 | Approved exception (DEC-3, 2026-11-07); covers 201 of 227 source anchors; 3 retired (DEC-4, 2026-11-12) |
+| azure.github.io/azure-sdk | azure-sdk-telemetry.md | 5 IDs (2 active) | 100 | Covers 11 of 12 anchors in the two sections; SDK-01 … SDK-03 retired (DEC-4, 2026-11-12) |
 
 ## Rules for editing elements
 
@@ -18,7 +18,8 @@ Cross-skill strategy, cadence overview and AI-tool usage: `compliance-reviewer/S
 - Level is the source's own word, verbatim (or `REVIEW` for a locally derived rule). Merged elements list each level.
 - Primary anchor first; list every absorbed anchor so coverage stays auditable.
 - Keep rows to one line (≈ 200 characters where possible).
-- Every AZ/SDK ID must be listed by exactly one check in `../checklist.md`; every OAS ID by API-01, API-02 or API-03.
+- Every active AZ/SDK ID must be listed by exactly one check in `../checklist.md`; every OAS ID by API-01, API-02 or API-03.
+- **No Azure-only elements (DEC-4, 2026-11-12).** The checks must apply to any HTTP API, Azure-hosted or not. When a source rule names an Azure-only mechanism (an `x-ms-*` or `azure-*` header, the `api-version` parameter or its date format, Azure error codes, Azure host names, Azure SDK telemetry), either generalize it (Scope `G†`: keep the intent and level, accept any equivalent generic mechanism, and name the Azure form as one example that satisfies it) or retire it when nothing generic is left. Don't add Scope `A` rows. On refresh, re-apply the same generalization to changed source text.
 - Don't add elements for caller authorization (review-security-identity-access), runtime input validation and size limits (review-security-input-injection), version headers, `405`/`415`, `Accept` reflection, credentials in URLs or `no-store` (review-security-web-api), trace propagation in code (review-observability), load limiting or outbound `Retry-After` handling (review-reliability), contract tests (review-testing) or controller code design (review-software-quality). See `SKILL.md` step 8.
 
 ## Refresh procedure
@@ -50,6 +51,14 @@ Cross-skill strategy, cadence overview and AI-tool usage: `compliance-reviewer/S
   - Minor wording added from the source: AZ-011, AZ-022, AZ-029, AZ-034, AZ-055, AZ-064, AZ-082 (`top` minimum 1, default unlimited), AZ-084, AZ-090, AZ-095.
   - SDK levels use the rendered wording on the published page (DO / YOU SHOULD); the Markdown source uses MUST / SHOULD.
 
+### 2026-11-12 — Azure-only mechanisms generalized or retired (DEC-4)
+
+- Goal: the API Design checks apply to any HTTP API (e.g. any ASP.NET Core API), not only Azure services. Pins unchanged.
+- Generalized (`G†`): AZ-023 (standard headers without `x-ms-*`), AZ-027 (request ID in any consistent header or error-body field), AZ-044/AZ-045 (machine-readable error code; header optional), AZ-046 (RFC 9457 Problem Details or the source's `error` object), AZ-069 (colon or verb sub-path action URLs), AZ-085 (any one explicit versioning mechanism, including a path segment), AZ-086 (any documented version scheme), AZ-087 (descriptive error code, not the Azure code names), AZ-090 (`Deprecation`/`Sunset` headers or an equivalent), AZ-108 (offset unit stated), AZ-110 (any client request-ID header name), SDK-05 (OpenTelemetry HTTP semantic conventions).
+- Wording only (`api-version` → the API's version parameter, if any): AZ-075, AZ-093, AZ-102, AZ-106.
+- Retired: AZ-088 (no version in path: Azure convention; AZ-085 now allows any mechanism), AZ-100 (pointer to Azure SDK telemetry), AZ-109 (Azure host pattern), SDK-01 … SDK-03 (Azure SDK `User-Agent`, `X-MS-UserAgent`, `X-MS-AZSDK-Telemetry`).
+- Checklist: API-04 no longer judges hosts; API-07 no longer fails path versioning; API-15 lists AZ-027, AZ-110, SDK-04, SDK-05. Check count unchanged (15), but API-04, API-05, API-07, API-10, API-15 findings from runs before and after this date aren't directly comparable.
+
 ## Open items
 
 - Follow-ups outside this skill: reviewed and closed in the cross-skill follow-up pass of 2026-11-09. Open hand-offs: none.
@@ -66,7 +75,7 @@ Cross-skill strategy, cadence overview and AI-tool usage: `compliance-reviewer/S
 
 | Source anchor | Element / status |
 |---|---|
-| http-url-pattern | AZ-008, AZ-109 |
+| http-url-pattern | AZ-008 (AZ-109 retired 2026-11-12) |
 | http-url-casing | AZ-001 |
 | http-url-length | AZ-006 |
 | http-url-case-sensitivity | AZ-002 |
@@ -75,7 +84,7 @@ Cross-skill strategy, cadence overview and AI-tool usage: `compliance-reviewer/S
 | http-url-allowed-characters-2 | AZ-004 |
 | http-url-should-be-readable | AZ-005 |
 | http-url-allowed-characters-3 | not localized — Permissive YOU MAY with no failure condition |
-| http-direct-endpoints | AZ-109 |
+| http-direct-endpoints | AZ-109 (retired 2026-11-12, Azure-only) |
 | http-url-return-consistent-form | AZ-007 |
 | http-url-parameter-values | not localized — Permissive YOU MAY with no failure condition |
 | http-all-methods-idempotent | AZ-009 |
@@ -205,7 +214,7 @@ Cross-skill strategy, cadence overview and AI-tool usage: `compliance-reviewer/S
 | versioning-api-version-unsupported | AZ-087 |
 | versioning-use-later-date | AZ-086 |
 | versioning-no-breaking-changes | AZ-089 |
-| versioning-no-version-in-path | AZ-088 |
+| versioning-no-version-in-path | AZ-088 (retired 2026-11-12, Azure convention) |
 | versioning-use-later-date-2 | AZ-086 |
 | versioning-preview-goes-ga-within-one-year | not localized — Needs release history (Git/release data), which reviews may not read |
 | versioning-use-extensible-enums | AZ-062 |
@@ -291,7 +300,7 @@ Cross-skill strategy, cadence overview and AI-tool usage: `compliance-reviewer/S
 | condreq-etag-depends-on-encoding | AZ-099 |
 | substrings-return-value-for-each-encoding | AZ-108 |
 | substrings-return-value-structure | AZ-108 |
-| telemetry-headers | AZ-100 |
+| telemetry-headers | AZ-100 (retired 2026-11-12, Azure-only) |
 | telemetry-allow-unrecognized-headers | AZ-028 |
 | distributed-tracing--telemetry (heading; correlation-header table, no item anchor) | AZ-110 |
 
@@ -301,13 +310,13 @@ Non-normative anchors in the file (section headings, retired-link placeholders),
 
 | Source anchor | Element / status |
 |---|---|
-| azurecore-http-telemetry-useragent | SDK-01 |
-| azurecore-http-telemetry-useragent-stacking | SDK-01 |
-| azurecore-http-telemetry-useragent-stacking-core | SDK-01 |
-| azurecore-http-telemetry-appid | SDK-01 |
-| azurecore-http-telemetry-appid-length | SDK-01 |
-| azurecore-http-telemetry-x-ms-useragent | SDK-02 |
-| azurecore-http-telemetry-dynamic | SDK-03 |
+| azurecore-http-telemetry-useragent | SDK-01 (retired 2026-11-12, Azure-only) |
+| azurecore-http-telemetry-useragent-stacking | SDK-01 (retired 2026-11-12, Azure-only) |
+| azurecore-http-telemetry-useragent-stacking-core | SDK-01 (retired 2026-11-12, Azure-only) |
+| azurecore-http-telemetry-appid | SDK-01 (retired 2026-11-12, Azure-only) |
+| azurecore-http-telemetry-appid-length | SDK-01 (retired 2026-11-12, Azure-only) |
+| azurecore-http-telemetry-x-ms-useragent | SDK-02 (retired 2026-11-12, Azure-only) |
+| azurecore-http-telemetry-dynamic | SDK-03 (retired 2026-11-12, Azure-only) |
 | azurecore-http-tracing-opentelemetry | SDK-05 |
 | azurecore-http-tracing-accept-context | SDK-04 |
 | azurecore-http-tracing-pass-context | SDK-04 |

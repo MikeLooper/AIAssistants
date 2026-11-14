@@ -1,0 +1,69 @@
+{
+  "$comment": "Source pins for check_source_drift.py (maintainers only; never used during a review). Pins copied from the standards file headers must match them; 'baseline' marks values recorded by the script.",
+  "skill": "review-mcp-server",
+  "checks": [
+    {
+      "id": "mcp-spec-stdio",
+      "file": "mcp-specification.md",
+      "method": "github-commit",
+      "repo": "modelcontextprotocol/modelcontextprotocol",
+      "path": "docs/specification/2026-07-28/basic/transports/stdio.mdx",
+      "pinned": "b488c16623e5202a3961e551886044577ae0f096",
+      "pinnedDate": "2026-07-28"
+    },
+    {
+      "id": "mcp-spec-tools",
+      "file": "mcp-specification.md",
+      "method": "github-commit",
+      "repo": "modelcontextprotocol/modelcontextprotocol",
+      "path": "docs/specification/2026-07-28/server/tools.mdx",
+      "pinned": "9850cae8923b0ee3d19a4476f1010b97aa161a55",
+      "pinnedDate": "2026-10-28"
+    },
+    {
+      "id": "mcp-security-best-practices",
+      "file": "mcp-security-best-practices.md",
+      "method": "github-commit",
+      "repo": "modelcontextprotocol/modelcontextprotocol",
+      "path": "docs/docs/2026-07-28/tutorials/security/security_best_practices.mdx",
+      "pinned": "c713a5485f653cc1da8c2658510862030846d498",
+      "pinnedDate": "2026-10-30"
+    },
+    {
+      "id": "mcp-local-server-security",
+      "file": "mcp-security-best-practices.md",
+      "method": "github-commit",
+      "repo": "modelcontextprotocol/modelcontextprotocol",
+      "path": "docs/docs/2026-07-28/tutorials/security/local-server-security.mdx",
+      "pinned": "e85b7ae9ee0d4c2b783f523ecf5ac34f6099102e",
+      "pinnedDate": "2026-10-05"
+    },
+    {
+      "id": "mcp-info-best-practices",
+      "file": "mcp-server-best-practices.md",
+      "method": "text-hash",
+      "url": "https://modelcontextprotocol.info/docs/best-practices/",
+      "pinned": "8128d4bd3b14f1d5",
+      "baseline": "2026-11-13"
+    },
+    {
+      "id": "csa-agentic-mcp",
+      "file": "csa-agentic-mcp-security.md",
+      "method": "text-hash",
+      "url": "https://labs.cloudsecurityalliance.org/agentic/agentic-mcp-security-best-practices-v1/",
+      "pinned": "ccd03b7f81977ae8",
+      "baseline": "2026-11-13"
+    },
+    {
+      "id": "mcp-spec-new-revision",
+      "method": "manual",
+      "note": "Check https://modelcontextprotocol.io/specification for a revision newer than 2026-07-28; if one exists, re-localize mcp-specification.md and mcp-security-best-practices.md from the new revision's pages."
+    },
+    {
+      "id": "thenewstack-article",
+      "file": "thenewstack-mcp-practices.md",
+      "method": "manual",
+      "note": "thenewstack.io refused automated retrieval (HTTP 403) on 2026-11-13. Read the article in a browser and complete thenewstack-mcp-practices.md (only items 1, 8 and 15 are localized)."
+    }
+  ]
+}

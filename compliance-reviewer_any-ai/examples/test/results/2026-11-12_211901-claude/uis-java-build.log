@@ -1,0 +1,8 @@
+$ mvn -B -q clean package -DskipTests
+# exit code: 0
+
+## stdout
+
+
+## stderr
+

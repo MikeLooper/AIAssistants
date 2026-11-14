@@ -1,12 +1,12 @@
 ---
 name: review-api-design
-description: 'Reviews whether an OpenAPI spec exists, is valid, and matches the implementation, and checks the implementation against the Microsoft Azure REST API Guidelines. Use when the compliance-reviewer orchestrator delegates the API Design subject. Marked N/A when no API is found.'
+description: 'Reviews whether an OpenAPI spec exists, is valid, and matches the implementation, and checks the implementation against generic REST API design practice (localized from the Microsoft REST API Guidelines, with Azure-only mechanisms generalized or removed). Use when the compliance-reviewer orchestrator delegates the API Design subject. Marked N/A when no API is found.'
 user-invocable: false
 ---
 
 # Review: API Design
 
-Checks the OpenAPI/Swagger spec (existence, validity, match to implementation) and the Microsoft Azure REST API Guidelines (plus the Azure SDK telemetry guidance they reference), using local, version-pinned summaries of those standards. Severity comes from each element's own normative wording.
+Checks the OpenAPI/Swagger spec (existence, validity, match to implementation) and generic REST API design practice, using local, version-pinned summaries of the OpenAPI Specification and the Microsoft REST API Guidelines (Azure edition, plus the trace-context part of the Azure SDK guidance). Only the guidelines' generic HTTP/REST rules are used: rules that named an Azure-only mechanism were generalized or retired, so the checks apply to any HTTP API, whatever its language, framework or host. Severity comes from each element's own normative wording.
 
 ## Inputs
 
@@ -17,8 +17,8 @@ controllers/routers, mark this whole subject N/A with a `notes` explanation — 
 ## Standards (local, authoritative)
 
 - `references/standards/openapi-specification.md` — OAS-01…OAS-43. Load only when a spec file is in scope.
-- `references/standards/azure-rest-api-guidelines.md` — AZ-001…AZ-110. Load when routes/controllers or a spec are in scope.
-- `references/standards/azure-sdk-telemetry.md` — SDK-01…SDK-05. Load with the Azure file.
+- `references/standards/azure-rest-api-guidelines.md` — AZ-001…AZ-110 (AZ-088, AZ-100, AZ-109 retired). Load when routes/controllers or a spec are in scope.
+- `references/standards/azure-sdk-telemetry.md` — SDK-04, SDK-05 (SDK-01…SDK-03 retired). Load with the guidelines file.
 - Do **not** fetch any URL for this skill. Do not load `references/standards/MAINTENANCE.md`.
 - If no element covers a situation: apply the closest element if it clearly fits; otherwise mark the check N/A
   ("not covered by localized standard") and add `localized-standard-gap: <description>` to `notes`.
@@ -32,7 +32,10 @@ controllers/routers, mark this whole subject N/A with a `notes` explanation — 
    ("no spec"), and review the routes directly against the AZ and SDK elements.
 4. For each check API-04…API-15, evaluate only the elements it lists whose "Applies when" condition holds in the
    files; if none apply, mark the check N/A with that reason (e.g. API-13 when no long-running operations exist).
-   Scope `A` (Azure-specific) elements apply to every target. Versioning is judged only under API-07.
+   Every active element applies to every target, Azure-hosted or not. A `G†` element accepts any equivalent generic
+   mechanism (header name, versioning style, error format); never fail a target for not using an Azure-specific name
+   (`x-ms-*`, `api-version`, `azure-deprecating`) or format. Retired rows are not evaluated. Versioning is judged only
+   under API-07.
 5. Severity: each Finding takes the failed element's level — DO/DO NOT/MUST/MUST NOT/REQUIRED/SHALL → Error;
    (YOU) SHOULD/(YOU) SHOULD NOT/RECOMMENDED → Warning; (YOU) MAY/OPTIONAL → Information; REVIEW → the check's
    default. For a merged element with mixed levels, use the level of the part that failed.

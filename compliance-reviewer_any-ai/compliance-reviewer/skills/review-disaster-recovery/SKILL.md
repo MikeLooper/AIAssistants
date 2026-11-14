@@ -18,7 +18,7 @@ region and traffic-routing IaC, deployment pipeline files, and DR documentation 
 
 ## Standards (local, authoritative)
 
-- `references/standards/azure-well-architected-reliability-dr.md` — WAFR-01…WAFR-46. Always load.
+- `references/standards/azure-well-architected-reliability-dr.md` — WAFR-01…WAFR-46 (WAFR-05, WAFR-19, WAFR-20, WAFR-41 retired). Always load.
 - `references/standards/nist-sp-800-34-contingency-planning.md` — SP34-01…SP34-25. Always load.
 - `references/standards/owasp-secrets-backup.md` — OSM-01 (secret-store backup and break-glass). Always load.
 - Do **not** fetch any URL for this skill. Do not load `references/standards/MAINTENANCE.md`.
@@ -28,8 +28,8 @@ region and traffic-routing IaC, deployment pipeline files, and DR documentation 
 ## Procedure
 
 1. Load `references/checklist.md`, `references/sources.md` and the three standards files.
-2. Note whether the IaC is Azure (`*.bicep`, ARM deploymentTemplate JSON, or Terraform `azurerm` provider). Scope `A`
-   elements apply only to Azure IaC; otherwise skip them ("Azure-specific element; target IaC is not Azure").
+2. Every active element is generic and applies to any cloud, Kubernetes or on-premises IaC; judge each one by the
+   cloud-neutral requirement, using the target's own resource types as evidence. Retired rows are not evaluated.
 3. Find the stated recovery tier or targets (criticality tier, SLO, RTO, RPO, FIPS 199 impact) in the files. Map them
    to the minimum posture with the tier table below. If none is stated, DR-04 and DR-08 are N/A ("no stated recovery
    target to judge against"); DR-03 reports the missing targets.

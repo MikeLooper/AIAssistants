@@ -1,0 +1,697 @@
+{
+  "app": "apis-python",
+  "target": "test/apis/python",
+  "tool": "claude",
+  "toolReason": "--tool",
+  "minFoundPct": 90.0,
+  "startedAt": "2026-11-14T10:59:14",
+  "build": {
+    "removedBefore": [],
+    "commands": [
+      "C:\\Users\\Michael\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe -m compileall -q .",
+      "C:\\Users\\Michael\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe -m unittest discover -s tests"
+    ],
+    "log": ".\\test\\logic\\results\\2026-11-14_105914-claude\\apis-python-build.log",
+    "durationSeconds": 1.0,
+    "status": "succeeded"
+  },
+  "runId": "20261114-105915",
+  "durationSeconds": 380.6,
+  "costUsd": 1.0958474000000002,
+  "command": [
+    "C:\\Users\\Michael\\.local\\bin\\claude.EXE",
+    "-p",
+    "Act as the agent defined in `.github/agents/unit-test-coverage-reviewer.agent.md`: read that file and follow its constraints and workflow exactly. Its four skills are at `.github/skills/<skill-name>/SKILL.md`; read each skill file before you run its stage and follow it. Review the unit test coverage of the workspace subfolder `test/apis/python` (the scope is that folder only: its source files and its unit test files). This is a headless, non-interactive run: do not ask questions; where something is ambiguous, make a reasonable assumption and note it in the report. Ignore the model-selection instructions. Start a fresh review and use Run ID `20261114-105915` (use exactly this value instead of reading the clock). Complete all four stages and persist every artifact: `transitions/run-20261114-105915.md`, `transitions/01-test-mapping-20261114-105915.md`, `transitions/02-control-flow-20261114-105915.md`, `transitions/03-assertion-audit-20261114-105915.md` and `docs/coverage-review-20261114-105915.md`. In the stage-3 audit tables, give every logical path its own row (do not merge or abbreviate paths) and name the method each path belongs to, either in the row or in the table's heading.",
+    "--output-format",
+    "json",
+    "--allowedTools",
+    "Read,Grep,Glob,Write,Edit,TodoWrite,Task,Agent"
+  ],
+  "reportFile": ".\\docs\\coverage-review-20261114-105915.md",
+  "artifacts": [
+    ".\\transitions\\run-20261114-105915.md",
+    ".\\transitions\\01-test-mapping-20261114-105915.md",
+    ".\\transitions\\02-control-flow-20261114-105915.md",
+    ".\\transitions\\03-assertion-audit-20261114-105915.md",
+    ".\\docs\\coverage-review-20261114-105915.md"
+  ],
+  "metrics": {
+    "totalPaths": "47",
+    "totalProblems": "27",
+    "problemPct": "57.45",
+    "severity": "11 / 9 / 3 / 4"
+  },
+  "score": {
+    "total": 10,
+    "found": [
+      {
+        "id": "G1",
+        "title": "CreateTodo: title longer than 100 characters is never tested",
+        "category": "Boundary",
+        "status": "found",
+        "expected": [
+          "uncovered",
+          "partial"
+        ],
+        "classifications": [
+          "covered",
+          "uncovered"
+        ],
+        "rows": [
+          {
+            "section": "Method: `TodoService.create_todo`",
+            "row": "P-03 | Trimmed title length `> MAX_TITLE_LENGTH` (100) | \u2014 | \u2014 | Uncovered | No test constructs a title longer than 100 characters.",
+            "classification": "uncovered",
+            "source": "03-assertion-audit"
+          }
+        ]
+      },
+      {
+        "id": "G2",
+        "title": "CreateTodo: only the priority < 1 half of 'priority < 1 || priority > 5' is tested",
+        "category": "Compound decision",
+        "status": "found",
+        "expected": [
+          "uncovered",
+          "partial"
+        ],
+        "classifications": [
+          "covered",
+          "uncovered"
+        ],
+        "rows": [
+          {
+            "section": "Method: `TodoService.create_todo`",
+            "row": "P-05 | `priority > 5` | \u2014 | \u2014 | Uncovered | No test uses a priority above 5.",
+            "classification": "uncovered",
+            "source": "03-assertion-audit"
+          }
+        ]
+      },
+      {
+        "id": "G3",
+        "title": "CompleteTodo: the 'id not found' error branch is never tested",
+        "category": "Error branch",
+        "status": "found",
+        "expected": [
+          "uncovered",
+          "partial"
+        ],
+        "classifications": [
+          "uncovered"
+        ],
+        "rows": [
+          {
+            "section": "Method: `TodoService.complete_todo`",
+            "row": "P-01 | `repository.find_by_id` returns `None` | \u2014 | \u2014 | Uncovered | No test calls `complete_todo` with a non-existent id; the `NotFoundError` branch is never exercised.",
+            "classification": "uncovered",
+            "source": "03-assertion-audit"
+          }
+        ]
+      },
+      {
+        "id": "G4",
+        "title": "CompleteTodo: the 'already completed' test only asserts the result is not null (weak assertion)",
+        "category": "Weak assertion",
+        "status": "found",
+        "expected": [
+          "partial",
+          "uncovered"
+        ],
+        "classifications": [
+          "partial"
+        ],
+        "rows": [
+          {
+            "section": "Method: `TodoService.complete_todo`",
+            "row": "P-02 | Item found, already `completed` | `test_complete_todo_already_completed_returns_item` | Weak \u2014 only `assertIsNotNone(result)`; does not assert `result.completed` remains `True`, nor identity/idempotency | Parti...",
+            "classification": "partial",
+            "source": "03-assertion-audit"
+          }
+        ]
+      },
+      {
+        "id": "G5",
+        "title": "ListTodos: the minPriority filter is never tested",
+        "category": "Decision branch",
+        "status": "found",
+        "expected": [
+          "uncovered",
+          "partial"
+        ],
+        "classifications": [
+          "uncovered"
+        ],
+        "rows": [
+          {
+            "section": "Method: `TodoService.list_todos`",
+            "row": "P-03 | `min_priority is not None` | \u2014 | \u2014 | Uncovered | Neither test passes the `min_priority` argument; the filter branch never executes.",
+            "classification": "uncovered",
+            "source": "03-assertion-audit"
+          }
+        ]
+      },
+      {
+        "id": "G6",
+        "title": "DeleteTodo: the successful delete is executed by a test with no assertion",
+        "category": "Absent assertion",
+        "status": "found",
+        "expected": [
+          "uncovered",
+          "partial"
+        ],
+        "classifications": [
+          "uncovered"
+        ],
+        "rows": [
+          {
+            "section": "Method: `TodoService.delete_todo`",
+            "row": "P-02 | `repository.remove` returns `True` | `test_delete_todo_existing_item_deletes` | **Absent** \u2014 the test body calls `self.service.delete_todo(item.id)` with no `assert*` statement at all (\"execution without verifi...",
+            "classification": "uncovered",
+            "source": "03-assertion-audit"
+          }
+        ]
+      },
+      {
+        "id": "G7",
+        "title": "PriorityLabel: the 'medium' (priority 3) arm is never tested",
+        "category": "Decision branch",
+        "status": "found",
+        "expected": [
+          "uncovered",
+          "partial"
+        ],
+        "classifications": [
+          "uncovered"
+        ],
+        "rows": [
+          {
+            "section": "`todo_service.py`",
+            "row": "P-02 | `priority_label` | `3` | **Uncovered** | \u2014 | \u2014 | [todo_service.py#L70-L71](../test/apis/python/todo_service.py) | \u2014",
+            "classification": "uncovered",
+            "source": "coverage-review"
+          }
+        ]
+      },
+      {
+        "id": "G8",
+        "title": "PriorityLabel: the default 'unknown' arm (out-of-range priority) is never tested",
+        "category": "Boundary",
+        "status": "found",
+        "expected": [
+          "uncovered",
+          "partial"
+        ],
+        "classifications": [
+          "uncovered"
+        ],
+        "rows": [
+          {
+            "section": "Function: `priority_label`",
+            "row": "P-04 | `priority` is any other value (default `case _`) | \u2014 | \u2014 | Uncovered | No test uses an out-of-range value (e.g., `0`, `6`, `-1`) to exercise the `\"unknown\"` fall-through.",
+            "classification": "uncovered",
+            "source": "03-assertion-audit"
+          }
+        ]
+      },
+      {
+        "id": "G9",
+        "title": "RenameTodo: the 'id not found' branch is hidden by a mock that returns an item for any id (mock bypass)",
+        "category": "Mock bypass",
+        "status": "found",
+        "expected": [
+          "uncovered",
+          "partial"
+        ],
+        "classifications": [
+          "uncovered"
+        ],
+        "rows": [
+          {
+            "section": "`todo_service.py`",
+            "row": "P-01 | `rename_todo` | `new_title is None` | **Uncovered** | \u2014 | \u2014 | [todo_service.py#L55-L56](../test/apis/python/todo_service.py) | \u2014",
+            "classification": "uncovered",
+            "source": "coverage-review"
+          },
+          {
+            "section": "`todo_service.py`",
+            "row": "P-03 | `rename_todo` | valid title, item not found | **Uncovered** | \u2014 | \u2014 | [todo_service.py#L59-L60](../test/apis/python/todo_service.py) | \u2014",
+            "classification": "uncovered",
+            "source": "coverage-review"
+          }
+        ]
+      },
+      {
+        "id": "G10",
+        "title": "API layer (endpoints and their error mapping) has no unit tests",
+        "category": "Unmapped unit",
+        "status": "found",
+        "expected": [
+          "uncovered"
+        ],
+        "classifications": [
+          "uncovered"
+        ],
+        "rows": [
+          {
+            "section": "Function: `health`",
+            "row": "P-01 | Called (straight-line) | \u2014 | \u2014 | Uncovered | No test suite exercises `main.py` at all.",
+            "classification": "uncovered",
+            "source": "03-assertion-audit"
+          },
+          {
+            "section": "Function: `list_todos` (route handler)",
+            "row": "P-01 | Called with any arguments (pass-through to `TodoService.list_todos`) | \u2014 | \u2014 | Uncovered | No HTTP-layer test exists.",
+            "classification": "uncovered",
+            "source": "03-assertion-audit"
+          },
+          {
+            "section": "Function: `get_todo` (route handler)",
+            "row": "P-01 | `repository.find_by_id` returns `None` | \u2014 | \u2014 | Uncovered | \u2014",
+            "classification": "uncovered",
+            "source": "03-assertion-audit"
+          }
+        ]
+      }
+    ],
+    "foundPct": 100.0,
+    "required": 9,
+    "minFoundPct": 90.0,
+    "coverageOk": true,
+    "gaps": [
+      {
+        "id": "G1",
+        "title": "CreateTodo: title longer than 100 characters is never tested",
+        "category": "Boundary",
+        "status": "found",
+        "expected": [
+          "uncovered",
+          "partial"
+        ],
+        "classifications": [
+          "covered",
+          "uncovered"
+        ],
+        "rows": [
+          {
+            "section": "Method: `TodoService.create_todo`",
+            "row": "P-03 | Trimmed title length `> MAX_TITLE_LENGTH` (100) | \u2014 | \u2014 | Uncovered | No test constructs a title longer than 100 characters.",
+            "classification": "uncovered",
+            "source": "03-assertion-audit"
+          }
+        ]
+      },
+      {
+        "id": "G2",
+        "title": "CreateTodo: only the priority < 1 half of 'priority < 1 || priority > 5' is tested",
+        "category": "Compound decision",
+        "status": "found",
+        "expected": [
+          "uncovered",
+          "partial"
+        ],
+        "classifications": [
+          "covered",
+          "uncovered"
+        ],
+        "rows": [
+          {
+            "section": "Method: `TodoService.create_todo`",
+            "row": "P-05 | `priority > 5` | \u2014 | \u2014 | Uncovered | No test uses a priority above 5.",
+            "classification": "uncovered",
+            "source": "03-assertion-audit"
+          }
+        ]
+      },
+      {
+        "id": "G3",
+        "title": "CompleteTodo: the 'id not found' error branch is never tested",
+        "category": "Error branch",
+        "status": "found",
+        "expected": [
+          "uncovered",
+          "partial"
+        ],
+        "classifications": [
+          "uncovered"
+        ],
+        "rows": [
+          {
+            "section": "Method: `TodoService.complete_todo`",
+            "row": "P-01 | `repository.find_by_id` returns `None` | \u2014 | \u2014 | Uncovered | No test calls `complete_todo` with a non-existent id; the `NotFoundError` branch is never exercised.",
+            "classification": "uncovered",
+            "source": "03-assertion-audit"
+          }
+        ]
+      },
+      {
+        "id": "G4",
+        "title": "CompleteTodo: the 'already completed' test only asserts the result is not null (weak assertion)",
+        "category": "Weak assertion",
+        "status": "found",
+        "expected": [
+          "partial",
+          "uncovered"
+        ],
+        "classifications": [
+          "partial"
+        ],
+        "rows": [
+          {
+            "section": "Method: `TodoService.complete_todo`",
+            "row": "P-02 | Item found, already `completed` | `test_complete_todo_already_completed_returns_item` | Weak \u2014 only `assertIsNotNone(result)`; does not assert `result.completed` remains `True`, nor identity/idempotency | Parti...",
+            "classification": "partial",
+            "source": "03-assertion-audit"
+          }
+        ]
+      },
+      {
+        "id": "G5",
+        "title": "ListTodos: the minPriority filter is never tested",
+        "category": "Decision branch",
+        "status": "found",
+        "expected": [
+          "uncovered",
+          "partial"
+        ],
+        "classifications": [
+          "uncovered"
+        ],
+        "rows": [
+          {
+            "section": "Method: `TodoService.list_todos`",
+            "row": "P-03 | `min_priority is not None` | \u2014 | \u2014 | Uncovered | Neither test passes the `min_priority` argument; the filter branch never executes.",
+            "classification": "uncovered",
+            "source": "03-assertion-audit"
+          }
+        ]
+      },
+      {
+        "id": "G6",
+        "title": "DeleteTodo: the successful delete is executed by a test with no assertion",
+        "category": "Absent assertion",
+        "status": "found",
+        "expected": [
+          "uncovered",
+          "partial"
+        ],
+        "classifications": [
+          "uncovered"
+        ],
+        "rows": [
+          {
+            "section": "Method: `TodoService.delete_todo`",
+            "row": "P-02 | `repository.remove` returns `True` | `test_delete_todo_existing_item_deletes` | **Absent** \u2014 the test body calls `self.service.delete_todo(item.id)` with no `assert*` statement at all (\"execution without verifi...",
+            "classification": "uncovered",
+            "source": "03-assertion-audit"
+          }
+        ]
+      },
+      {
+        "id": "G7",
+        "title": "PriorityLabel: the 'medium' (priority 3) arm is never tested",
+        "category": "Decision branch",
+        "status": "found",
+        "expected": [
+          "uncovered",
+          "partial"
+        ],
+        "classifications": [
+          "uncovered"
+        ],
+        "rows": [
+          {
+            "section": "`todo_service.py`",
+            "row": "P-02 | `priority_label` | `3` | **Uncovered** | \u2014 | \u2014 | [todo_service.py#L70-L71](../test/apis/python/todo_service.py) | \u2014",
+            "classification": "uncovered",
+            "source": "coverage-review"
+          }
+        ]
+      },
+      {
+        "id": "G8",
+        "title": "PriorityLabel: the default 'unknown' arm (out-of-range priority) is never tested",
+        "category": "Boundary",
+        "status": "found",
+        "expected": [
+          "uncovered",
+          "partial"
+        ],
+        "classifications": [
+          "uncovered"
+        ],
+        "rows": [
+          {
+            "section": "Function: `priority_label`",
+            "row": "P-04 | `priority` is any other value (default `case _`) | \u2014 | \u2014 | Uncovered | No test uses an out-of-range value (e.g., `0`, `6`, `-1`) to exercise the `\"unknown\"` fall-through.",
+            "classification": "uncovered",
+            "source": "03-assertion-audit"
+          }
+        ]
+      },
+      {
+        "id": "G9",
+        "title": "RenameTodo: the 'id not found' branch is hidden by a mock that returns an item for any id (mock bypass)",
+        "category": "Mock bypass",
+        "status": "found",
+        "expected": [
+          "uncovered",
+          "partial"
+        ],
+        "classifications": [
+          "uncovered"
+        ],
+        "rows": [
+          {
+            "section": "`todo_service.py`",
+            "row": "P-01 | `rename_todo` | `new_title is None` | **Uncovered** | \u2014 | \u2014 | [todo_service.py#L55-L56](../test/apis/python/todo_service.py) | \u2014",
+            "classification": "uncovered",
+            "source": "coverage-review"
+          },
+          {
+            "section": "`todo_service.py`",
+            "row": "P-03 | `rename_todo` | valid title, item not found | **Uncovered** | \u2014 | \u2014 | [todo_service.py#L59-L60](../test/apis/python/todo_service.py) | \u2014",
+            "classification": "uncovered",
+            "source": "coverage-review"
+          }
+        ]
+      },
+      {
+        "id": "G10",
+        "title": "API layer (endpoints and their error mapping) has no unit tests",
+        "category": "Unmapped unit",
+        "status": "found",
+        "expected": [
+          "uncovered"
+        ],
+        "classifications": [
+          "uncovered"
+        ],
+        "rows": [
+          {
+            "section": "Function: `health`",
+            "row": "P-01 | Called (straight-line) | \u2014 | \u2014 | Uncovered | No test suite exercises `main.py` at all.",
+            "classification": "uncovered",
+            "source": "03-assertion-audit"
+          },
+          {
+            "section": "Function: `list_todos` (route handler)",
+            "row": "P-01 | Called with any arguments (pass-through to `TodoService.list_todos`) | \u2014 | \u2014 | Uncovered | No HTTP-layer test exists.",
+            "classification": "uncovered",
+            "source": "03-assertion-audit"
+          },
+          {
+            "section": "Function: `get_todo` (route handler)",
+            "row": "P-01 | `repository.find_by_id` returns `None` | \u2014 | \u2014 | Uncovered | \u2014",
+            "classification": "uncovered",
+            "source": "03-assertion-audit"
+          }
+        ]
+      }
+    ],
+    "controls": [
+      {
+        "id": "C1",
+        "title": "CreateTodo: blank title (null, empty, whitespace) throws a validation error",
+        "status": "confirmed",
+        "classifications": [
+          "covered"
+        ],
+        "rows": [
+          {
+            "section": "Method: `TodoService.create_todo`",
+            "row": "P-01 | `title is None` | `test_create_todo_blank_title_raises_validation_error` (subTest `title=None`) | Strong \u2014 exact message asserted (`assertEqual(\"Title is required.\", str(ctx.exception))`) | Covered | \u2014",
+            "classification": "covered",
+            "source": "03-assertion-audit"
+          },
+          {
+            "section": "Method: `TodoService.create_todo`",
+            "row": "P-02 | `title` is empty/whitespace-only (`not title.strip()`) | `test_create_todo_blank_title_raises_validation_error` (subTests `title=\"\"`, `title=\"   \"`) | Strong \u2014 exact message asserted | Covered | \u2014",
+            "classification": "covered",
+            "source": "03-assertion-audit"
+          }
+        ]
+      },
+      {
+        "id": "C2",
+        "title": "CreateTodo: valid input stores and returns the trimmed item",
+        "status": "confirmed",
+        "classifications": [
+          "covered"
+        ],
+        "rows": [
+          {
+            "section": "`todo_service.py`",
+            "row": "P-06 | `create_todo` | valid input (happy path) | Covered | `test_create_todo_valid_input_stores_trimmed_item` | Strong | [todo_service.py#L27](../test/apis/python/todo_service.py) | [test_todo_service.py#L30-L36](../...",
+            "classification": "covered",
+            "source": "coverage-review"
+          }
+        ]
+      },
+      {
+        "id": "C3",
+        "title": "CompleteTodo: an open item is marked completed",
+        "status": "confirmed",
+        "classifications": [
+          "covered"
+        ],
+        "rows": [
+          {
+            "section": "Method: `TodoService.complete_todo`",
+            "row": "P-03 | Item found, not yet completed | `test_complete_todo_open_item_marks_it_completed` | Strong \u2014 `assertTrue` on both the returned item and the repository-persisted item | Covered | \u2014",
+            "classification": "covered",
+            "source": "03-assertion-audit"
+          }
+        ]
+      },
+      {
+        "id": "C4",
+        "title": "ListTodos: completed items are hidden unless includeCompleted is true",
+        "status": "confirmed",
+        "classifications": [
+          "covered"
+        ],
+        "rows": [
+          {
+            "section": "Method: `TodoService.list_todos`",
+            "row": "P-01 | `include_completed` is `False` | `test_list_todos_default_excludes_completed_items_and_sorts_by_priority` | Strong \u2014 exact remaining id list/order asserted | Covered | \u2014",
+            "classification": "covered",
+            "source": "03-assertion-audit"
+          },
+          {
+            "section": "Method: `TodoService.list_todos`",
+            "row": "P-02 | `include_completed` is `True` | `test_list_todos_include_completed_returns_all_items_sorted_by_priority` | Strong \u2014 exact id list/order asserted, including the completed item | Covered | \u2014",
+            "classification": "covered",
+            "source": "03-assertion-audit"
+          }
+        ]
+      },
+      {
+        "id": "C5",
+        "title": "DeleteTodo: a missing id throws a not-found error",
+        "status": "confirmed",
+        "classifications": [
+          "covered",
+          "partial"
+        ],
+        "rows": [
+          {
+            "section": "Method: `NotFoundError.__init__`",
+            "row": "P-01 | Constructor called with any `todo_id` | `test_delete_todo_missing_item_raises_not_found_error` | Partial \u2014 `todo_id` attribute is strongly asserted (`assertEqual(404, ctx.exception.todo_id)`), but the formatted...",
+            "classification": "partial",
+            "source": "03-assertion-audit"
+          },
+          {
+            "section": "Method: `TodoService.delete_todo`",
+            "row": "P-01 | `repository.remove` returns `False` | `test_delete_todo_missing_item_raises_not_found_error` | Strong \u2014 exact `todo_id` on raised exception asserted | Covered | \u2014",
+            "classification": "covered",
+            "source": "03-assertion-audit"
+          }
+        ]
+      },
+      {
+        "id": "C6",
+        "title": "PriorityLabel: priority 4 and 5 return 'high'",
+        "status": "not located",
+        "classifications": [],
+        "rows": []
+      },
+      {
+        "id": "C7",
+        "title": "Repository FindById: a missing id returns null / empty / None",
+        "status": "confirmed",
+        "classifications": [
+          "covered",
+          "partial"
+        ],
+        "rows": [
+          {
+            "section": "Method: `InMemoryTodoRepository.__init__`",
+            "row": "P-01 | Constructor called (straight-line) | Exercised implicitly via `setUp` in every test; initial state indirectly implied by `test_add_assigns_sequential_ids` (first id is `1`, implying `_next_id` started at `1`) a...",
+            "classification": "partial",
+            "source": "03-assertion-audit"
+          },
+          {
+            "section": "Method: `InMemoryTodoRepository.find_by_id`",
+            "row": "P-02 | `todo_id` does not exist in `_items` | `test_find_by_id_missing_item_returns_none` | Strong \u2014 `assertIsNone(...)` | Covered | \u2014",
+            "classification": "covered",
+            "source": "03-assertion-audit"
+          },
+          {
+            "section": "Method: `InMemoryTodoRepository.remove`",
+            "row": "P-01 | `todo_id` exists in `_items` | `test_remove_existing_item_returns_true_and_removes_it` | Strong \u2014 `assertTrue` on return value plus follow-up `assertIsNone(find_by_id(...))` confirming removal | Covered | \u2014",
+            "classification": "covered",
+            "source": "03-assertion-audit"
+          }
+        ]
+      }
+    ],
+    "falsePositives": [],
+    "unscoredProblems": [
+      {
+        "section": "Method: `InMemoryTodoRepository.all`",
+        "row": "P-01 | `_items` is empty | \u2014 | \u2014 | Uncovered | No test calls `all()` on an empty repository.",
+        "classification": "uncovered",
+        "source": "03-assertion-audit"
+      },
+      {
+        "section": "Method: `TodoService.list_todos`",
+        "row": "P-05 | `repository.all()` returns an empty list | \u2014 | \u2014 | Uncovered | No test calls `list_todos` on an empty repository.",
+        "classification": "uncovered",
+        "source": "03-assertion-audit"
+      },
+      {
+        "section": "Method: `TodoService.rename_todo`",
+        "row": "P-01 | `new_title is None` | \u2014 | \u2014 | Uncovered | `test_rename_todo_blank_title_raises_validation_error` only exercises `new_title=\" \"`; no test passes `None` to `rename_todo`.",
+        "classification": "uncovered",
+        "source": "03-assertion-audit"
+      },
+      {
+        "section": "Method: `TodoService.rename_todo`",
+        "row": "P-03 | Title valid, `repository.find_by_id` returns `None` | \u2014 | \u2014 | Uncovered | No test combines a non-blank title with an id the mocked/real repository doesn't have.",
+        "classification": "uncovered",
+        "source": "03-assertion-audit"
+      },
+      {
+        "section": "Function: `priority_label`",
+        "row": "P-02 | `priority` is `3` | \u2014 | \u2014 | Uncovered | The subTest loop `((1,\"low\"),(2,\"low\"),(4,\"high\"),(5,\"high\"))` skips `3`; the `\"medium\"` case is never exercised.",
+        "classification": "uncovered",
+        "source": "03-assertion-audit"
+      },
+      {
+        "section": "Run Tallies",
+        "row": "Partially Covered | 3",
+        "classification": "partial",
+        "source": "03-assertion-audit"
+      },
+      {
+        "section": "Run Tallies",
+        "row": "Uncovered | 24",
+        "classification": "uncovered",
+        "source": "03-assertion-audit"
+      }
+    ]
+  },
+  "verdict": "pass",
+  "finishedAt": "2026-11-14T11:05:36"
+}

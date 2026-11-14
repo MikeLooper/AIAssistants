@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <title>Todo List</title>
+</head>
+<body>
+    <h1>Todo List</h1>
+
+    <form method="post" action="/todos/add">
+        <input type="text" name="title" placeholder="What needs doing?" />
+        <input type="text" name="priority" placeholder="Priority (1-5)" />
+        <input type="hidden" name="returnUrl" th:value="${returnUrl}" />
+        <button type="submit">Add</button>
+    </form>
+
+    <ul>
+        <li th:each="item : ${items}">
+            <s th:if="${item.complete}" th:utext="${item.title}"></s>
+            <span th:unless="${item.complete}">
+                <span th:utext="${item.title}"></span>
+                <form method="post" th:action="@{/todos/{id}/complete(id=${item.id})}" style="display:inline">
+                    <button type="submit">Done</button>
+                </form>
+            </span>
+            (priority <span th:text="${item.priority}"></span>)
+        </li>
+    </ul>
+</body>
+</html>

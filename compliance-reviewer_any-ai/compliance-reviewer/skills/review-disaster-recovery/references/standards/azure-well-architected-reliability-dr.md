@@ -3,10 +3,10 @@
 - Source site: learn.microsoft.com (azure/well-architected)
 - Pinned pages: see the page table below (path + `ms.date` at retrieval)
 - Citation base: https://learn.microsoft.com/azure/well-architected/
-- Localized: 2026-11-08 · Elements: 46 (cap 100)
+- Localized: 2026-11-08 · Elements: 46 IDs, 42 active (cap 100); WAFR-05, WAFR-19, WAFR-20, WAFR-41 retired 2026-11-12
 - Source name for `Finding.standard`: `Azure Well-Architected Framework`
 - Level: every element is `REVIEW` (the source uses no normative keywords); severity is the owning check's default.
-- Scope column: G = generic (any cloud / Kubernetes); A = Azure-only (apply only when Azure IaC is detected). Every A element has a G counterpart.
+- Scope column: G = generic (any cloud / Kubernetes). Every active element is Scope G. The Azure-only elements were retired on 2026-11-12; each had a G counterpart that still applies to Azure IaC.
 - RE column: the WAF Reliability checklist code the element implements (traceability only).
 - Anchor(s): `<page key>#<section anchor>`, primary first. Table rows have no anchors of their own, so the anchor is the section that holds the row. `dg-dr#suggested-actions` = backup and restore; `-1` = active-passive cold standby; `-2` = warm standby; `-3` = active-active.
 - Citation URL: citation base + page path + `#` + primary anchor, with no locale segment.
@@ -30,7 +30,7 @@
 | WAFR-02 | REVIEW | G | Backup frequency or PITR window is consistent with the stated RPO (backup frequency determines the recovery point). | backup config + stated RPO | RE:09 | dg-dr#suggested-actions, dg-az#locally-redundant-deployments-with-backup-across-regions |
 | WAFR-03 | REVIEW | G | Backup retention periods are set explicitly and meet stated regulatory or business retention needs. | backup config | RE:09 | dg-dr#suggested-actions, re-dr#implement-robust-backup-strategies |
 | WAFR-04 | REVIEW | G | Backups account for dependencies between data stores, so a restore gives a consistent state across stores that reference each other. | multiple stores | RE:09 | re-dr#design-recovery-aware-architecture |
-| WAFR-05 | REVIEW | A | Azure: Azure Backup protects VMs, Azure Files and Blob Storage; PaaS data services (SQL Database, PostgreSQL, MySQL, Cosmos DB) have point-in-time restore / continuous backup enabled. | Azure IaC | RE:09 | re-dr#azure-facilitation, dg-dr#suggested-actions, re-red#azure-facilitation |
+| WAFR-05 (retired) | — | — | *(retired 2026-11-12, Azure-only: Azure Backup / PaaS PITR; judged generically by WAFR-01)* | — | — | re-dr#azure-facilitation, dg-dr#suggested-actions, re-red#azure-facilitation |
 
 ## DR-02 — Backups tested and restorable
 
@@ -59,8 +59,8 @@
 | WAFR-16 | REVIEW | G | Stateful data is replicated according to RPO: synchronous (across zones) for near-zero RPO, asynchronous cross-region otherwise; replication is configured on the data store. | stated RPO + stateful store | RE:09 | re-dr#design-recovery-aware-architecture, dg-az#data-replication, dg-az#synchronous-data-replication, dg-az#asynchronous-data-replication, dg-dr#suggested-actions-1 |
 | WAFR-17 | REVIEW | G | The secondary region is geographically distant enough not to share the same disaster. | multi-region or cross-region backup | RE:05 | re-red#strengthen-fault-tolerance-with-geo-distant-deployments, dg-az#deployment-approach-4-multi-region-deployments |
 | WAFR-18 | REVIEW | G | Secondary-region and backup locations satisfy stated data-residency requirements. | residency stated | RE:09 | dg-az#data-residency, dg-dr#suggested-actions-1 |
-| WAFR-19 | REVIEW | A | Azure: storage holding critical data uses a geo-redundant SKU (GRS, RA-GRS, GZRS, RA-GZRS), or object replication when the regions aren't paired. | Azure storage + stated tier | RE:09 | dg-dr#suggested-actions-1, dg-az#region-architectures |
-| WAFR-20 | REVIEW | A | Azure: SQL Database, PostgreSQL, MySQL and Cosmos DB use built-in geo-replication, failover groups or multi-region accounts when the tier requires cross-region data. | Azure data store + stated tier | RE:09 | dg-dr#suggested-actions-1, re-red#azure-facilitation |
+| WAFR-19 (retired) | — | — | *(retired 2026-11-12, Azure-only: Azure geo-redundant storage SKUs; judged generically by WAFR-16 and WAFR-28)* | — | — | dg-dr#suggested-actions-1, dg-az#region-architectures |
+| WAFR-20 (retired) | — | — | *(retired 2026-11-12, Azure-only: Azure data-service geo-replication; judged generically by WAFR-16)* | — | — | dg-dr#suggested-actions-1, re-red#azure-facilitation |
 
 ## DR-05 — DR plan and runbook
 
@@ -101,7 +101,7 @@
 | WAFR-38 | REVIEW | G | Global traffic routing fits the DR pattern (priority routing for active-passive; latency or weighted for active-active) with health probes per endpoint. | multi-region + stated tier | RE:09 | dg-dr#suggested-actions-1, dg-dr#suggested-actions-2, dg-dr#suggested-actions-3, re-red#use-an-active-passive-architecture-design-as-a-cost-effective-dr-approach |
 | WAFR-39 | REVIEW | G | Managed data services have automatic failover enabled where supported and the tier needs it; services without it have documented manual failover steps. | multi-region data + stated tier | RE:09 | dg-dr#suggested-actions-2 |
 | WAFR-40 | REVIEW | G | Standby capacity can reach full load: warm standby has autoscale rules and pre-defined scale targets; cold standby has scale parameters in IaC. Fail only when below the stated tier. | standby region | RE:09 | dg-dr#suggested-actions-1, dg-dr#suggested-actions-2, dg-dr#suggested-actions-3, re-test#incidents-and-disaster-recovery-dr |
-| WAFR-41 | REVIEW | A | Azure: Front Door or Traffic Manager is configured for failover (priority routing, health probes); Azure Site Recovery protects IaaS VMs that are in the recovery scope. | Azure IaC + stated tier | RE:09 | dg-dr#suggested-actions-1, re-dr#azure-facilitation |
+| WAFR-41 (retired) | — | — | *(retired 2026-11-12, Azure-only: Front Door / Traffic Manager / Site Recovery; judged generically by WAFR-38)* | — | — | dg-dr#suggested-actions-1, re-dr#azure-facilitation |
 | WAFR-42 | REVIEW | G | Replication health and lag are monitored with alerts, and observability covers the secondary region. | replication configured | RE:09 | dg-dr#suggested-actions-1 |
 
 ## DR-09 — DR testing and plan maintenance

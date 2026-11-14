@@ -1,0 +1,17 @@
+<Project>
+  <!--
+    Keeps MSBuild output (bin/, obj/) out of the test apps.
+
+    The reviewer judges working files, so bin/ or obj/ inside an app adds findings that aren't in the
+    answer key. IDE tooling (VS Code's C# extension) restores a project whenever its obj/ folder is missing,
+    which recreated those folders right after the test harness deleted them. Every build or restore of a
+    project under test/ (by the IDE, by `dotnet`, or by the harness's build copy) now writes to
+    test/.build-output/<path of the project under test>/ instead, which no review targets.
+  -->
+  <PropertyGroup>
+    <_ComplianceTestProjectRel>$([MSBuild]::MakeRelative('$(MSBuildThisFileDirectory)', '$(MSBuildProjectDirectory)'))</_ComplianceTestProjectRel>
+    <_ComplianceTestOutputRoot>$(MSBuildThisFileDirectory).build-output\$(_ComplianceTestProjectRel)\</_ComplianceTestOutputRoot>
+    <BaseIntermediateOutputPath>$(_ComplianceTestOutputRoot)obj\</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(_ComplianceTestOutputRoot)bin\</BaseOutputPath>
+  </PropertyGroup>
+</Project>

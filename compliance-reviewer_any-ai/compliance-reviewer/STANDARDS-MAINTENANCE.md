@@ -26,17 +26,22 @@ Shared files:
 - `compliance-review-core/references/approved-sources.md` — the maintainer-only registry of the exact pages a maintainer may fetch for each subject. Update it whenever a pinned URL or version path changes. Site-wide prefixes aren't allowed.
 - `compliance-reviewer/README.md` → **Maintenance** — score-comparability notes (see "Record" below).
 
+## Vendor-neutral elements
+
+Every active element must apply to any codebase in its language, whatever the cloud or host. Vendor sources (Azure Well-Architected Framework, Azure Architecture Center, the Microsoft REST API Guidelines' Azure edition, Azure SDK guidance) are used for their generic guidance only. When a source rule names a vendor-only mechanism (a product, SKU, `x-ms-*` header, `api-version` parameter, host-name pattern or vendor SDK), either generalize it to the cloud-neutral rule it illustrates, naming the vendor form only as one example that satisfies it, or retire it when nothing generic is left. Don't add elements that apply only to one vendor (the former Scope `A`). Vendor names may still appear in lookup tables (`languages/*.md`, `*-signals.md`) next to their equivalents from other vendors. Applied across all skills on 2026-11-12 (see the README's Maintenance notes). On refresh, re-apply the same generalization to changed source text.
+
 ## When to refresh
 
 Each skill's `MAINTENANCE.md` is authoritative for its cadence; this table is the overview.
 
 | Subject skill | Sources (pinned) | Scheduled cadence | Extra triggers |
 |---|---|---|---|
-| review-api-design | OpenAPI 2.0/3.0.4/3.1.2/3.2.1; Azure REST API Guidelines (commit SHA); Azure SDK telemetry | Quarterly | Azure guideline History table gains an entry |
+| review-api-design | OpenAPI 2.0/3.0.4/3.1.2/3.2.1; Microsoft REST API Guidelines, Azure edition (commit SHA; generic rules only, Azure-only mechanisms generalized or retired); Azure SDK trace-context guidance | Quarterly | Azure guideline History table gains an entry |
 | review-cost-sustainability | Azure WAF cost + sustainability pages; Green Software Foundation principles and patterns | Quarterly | — |
 | review-dependency-management | OWASP A03:2025 and supply-chain cheat sheets; .NET, Java, Python, Spring, Node.js lifecycle data | Lifecycle files quarterly; OWASP quarterly | Within 2 weeks of vendor GA events (.NET Nov, Java Mar/Sep, Python Oct, Spring May/Nov, Node.js Apr/Oct); dates in "Refresh due"; any stale note |
 | review-disaster-recovery | Azure WAF Reliability (DR); NIST SP 800-34 Rev. 1; OWASP secrets backup | Quarterly | New NIST revision or withdrawal |
 | review-maintainability | Local rubric only (no website) | Every 6 months | A disputed finding |
+| review-mcp-server | MCP specification revision 2026-07-28 (stdio, tools; commit SHAs); MCP Security Best Practices and Local Server Security; modelcontextprotocol.info best practices; CSA Agentic MCP guide v1 (draft); The New Stack (partial, manual) | Quarterly | New MCP specification revision; official SDK major version; CSA final version |
 | review-monitoring | Azure WAF monitoring/alerting; Google SRE books | Quarterly | — |
 | review-observability | OpenTelemetry (semconv v1.45.0, spec v1.62.0); Azure WAF observability | Quarterly | Semconv minor release touching HTTP, DB, messaging, exception or resource conventions |
 | review-performance | Azure WAF Performance Efficiency; Architecture Center antipatterns and caching | Quarterly | — |

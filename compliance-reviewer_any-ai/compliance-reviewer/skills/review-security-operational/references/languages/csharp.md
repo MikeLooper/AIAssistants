@@ -23,9 +23,9 @@ DNO-14). Serilog, NLog and log4net defaults are not localized: report explicit v
 | `[DataClassification]`/sensitive attributes present but no `AddRedaction` | models, `Program.cs` | Sensitive fields logged without redaction | DNO-15 |
 | `Password=`, `AccountKey=`, `ClientSecret`, `ApiKey` with real values | `appsettings*.json`, `web.config` `connectionStrings`, code | Hardcoded secrets | DNO-01, SMG-01 |
 | `AddUserSecrets` outside Development; Secret Manager or `secrets.json` referenced for production | `Program.cs`, deployment docs/scripts | Development-only store in production | DNO-02, DNO-12 |
-| `ClientSecretCredential` or client-secret values for Key Vault in config | `Program.cs`, `appsettings*.json` | Key Vault secret-zero in config | DNO-13 |
-| `PersistKeysToFileSystem`/`PersistKeysToAzureBlobStorage` without `ProtectKeysWith*` | `Program.cs` | Unprotected Data Protection keys | DNO-05 |
-| `http://` Key Vault/secret-store URLs; certificate validation disabled for them | config, `Program.cs` | Secrets in plaintext transit | SMG-11 |
+| Secret-store or cloud credentials in config: `ClientSecretCredential`/client secrets (Azure Key Vault), `AWSAccessKeyId`/`aws_secret_access_key` or `BasicAWSCredentials` (AWS Secrets Manager), Vault tokens/AppRole secret IDs (HashiCorp Vault) | `Program.cs`, `appsettings*.json` | Secret-zero in config instead of a workload identity | DNO-13 |
+| `PersistKeysTo*` (e.g. `PersistKeysToFileSystem`, `PersistKeysToDbContext`, `PersistKeysToStackExchangeRedis`, `PersistKeysToAzureBlobStorage`, `PersistKeysToAWSSystemsManager`) without `ProtectKeysWith*` | `Program.cs` | Unprotected Data Protection keys | DNO-05 |
+| `http://` secret-store URLs (Key Vault, Secrets Manager, Vault, …); certificate validation disabled for them | config, `Program.cs` | Secrets in plaintext transit | SMG-11 |
 | Serilog/NLog file sinks under `wwwroot`; no `fileSizeLimitBytes`/`rollingInterval`/`retainedFileCountLimit`/archive limits (explicit values only) | `appsettings*.json` `Serilog`, `nlog.config` | Web-accessible or unbounded log files | LOG-22, LOG-21 |
 | Minimum level `None`/`Off` for the app or security categories in production config | `appsettings.Production.json` `Logging`, `Serilog` | Logging deactivated | LOG-19 |
 | Security events written with `Console.WriteLine`/`Debug.WriteLine` | admin, export, startup code | Not using the logging framework | LOG-11 |

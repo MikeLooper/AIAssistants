@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Todo List</title>
+</head>
+<body>
+    <h1>Todo List</h1>
+
+    <form method="post" action="/todos/add">
+        <input type="text" name="title" placeholder="What needs doing?" />
+        <input type="text" name="priority" placeholder="Priority (1-5)" />
+        <input type="hidden" name="return_url" value="{{ return_url }}" />
+        <button type="submit">Add</button>
+    </form>
+
+    <ul>
+        {% for item in items %}
+        <li>
+            {% if item.complete %}
+            <s>{{ item.title|safe }}</s>
+            {% else %}
+            {{ item.title|safe }}
+            <form method="post" action="/todos/{{ item.id }}/complete" style="display:inline">
+                <button type="submit">Done</button>
+            </form>
+            {% endif %}
+            (priority {{ item.priority }})
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

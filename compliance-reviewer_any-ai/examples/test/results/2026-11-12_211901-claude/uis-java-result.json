@@ -1,0 +1,223 @@
+{
+  "app": "uis-java",
+  "target": "test/uis/java",
+  "tool": "claude",
+  "toolReason": "--tool",
+  "minFoundPct": 90.0,
+  "startedAt": "2026-11-12T21:19:01",
+  "build": {
+    "removedBefore": [],
+    "commands": [
+      "mvn -B -q clean package -DskipTests"
+    ],
+    "log": ".\\test\\logic\\results\\2026-11-12_211901-claude\\uis-java-build.log",
+    "durationSeconds": 4.3,
+    "status": "succeeded"
+  },
+  "runId": "2026-11-13_0422-java-ui",
+  "runDir": ".\\transitions\\2026-11-13_0422-java-ui",
+  "reportFile": "C:/Working/Storage/Dev/GitHub/AIAssistants/compliance-reviewer_any-ai/test/logic/results/2026-11-12_211901-claude/uis-java-report.md",
+  "overallScore": 36.65,
+  "overallBand": "Poor",
+  "durationSeconds": 901.6,
+  "costUsd": 5.322823100000002,
+  "command": [
+    "C:\\Users\\Michael\\.local\\bin\\claude.EXE",
+    "-p",
+    "/compliance-reviewer test/uis/java --subjects all --programmatic --output file --out-file C:/Working/Storage/Dev/GitHub/AIAssistants/compliance-reviewer_any-ai/test/logic/results/2026-11-12_211901-claude/uis-java-report.md",
+    "--output-format",
+    "json",
+    "--allowedTools",
+    "Read,Grep,Glob,Write,Edit,Agent,Task,Skill,TodoWrite,Bash(git -C:*),Bash(python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py:*)",
+    "--add-dir",
+    ".\\test\\logic\\results\\2026-11-12_211901-claude"
+  ],
+  "score": {
+    "total": 12,
+    "found": [
+      {
+        "flaw": "U1",
+        "title": "Stored XSS: to-do titles rendered without encoding",
+        "findingIds": [
+          "SEC-II-08#1"
+        ]
+      },
+      {
+        "flaw": "U3",
+        "title": "Hard-coded admin password (Python: also hard-coded SECRET_KEY)",
+        "findingIds": [
+          "SEC-OP-05#1",
+          "TF-03#1"
+        ]
+      },
+      {
+        "flaw": "U4",
+        "title": "Admin password in query string to a state-changing GET; plain-text compare; no auth/throttling/audit",
+        "findingIds": [
+          "SEC-IA-01#1",
+          "SEC-IA-02#1",
+          "SEC-IA-07#1",
+          "SEC-IA-09#1"
+        ]
+      },
+      {
+        "flaw": "U5",
+        "title": "Open redirect: user-supplied return URL redirected to without validation",
+        "findingIds": [
+          "SEC-II-01#1",
+          "SEC-II-01#2",
+          "SEC-II-01#3"
+        ]
+      },
+      {
+        "flaw": "U6",
+        "title": "Detailed error pages / debug mode always on",
+        "findingIds": [
+          "SEC-OP-01#1",
+          "SEC-OP-07#1"
+        ]
+      },
+      {
+        "flaw": "U7",
+        "title": "Unsynchronized static/global mutable state used as the data store",
+        "findingIds": [
+          "DP-01#1"
+        ]
+      },
+      {
+        "flaw": "U8",
+        "title": "Exception silently swallowed (invalid priority ignored)",
+        "findingIds": [
+          "SEC-OP-02#1",
+          "SQ-06#1"
+        ]
+      },
+      {
+        "flaw": "U9",
+        "title": "App writes its own log file instead of stdout; log lines concatenated with user input",
+        "findingIds": [
+          "OBS-01#1",
+          "SEC-OP-04#1",
+          "TF-11#1"
+        ]
+      },
+      {
+        "flaw": "U12",
+        "title": "No automated tests",
+        "findingIds": [
+          "TST-01#1",
+          "TST-02#1",
+          "TST-06#1",
+          "TST-07#1",
+          "TST-11#1",
+          "TST-12#1"
+        ]
+      }
+    ],
+    "missed": [
+      {
+        "flaw": "U2",
+        "title": "No CSRF protection on state-changing forms",
+        "checks": [
+          "SEC-IA-05"
+        ],
+        "locations": [
+          "src/main/java/com/example/todoui/TodoController.java",
+          "src/main/resources/templates/index.html",
+          "pom.xml"
+        ]
+      },
+      {
+        "flaw": "U10",
+        "title": "Commented-out code",
+        "checks": [
+          "SQ-08"
+        ],
+        "locations": [
+          "src/main/java/com/example/todoui/TodoController.java"
+        ]
+      },
+      {
+        "flaw": "U11",
+        "title": "No security headers (CSP, frame-ancestors, nosniff and so on)",
+        "checks": [
+          "SEC-WA-01",
+          "SEC-WA-03",
+          "SEC-WA-04",
+          "SEC-WA-11"
+        ],
+        "locations": [
+          "(whole app)"
+        ]
+      }
+    ],
+    "foundPct": 75.0,
+    "required": 11,
+    "minFoundPct": 90.0,
+    "coverageOk": false,
+    "unexpectedErrors": [],
+    "unexpectedOther": [
+      {
+        "id": "PERF-05#1",
+        "checkId": "PERF-05",
+        "severity": "Information",
+        "title": "Linear scan over the in-memory todo list to find an item by id",
+        "location": "src/main/java/com/example/todoui/TodoController.java:52"
+      }
+    ],
+    "related": [],
+    "incidental": [
+      {
+        "id": "SL-01#1",
+        "checkId": "SL-01",
+        "severity": "Error",
+        "title": "No CI pipeline builds changes before merge",
+        "location": "pom.xml:1"
+      },
+      {
+        "id": "SL-07#1",
+        "checkId": "SL-07",
+        "severity": "Information",
+        "title": "No SECURITY.md security policy in the repository",
+        "location": "pom.xml:1"
+      },
+      {
+        "id": "SL-11#1",
+        "checkId": "SL-11",
+        "severity": "Warning",
+        "title": "No static analysis or compiler security gating configured",
+        "location": "pom.xml:34"
+      },
+      {
+        "id": "OBS-08#1",
+        "checkId": "OBS-08",
+        "severity": "Information",
+        "title": "Service version is not set in telemetry identity",
+        "location": "src/main/resources/application.properties:1"
+      },
+      {
+        "id": "MAINT-01#1",
+        "checkId": "MAINT-01",
+        "severity": "Warning",
+        "title": "No README exists for the app",
+        "location": "pom.xml:14"
+      },
+      {
+        "id": "MAINT-06#1",
+        "checkId": "MAINT-06",
+        "severity": "Information",
+        "title": "No contributing guide exists",
+        "location": "pom.xml:14"
+      },
+      {
+        "id": "MAINT-10#1",
+        "checkId": "MAINT-10",
+        "severity": "Information",
+        "title": "No license is stated for the app",
+        "location": "pom.xml:1"
+      }
+    ]
+  },
+  "verdict": "fail",
+  "finishedAt": "2026-11-12T21:34:07"
+}

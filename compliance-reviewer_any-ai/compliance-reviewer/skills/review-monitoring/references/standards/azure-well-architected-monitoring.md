@@ -3,10 +3,10 @@
 - Source site: learn.microsoft.com (azure/well-architected)
 - Pinned pages: see the page table below (path + `ms.date` at retrieval)
 - Citation base: https://learn.microsoft.com/azure/well-architected/
-- Localized: 2026-11-08 (security-alerting rows WAFM-41 … WAFM-44: 2026-11-09) · Elements: 44 (cap 100)
+- Localized: 2026-11-08 (security-alerting rows WAFM-41 … WAFM-44: 2026-11-09) · Elements: 44 IDs, 41 active (cap 100); WAFM-31, WAFM-34, WAFM-44 retired 2026-11-12
 - Source name for `Finding.standard`: `Azure Well-Architected Framework`
 - Level: every element is `REVIEW` (the source uses no normative keywords); severity is the owning check's default.
-- Scope column: G = generic (any cloud / Kubernetes / SaaS monitoring); A = Azure-only (apply only when Azure IaC is detected). Every A element has a G counterpart.
+- Scope column: G = generic (any cloud / Kubernetes / SaaS monitoring). Every active element is Scope G. The Azure-only elements were retired on 2026-11-12; each had a G counterpart that still applies to Azure IaC.
 - Anchor(s): `<page key>#<section anchor>`, primary first. Rows of the `dg-mon` antipattern table have no anchors of their own, so the anchor is the table's section.
 - Citation URL: citation base + page path + `#` + primary anchor, with no locale segment.
 
@@ -67,7 +67,7 @@
 | WAFM-21 | REVIEW | G | Each alert has an owning team; business-flow alerts reach application owners and component alerts reach operators. | alert rules present | oe-obs#define-alerts-around-meaningful-operational-conditions, dg-mon#best-practices-for-alerts, dg-hm#set-actionable-alerts |
 | WAFM-22 | REVIEW | G | Alerts integrate with incident/ticketing tooling and, where safe, automated remediation or scaling, and tie into operational runbooks. | alert rules present | dg-mon#best-practices-for-alerts, oe-obs#define-alerts-around-meaningful-operational-conditions, dg-hm#set-actionable-alerts |
 | WAFM-43 | REVIEW | G | Security alerts and security-relevant logs are routed to a security owner or a SIEM where they are correlated across sources, not only to the operations channel, and the security data sink outlives the resources it watches. | security alert rules or security logs in IaC | se-mon#centralized-threat-detection-with-correlated-logs, se-mon#store-aggregate-and-analyze-data |
-| WAFM-44 | REVIEW | A | Azure: built-in threat-protection plans (Microsoft Defender for Cloud) are enabled for the workload's resources, and their alerts feed Microsoft Sentinel or the organization's SIEM. | Azure IaC with compute, data or container resources | se-mon#azure-facilitation |
+| WAFM-44 (retired) | — | — | *(retired 2026-11-12, Azure-only: Defender for Cloud / Sentinel; judged generically by WAFM-43)* | — | se-mon#azure-facilitation |
 
 ## MON-05 — Dashboards present actionable health
 
@@ -86,10 +86,10 @@
 | ID | Level | Scope | Requirement (summary) | Applies when | Anchor(s) |
 |----|-------|-------|-----------------------|--------------|-----------|
 | WAFM-30 | REVIEW | G | Every deployed resource routes its platform metrics and resource logs to the chosen monitoring backend (diagnostic settings, log export, agents). | IaC resources | dg-hm#use-platform-metrics-and-logs, oe-obs#standardize-data-consolidation |
-| WAFM-31 | REVIEW | A | Azure: diagnostic settings target a Log Analytics workspace (not only a storage account), and consistency is enforced with Azure Policy. | Azure IaC | dg-hm#use-platform-metrics-and-logs, dg-hm#add-application-logs |
+| WAFM-31 (retired) | — | — | *(retired 2026-11-12, Azure-only: Log Analytics workspace / Azure Policy; judged generically by WAFM-30)* | — | dg-hm#use-platform-metrics-and-logs, dg-hm#add-application-logs |
 | WAFM-32 | REVIEW | G | External (black-box) probes or availability tests check user-facing endpoints or health endpoints and feed alerts. | user-facing endpoint | dg-hm#use-health-probes, dg-hm#adopt-structural-and-functional-monitoring-techniques, re-mon#monitor-all-layers-of-the-system |
 | WAFM-33 | REVIEW | G | Cloud-provider health events (outages, planned maintenance, advisories) notify the team. | cloud IaC | re-mon#be-informed-about-platform-reliability-status, oe-obs#define-alerts-around-meaningful-operational-conditions |
-| WAFM-34 | REVIEW | A | Azure: Service Health and Resource Health activity-log alerts cover the subscriptions, regions and services in use. | Azure IaC | re-mon#be-informed-about-platform-reliability-status, re-mon#azure-facilitation |
+| WAFM-34 (retired) | — | — | *(retired 2026-11-12, Azure-only: Service Health / Resource Health alerts; judged generically by WAFM-33)* | — | re-mon#be-informed-about-platform-reliability-status, re-mon#azure-facilitation |
 | WAFM-35 | REVIEW | G | The network layer is monitored where network IaC exists: connectivity/latency checks, flow logs. | network IaC | re-mon#monitor-all-layers-of-the-system |
 | WAFM-36 | REVIEW | G | Telemetry retention is set explicitly to meet operational and stated compliance needs, so incident data isn't deleted too early. Sufficiency only: never fail for keeping more. | telemetry store in IaC | oe-obs#tailor-storage-and-retention-for-usage-patterns, dg-mon#telemetry-data-lifecycle-management, re-mon#track-recoverability-targets |
 | WAFM-37 | REVIEW | G | Telemetry stores are protected like production data: access control, soft delete or resource locks against accidental change or deletion. | telemetry store in IaC | oe-obs#tailor-storage-and-retention-for-usage-patterns, dg-mon#telemetry-data-security |

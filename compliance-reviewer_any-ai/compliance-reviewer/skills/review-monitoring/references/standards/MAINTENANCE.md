@@ -19,7 +19,7 @@ The cap is counted per skill per website (plan DEC-1).
 
 - IDs are stable forever. Retire an element by marking its row `(retired)`; never reuse the ID. Prefixes are skill-specific (`WAFM-`, `SREM-`; plan DEC-6) so they can't be confused with the cost skill's `WAF-xx`, the DR skill's `WAFR-xx`, or a future reliability localization of the SRE books.
 - Level: WAF elements are `REVIEW` (no normative keywords). SRE elements are `SHOULD` only when the summarized sentence says "should" or "(strongly) recommend/advise"; otherwise `REVIEW`. The level never changes severity (plan DEC-8; `SKILL.md` step 8).
-- Scope (WAF): `G` generic, `A` Azure-only. Keep wording tool-neutral for `G` elements. Every `A` element needs a `G` counterpart (today: WAFM-31 → WAFM-30; WAFM-34 → WAFM-33; WAFM-44 → WAFM-43).
+- Scope (WAF): `G` generic only. Keep wording tool-neutral; name a provider's product only as an example. Don't add Azure-only (`A`) elements: map the source's Azure facilitation to the G element it illustrates, or leave it unmapped. On 2026-11-12 the former `A` elements were retired in favour of their G counterparts (WAFM-31 → WAFM-30; WAFM-34 → WAFM-33; WAFM-44 → WAFM-43).
 - SRE rows must be summaries in our own words. The chapters are CC BY-NC-ND 4.0: never paste passages, tables or rule examples.
 - Primary anchor first; list every absorbed anchor so coverage stays auditable. sre.google anchors with generated suffixes (`-g0sEi4`) are used exactly as published.
 - Keep rows to one line (≈ 200 characters where possible).

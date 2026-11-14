@@ -1,0 +1,397 @@
+{
+  "$comment": "Machine-readable copy of the answer key in test/README.md. Keep the two in sync. 'checks' are the expected checklist IDs; a trailing '*' is a prefix wildcard (e.g. 'TST-*'). 'locations' are file paths relative to the app directory; an empty list means 'whole app' (any evidence location counts). A flaw is found when a finding cites one of its checks with evidence in one of its locations.",
+  "kinds": {
+    "apis": {
+      "incidentalChecks": [
+        "MAINT-01", "MAINT-03", "MAINT-06", "MAINT-07", "MAINT-08", "MAINT-10",
+        "SL-01", "SL-02", "SL-04", "SL-05", "SL-07", "SL-11",
+        "DEP-02", "DEP-05", "DEP-07", "DEP-08",
+        "OBS-02", "OBS-03", "OBS-04", "OBS-05", "OBS-06", "OBS-07", "OBS-08", "OBS-10",
+        "SEC-WA-02", "SEC-WA-03", "SEC-WA-06", "SEC-WA-07",
+        "SEC-IA-09", "SEC-OP-02", "SEC-OP-09",
+        "CS-04", "AP-06",
+        "API-01", "API-06", "API-07", "API-10", "API-11", "API-14", "API-15",
+        "REL-05", "PERF-05", "PERF-08",
+        "DR-*", "MON-*", "COST-*"
+      ],
+      "flaws": [
+        {
+          "id": "A1",
+          "title": "Hard-coded API key in configuration in the source tree",
+          "checks": ["SEC-OP-05", "SEC-OP-06", "TF-03"],
+          "locations": {
+            "dotNET": ["appsettings.json"],
+            "java": ["src/main/resources/application.properties"],
+            "python": ["config.py"]
+          }
+        },
+        {
+          "id": "A2",
+          "title": "API key sent in the query string (?key=)",
+          "checks": ["SEC-WA-10", "SEC-IA-11"],
+          "locations": {
+            "dotNET": ["Program.cs"],
+            "java": ["src/main/java/com/example/todoapi/TodoController.java"],
+            "python": ["main.py"]
+          }
+        },
+        {
+          "id": "A3",
+          "title": "No authentication on create/read/update; hand-rolled DELETE key check (not deny-by-default)",
+          "checks": ["SEC-IA-01", "SEC-IA-02", "SEC-IA-07"],
+          "locations": {
+            "dotNET": ["Program.cs"],
+            "java": ["src/main/java/com/example/todoapi/TodoController.java"],
+            "python": ["main.py"]
+          }
+        },
+        {
+          "id": "A4",
+          "title": "No input validation; whole model bound, including id (over-posting)",
+          "checks": ["SEC-II-01"],
+          "locations": {
+            "dotNET": ["Program.cs", "TodoItem.cs"],
+            "java": ["src/main/java/com/example/todoapi/TodoController.java", "src/main/java/com/example/todoapi/TodoItem.java"],
+            "python": ["main.py"]
+          }
+        },
+        {
+          "id": "A5",
+          "title": "Exception details and stack traces returned to the client",
+          "checks": ["SEC-OP-01", "SEC-OP-07", "OBS-09"],
+          "locations": {
+            "dotNET": ["Program.cs"],
+            "java": ["src/main/java/com/example/todoapi/ErrorHandler.java", "src/main/resources/application.properties"],
+            "python": ["main.py"]
+          }
+        },
+        {
+          "id": "A6",
+          "title": "CORS allows any origin, method and header",
+          "checks": ["SEC-WA-05"],
+          "locations": {
+            "dotNET": ["Program.cs"],
+            "java": ["src/main/java/com/example/todoapi/TodoController.java"],
+            "python": ["main.py"]
+          }
+        },
+        {
+          "id": "A7",
+          "title": "Log injection via string concatenation; API key written to the log",
+          "checks": ["SEC-OP-03", "SEC-OP-04", "OBS-01"],
+          "locations": {
+            "dotNET": ["Program.cs"],
+            "java": ["src/main/java/com/example/todoapi/TodoController.java"],
+            "python": ["main.py"]
+          }
+        },
+        {
+          "id": "A8",
+          "title": "Unsynchronized static/global mutable state used as the data store",
+          "checks": ["DP-01", "TF-06", "REL-05"],
+          "locations": {
+            "dotNET": ["TodoStore.cs", "Program.cs"],
+            "java": ["src/main/java/com/example/todoapi/TodoController.java"],
+            "python": ["main.py"]
+          }
+        },
+        {
+          "id": "A9",
+          "title": "Wrong status codes (200 on create; 200 + error body on not found); no consistent error shape",
+          "checks": ["API-05", "API-09"],
+          "locations": {
+            "dotNET": ["Program.cs"],
+            "java": ["src/main/java/com/example/todoapi/TodoController.java", "src/main/java/com/example/todoapi/ErrorHandler.java"],
+            "python": ["main.py"]
+          }
+        },
+        {
+          "id": "A10",
+          "title": "Floating dependency version",
+          "checks": ["DEP-01", "DEP-02"],
+          "locations": {
+            "dotNET": ["TodoApi.csproj"],
+            "java": ["pom.xml"],
+            "python": ["requirements.txt"]
+          }
+        },
+        {
+          "id": "A11",
+          "title": "API explorer / debug features enabled in every environment",
+          "checks": ["SEC-OP-07"],
+          "locations": {
+            "dotNET": ["Program.cs"],
+            "java": ["src/main/resources/application.properties", "pom.xml"],
+            "python": ["main.py"]
+          }
+        },
+        {
+          "id": "A12",
+          "title": "No automated tests",
+          "checks": ["TST-*"],
+          "locations": { "dotNET": [], "java": [], "python": [] }
+        }
+      ]
+    },
+    "uis": {
+      "incidentalChecks": [
+        "MAINT-01", "MAINT-03", "MAINT-06", "MAINT-07", "MAINT-08", "MAINT-10",
+        "SL-01", "SL-02", "SL-04", "SL-05", "SL-07", "SL-11",
+        "DEP-02", "DEP-05", "DEP-07",
+        "OBS-02", "OBS-03", "OBS-04", "OBS-05", "OBS-06", "OBS-07", "OBS-08",
+        "SEC-WA-02", "SEC-WA-06", "SEC-WA-07",
+        "SEC-OP-08", "SEC-OP-09",
+        "CS-04", "CS-05", "AP-06",
+        "API-*",
+        "REL-05", "PERF-05", "PERF-08",
+        "DR-*", "MON-*", "COST-*"
+      ],
+      "flaws": [
+        {
+          "id": "U1",
+          "title": "Stored XSS: to-do titles rendered without encoding",
+          "checks": ["SEC-II-08"],
+          "locations": {
+            "dotNET": ["Pages/Index.cshtml"],
+            "java": ["src/main/resources/templates/index.html"],
+            "python": ["templates/index.html"]
+          }
+        },
+        {
+          "id": "U2",
+          "title": "No CSRF protection on state-changing forms",
+          "checks": ["SEC-IA-05"],
+          "locations": {
+            "dotNET": ["Pages/Index.cshtml.cs", "Pages/Index.cshtml", "Program.cs"],
+            "java": ["src/main/java/com/example/todoui/TodoController.java", "src/main/resources/templates/index.html", "pom.xml"],
+            "python": ["app.py", "templates/index.html", "requirements.txt"]
+          }
+        },
+        {
+          "id": "U3",
+          "title": "Hard-coded admin password (Python: also hard-coded SECRET_KEY)",
+          "checks": ["SEC-OP-05", "SEC-OP-06", "TF-03", "SEC-IA-06", "SEC-IA-10"],
+          "locations": {
+            "dotNET": ["appsettings.json"],
+            "java": ["src/main/resources/application.properties"],
+            "python": ["app.py"]
+          }
+        },
+        {
+          "id": "U4",
+          "title": "Admin password in query string to a state-changing GET; plain-text compare; no auth/throttling/audit",
+          "checks": ["SEC-WA-10", "SEC-IA-01", "SEC-IA-02", "SEC-IA-07", "SEC-IA-09", "API-09"],
+          "locations": {
+            "dotNET": ["Pages/Index.cshtml.cs", "Pages/Index.cshtml", "Program.cs"],
+            "java": ["src/main/java/com/example/todoui/TodoController.java", "src/main/resources/templates/index.html"],
+            "python": ["app.py", "templates/index.html"]
+          }
+        },
+        {
+          "id": "U5",
+          "title": "Open redirect: user-supplied return URL redirected to without validation",
+          "checks": ["SEC-IA-04", "SEC-II-01"],
+          "locations": {
+            "dotNET": ["Pages/Index.cshtml.cs"],
+            "java": ["src/main/java/com/example/todoui/TodoController.java"],
+            "python": ["app.py"]
+          }
+        },
+        {
+          "id": "U6",
+          "title": "Detailed error pages / debug mode always on",
+          "checks": ["SEC-OP-01", "SEC-OP-07"],
+          "locations": {
+            "dotNET": ["Program.cs"],
+            "java": ["src/main/resources/application.properties"],
+            "python": ["app.py"]
+          }
+        },
+        {
+          "id": "U7",
+          "title": "Unsynchronized static/global mutable state used as the data store",
+          "checks": ["DP-01", "TF-06", "REL-05"],
+          "locations": {
+            "dotNET": ["Pages/Index.cshtml.cs"],
+            "java": ["src/main/java/com/example/todoui/TodoController.java"],
+            "python": ["app.py"]
+          }
+        },
+        {
+          "id": "U8",
+          "title": "Exception silently swallowed (invalid priority ignored)",
+          "checks": ["SEC-OP-02", "SQ-06"],
+          "locations": {
+            "dotNET": ["Pages/Index.cshtml.cs"],
+            "java": ["src/main/java/com/example/todoui/TodoController.java"],
+            "python": ["app.py"]
+          }
+        },
+        {
+          "id": "U9",
+          "title": "App writes its own log file instead of stdout; log lines concatenated with user input",
+          "checks": ["TF-11", "SEC-OP-04", "OBS-01"],
+          "locations": {
+            "dotNET": ["Pages/Index.cshtml.cs"],
+            "java": ["src/main/resources/application.properties", "src/main/java/com/example/todoui/TodoController.java"],
+            "python": ["app.py"]
+          }
+        },
+        {
+          "id": "U10",
+          "title": "Commented-out code",
+          "checks": ["SQ-08"],
+          "locations": {
+            "dotNET": ["Pages/Index.cshtml.cs"],
+            "java": ["src/main/java/com/example/todoui/TodoController.java"],
+            "python": ["app.py"]
+          }
+        },
+        {
+          "id": "U11",
+          "title": "No security headers (CSP, frame-ancestors, nosniff and so on)",
+          "checks": ["SEC-WA-01", "SEC-WA-03", "SEC-WA-04", "SEC-WA-11"],
+          "locations": { "dotNET": [], "java": [], "python": [] }
+        },
+        {
+          "id": "U12",
+          "title": "No automated tests",
+          "checks": ["TST-*"],
+          "locations": { "dotNET": [], "java": [], "python": [] }
+        }
+      ]
+    },
+    "mcps": {
+      "incidentalChecks": [
+        "MAINT-01", "MAINT-03", "MAINT-06", "MAINT-07", "MAINT-08", "MAINT-10",
+        "SL-01", "SL-02", "SL-04", "SL-05", "SL-07", "SL-11",
+        "DEP-02", "DEP-05", "DEP-07", "DEP-08",
+        "OBS-01", "OBS-02", "OBS-03", "OBS-04", "OBS-05", "OBS-06", "OBS-07", "OBS-08", "OBS-09", "OBS-10",
+        "SEC-OP-02", "SEC-OP-04", "SEC-OP-08", "SEC-OP-10",
+        "CS-04", "CS-05", "AP-06", "SQ-04", "SQ-06",
+        "MCP-03", "MCP-13", "MCP-14", "MCP-16",
+        "TF-02", "TF-04",
+        "REL-02", "REL-04", "REL-05", "REL-06", "PERF-02", "PERF-05", "PERF-06", "PERF-08",
+        "DR-*", "MON-*", "COST-*"
+      ],
+      "flaws": [
+        {
+          "id": "M1",
+          "title": "Diagnostic output written to stdout, corrupting the stdio protocol stream",
+          "checks": ["MCP-01"],
+          "locations": {
+            "dotNET": ["Program.cs", "TodoTools.cs"],
+            "java": ["src/main/java/com/example/todomcp/TodoMcpServer.java", "src/main/java/com/example/todomcp/TodoTools.java"],
+            "python": ["server.py"]
+          }
+        },
+        {
+          "id": "M2",
+          "title": "Tool poisoning: hidden instructions in a tool description",
+          "checks": ["MCP-05"],
+          "locations": {
+            "dotNET": ["TodoTools.cs"],
+            "java": ["src/main/java/com/example/todomcp/TodoMcpServer.java"],
+            "python": ["server.py"]
+          }
+        },
+        {
+          "id": "M3",
+          "title": "Export tool writes to any caller-supplied path (no root confinement)",
+          "checks": ["MCP-09", "MCP-06", "SEC-II-01"],
+          "locations": {
+            "dotNET": ["TodoTools.cs"],
+            "java": ["src/main/java/com/example/todomcp/TodoTools.java", "src/main/java/com/example/todomcp/TodoMcpServer.java"],
+            "python": ["server.py"]
+          }
+        },
+        {
+          "id": "M4",
+          "title": "OS command injection: archive name concatenated into a shell command",
+          "checks": ["SEC-II-04", "MCP-09"],
+          "locations": {
+            "dotNET": ["TodoTools.cs"],
+            "java": ["src/main/java/com/example/todomcp/TodoTools.java"],
+            "python": ["server.py"]
+          }
+        },
+        {
+          "id": "M5",
+          "title": "Untyped tool input schema and no argument validation",
+          "checks": ["MCP-04", "MCP-06", "SEC-II-01"],
+          "locations": {
+            "dotNET": ["TodoTools.cs"],
+            "java": ["src/main/java/com/example/todomcp/TodoMcpServer.java", "src/main/java/com/example/todomcp/TodoTools.java"],
+            "python": ["server.py"]
+          }
+        },
+        {
+          "id": "M6",
+          "title": "Destructive tool annotated read-only, with no confirmation",
+          "checks": ["MCP-10"],
+          "locations": {
+            "dotNET": ["TodoTools.cs"],
+            "java": ["src/main/java/com/example/todomcp/TodoMcpServer.java", "src/main/java/com/example/todomcp/TodoTools.java"],
+            "python": ["server.py"]
+          }
+        },
+        {
+          "id": "M7",
+          "title": "Hard-coded sync token, returned to the model by a tool",
+          "checks": ["MCP-11", "MCP-08", "SEC-OP-05", "SEC-OP-06", "TF-03"],
+          "locations": {
+            "dotNET": ["TodoTools.cs"],
+            "java": ["src/main/java/com/example/todomcp/TodoTools.java"],
+            "python": ["server.py"]
+          }
+        },
+        {
+          "id": "M8",
+          "title": "Stack traces returned as successful tool results (no isError)",
+          "checks": ["MCP-07", "SEC-OP-01"],
+          "locations": {
+            "dotNET": ["TodoTools.cs"],
+            "java": ["src/main/java/com/example/todomcp/TodoTools.java", "src/main/java/com/example/todomcp/TodoMcpServer.java"],
+            "python": ["server.py"]
+          }
+        },
+        {
+          "id": "M9",
+          "title": "Import tool fetches any URL (SSRF) with no timeout and returns the raw content",
+          "checks": ["SEC-II-10", "MCP-09", "MCP-13", "MCP-08", "REL-01"],
+          "locations": {
+            "dotNET": ["TodoTools.cs"],
+            "java": ["src/main/java/com/example/todomcp/TodoTools.java"],
+            "python": ["server.py"]
+          }
+        },
+        {
+          "id": "M10",
+          "title": "Floating MCP SDK version",
+          "checks": ["DEP-01", "DEP-02"],
+          "locations": {
+            "dotNET": ["TodoMcp.csproj"],
+            "java": ["pom.xml"],
+            "python": ["requirements.txt"]
+          }
+        },
+        {
+          "id": "M11",
+          "title": "Unsynchronized static/global mutable state used as the data store",
+          "checks": ["DP-01", "TF-06", "REL-05", "MCP-12"],
+          "locations": {
+            "dotNET": ["TodoStore.cs", "TodoTools.cs"],
+            "java": ["src/main/java/com/example/todomcp/TodoStore.java", "src/main/java/com/example/todomcp/TodoTools.java"],
+            "python": ["server.py"]
+          }
+        },
+        {
+          "id": "M12",
+          "title": "No automated tests",
+          "checks": ["TST-*"],
+          "locations": { "dotNET": [], "java": [], "python": [] }
+        }
+      ]
+    }
+  }
+}

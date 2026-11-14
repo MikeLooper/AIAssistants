@@ -18,7 +18,7 @@ The cap is counted per skill per website (plan DEC-1).
 
 - IDs are stable forever. Retire an element by marking its row `(retired)`; never reuse the ID. Check ID COST-04 is retired (plan DEC-6) and must never be reused.
 - Level is `REVIEW` for every element (no source uses normative keywords). If a source adds keywords, record the verbatim keyword and update `SKILL.md` step 6.
-- Scope: `G` generic, `A` Azure-only. Keep wording cloud-neutral for `G` elements.
+- Scope: `G` generic only. Keep wording cloud-neutral; name a provider's product only as an example. Don't add Azure-only (`A`) elements: generalize the source's Azure facilitation to a cloud-neutral rule or leave it unmapped (2026-11-12: WAF-51 generalized from Azure Hybrid Benefit / dev-test pricing).
 - Primary anchor first; list every absorbed anchor so coverage stays auditable.
 - Keep rows to one line (≈ 200 characters where possible).
 - Every WAF, GSFL and GSP ID must be listed by exactly one active check in `../checklist.md`.

@@ -1,0 +1,7 @@
+bin/
+obj/
+target/
+__pycache__/
+.venv/
+*.log
+.build-output/
