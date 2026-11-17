@@ -154,6 +154,21 @@ def test_keep_sources(settings):
         assert (settings.work_path / "jobs" / job["id"] / "source" / "myapp" / "myapp" / "main.py").exists()
 
 
+@pytest.mark.parametrize("keep_sources", [False, True])
+def test_review_process_start_failure_cleans_source(settings, monkeypatch, keep_sources):
+    settings.keep_sources = keep_sources
+
+    def fail_start(*args):
+        raise OSError("process could not start")
+
+    monkeypatch.setattr("comp_review_api.jobs.process.start", fail_start)
+    with TestClient(create_app(settings)) as c:
+        job = wait_job(c, _upload(c).json()["id"])
+        source = settings.work_path / "jobs" / job["id"] / "source"
+        assert job["status"] == "failed"
+        assert source.exists() is keep_sources
+
+
 def test_review_reported_failure(client):
     job = wait_job(client, _upload(client, make_zip({"app/FAIL": "", "app/a.py": "x"}), "app.zip").json()["id"])
     assert job["status"] == "failed"

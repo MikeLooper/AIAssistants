@@ -67,6 +67,7 @@ class Job:
     log: deque = field(default_factory=lambda: deque(maxlen=LOG_LINES))
     timed_out: bool = False
     cancel_requested: bool = False
+    _cleanup: Callable[[], None] | None = None
     _proc: Any = None
     _future: Future | None = None
 
@@ -98,9 +99,9 @@ class JobManager:
 
     def submit(self, kind: JobKind, name: str, command: Sequence[str], cwd: Path, work_dir: Path,
                timeout_s: float, finalize: Finalizer, options: dict[str, Any] | None = None,
-               job_id: str | None = None) -> Job:
+               job_id: str | None = None, cleanup: Callable[[], None] | None = None) -> Job:
         job = Job(id=job_id or new_job_id(), kind=kind, name=name, command=list(command), cwd=cwd,
-                  work_dir=work_dir, timeout_s=timeout_s, options=options or {})
+                  work_dir=work_dir, timeout_s=timeout_s, options=options or {}, _cleanup=cleanup)
         with self._lock:
             self._jobs[job.id] = job
         job._future = self._pool.submit(self._run, job, finalize)
@@ -205,6 +206,12 @@ class JobManager:
         job.error = error if status != JobStatus.completed else None
         job.finished_at = _now()
         job._proc = None
+        cleanup, job._cleanup = job._cleanup, None
+        if cleanup is not None:
+            try:
+                cleanup()
+            except Exception:
+                log.exception("cleaning up job %s failed", job.id)
         log.info("job %s (%s %s) %s%s", job.id, job.kind.value, job.name, status.value,
                  f": {job.error}" if job.error else "")
 

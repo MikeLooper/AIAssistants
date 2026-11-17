@@ -74,10 +74,11 @@ class Services:
         cmd = review_command(s, target, out_file, summary_file, opts)
         options = {**asdict(opts), "fileName": filename, "uploadBytes": size}
         return self.jobs.submit(JobKind.review, target.name, cmd, s.root, work, opts.timeout_min * 60 + TIMEOUT_GRACE_S,
-                                lambda job: self.finalize_review(job, out_file, summary_file, work / "source"),
-                                options=options, job_id=job_id)
+                                lambda job: self.finalize_review(job, out_file, summary_file),
+                                options=options, job_id=job_id,
+                                cleanup=lambda: remove_tree(work / "source") if not s.keep_sources else None)
 
-    def finalize_review(self, job: Job, out_file: Path, summary_file: Path, source_dir: Path) -> JobStatus:
+    def finalize_review(self, job: Job, out_file: Path, summary_file: Path) -> JobStatus:
         summary = _read_json(summary_file) or {}
         report = _read_text(out_file) or _read_text(summary.get("docsReport"))
         job.result = {
@@ -89,8 +90,6 @@ class Services:
             "report": report,
             "summary": summary or None,
         }
-        if not self.settings.keep_sources:
-            remove_tree(source_dir)
         if job.exit_code == 0 and summary.get("status") == "completed":
             return JobStatus.completed
         job.error = (summary.get("error") or f"the reviewer exited with code {job.exit_code}") + _log_excerpt(job)
