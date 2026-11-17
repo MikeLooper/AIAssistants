@@ -43,6 +43,14 @@ class JobKind(str, Enum):
     test = "test"
 
 
+class ActiveJobError(RuntimeError):
+    """Raised when a submission conflicts with an active job of the same kind and name."""
+
+    def __init__(self, job: Job):
+        self.job = job
+        super().__init__(f"{job.kind.value} {job.name} is already active as job {job.id}")
+
+
 def _now() -> dt.datetime:
     return dt.datetime.now(dt.timezone.utc)
 
@@ -99,10 +107,16 @@ class JobManager:
 
     def submit(self, kind: JobKind, name: str, command: Sequence[str], cwd: Path, work_dir: Path,
                timeout_s: float, finalize: Finalizer, options: dict[str, Any] | None = None,
-               job_id: str | None = None, cleanup: Callable[[], None] | None = None) -> Job:
+               job_id: str | None = None, reject_active: bool = False,
+               cleanup: Callable[[], None] | None = None) -> Job:
         job = Job(id=job_id or new_job_id(), kind=kind, name=name, command=list(command), cwd=cwd,
                   work_dir=work_dir, timeout_s=timeout_s, options=options or {}, _cleanup=cleanup)
         with self._lock:
+            if reject_active:
+                active = next((j for j in self._jobs.values()
+                               if j.kind == kind and j.name == name and not j.status.finished), None)
+                if active:
+                    raise ActiveJobError(active)
             self._jobs[job.id] = job
         job._future = self._pool.submit(self._run, job, finalize)
         self._prune()

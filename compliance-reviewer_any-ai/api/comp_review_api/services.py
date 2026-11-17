@@ -10,7 +10,7 @@ from typing import Any, BinaryIO
 from .archive import ArchiveError, extract_zip, remove_tree, safe_folder_name, save_upload
 from .commands import (ReviewOptions, TesterDefinition, TesterOptions, review_command, tester_command)
 from .config import Settings
-from .jobs import Job, JobKind, JobManager, JobStatus, new_job_id
+from .jobs import ActiveJobError, Job, JobKind, JobManager, JobStatus, new_job_id
 
 MB = 1024 * 1024
 # Extra time the API allows past the script's own --timeout before it stops the process itself
@@ -99,16 +99,18 @@ class Services:
 
     def start_tester(self, test: TesterDefinition, opts: TesterOptions) -> Job:
         s = self.settings
-        busy = [j for j in self.jobs.list(JobKind.test) if j.name == test.name and not j.status.finished]
-        if busy:
-            raise ConflictError(f"tester {test.name} is already {busy[0].status.value} as job {busy[0].id}")
         job_id = new_job_id()
         work = self.jobs_root / job_id
         results_dir = work / "results"
         cmd = tester_command(s, test, results_dir, opts)
-        return self.jobs.submit(JobKind.test, test.name, cmd, s.root, work, opts.timeout_min * 60 + TIMEOUT_GRACE_S,
-                                lambda job: self.finalize_tester(job, test, results_dir),
-                                options={**asdict(opts), "app": test.app, "script": test.script}, job_id=job_id)
+        try:
+            return self.jobs.submit(
+                JobKind.test, test.name, cmd, s.root, work, opts.timeout_min * 60 + TIMEOUT_GRACE_S,
+                lambda job: self.finalize_tester(job, test, results_dir),
+                options={**asdict(opts), "app": test.app, "script": test.script}, job_id=job_id,
+                reject_active=True)
+        except ActiveJobError as e:
+            raise ConflictError(f"tester {test.name} is already {e.job.status.value} as job {e.job.id}") from None
 
     def finalize_tester(self, job: Job, test: TesterDefinition, results_dir: Path) -> JobStatus:
         result_file = next(iter(sorted(results_dir.rglob(f"{test.app}-result.json"))), None) if results_dir.is_dir() else None

@@ -1,9 +1,10 @@
 import sys
+import threading
 import time
 
 import pytest
 
-from comp_review_api.jobs import JobKind, JobManager, JobStatus
+from comp_review_api.jobs import ActiveJobError, JobKind, JobManager, JobStatus
 
 PY = sys.executable
 
@@ -135,3 +136,30 @@ def test_a_command_that_cannot_start_fails(manager, tmp_path):
     manager.wait(job.id, 30)
     assert job.status == JobStatus.failed
     assert "could not start" in job.error
+
+
+def test_reject_active_submission_is_atomic(manager, tmp_path):
+    barrier = threading.Barrier(2)
+    results = []
+
+    def submit():
+        barrier.wait()
+        try:
+            result = manager.submit(
+                JobKind.test, "same", [PY, "-c", "import time; time.sleep(30)"], tmp_path, tmp_path / "same",
+                30, lambda job: JobStatus.completed, reject_active=True)
+        except ActiveJobError as e:
+            result = e
+        results.append(result)
+
+    threads = [threading.Thread(target=submit) for _ in range(2)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+    accepted = [result for result in results if not isinstance(result, ActiveJobError)]
+    conflicts = [result for result in results if isinstance(result, ActiveJobError)]
+    assert len(accepted) == len(conflicts) == 1
+    assert conflicts[0].job is accepted[0]
+    manager.cancel(accepted[0].id)
+    manager.wait(accepted[0].id, 30)
