@@ -51,7 +51,9 @@ export class ApiService {
   startReview(zip: Blob, fileName: string, options: ReviewOptions): Observable<UploadEvent> {
     const form = new FormData();
     form.append('file', zip, fileName);
-    form.append('tool', options.tool);
+if (options.tool !== 'auto') {
+      form.append('tool', options.tool);
+    }
     form.append('subjects', options.subjects || 'all');
     form.append('advanced', String(!!options.advanced));
     if (options.model?.trim()) {
