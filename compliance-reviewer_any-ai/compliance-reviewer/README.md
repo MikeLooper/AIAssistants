@@ -31,12 +31,15 @@ flowchart TD
 | `compliance-reviewer/STANDARDS-MAINTENANCE.md` | Maintainer guide: how the localized standards are kept current (cadence, triggers, refresh steps, drift checker, AI-tool usage) |
 | `compliance-reviewer/REFRESH.md` | Neutral procedure for the maintainer-only standards refresh command |
 | `scripts/run_review.py` | Runs a review headlessly against an application directory, prints the report, then the run's duration, cost and token costs ([details](#running-a-review-from-a-script)) |
+| `api/` | comp-review-api: HTTP API (FastAPI, Swagger UI, port 12001) that reviews uploaded zips and runs the validation testers as background jobs ([details](#api-and-web-ui)) |
+| `webui/` | comp-review-ui: Angular web front end for the API (port 12101) ([details](#api-and-web-ui)) |
 | `compliance-reviewer/scripts/check_source_drift.py` | Maintainer-only drift checker: compares each skill's `references/standards/pins.json` with the live sources (never run during a review) |
 | `.claude/skills/refresh-standards/SKILL.md`, `.github/prompts/refresh-standards.prompt.md` | Refresh command adapters (Claude Code, GitHub Copilot) |
 | `compliance-reviewer/skills/compliance-review-core/` | Schemas, scoring rubric, maintainer-only source registry, resume rules |
 | `compliance-reviewer/skills/compliance-inventory/` | Repo mapping, capped per-subject file lists, batching |
 | `compliance-reviewer/skills/review-*/` | One folder per subject (18): checklist, sources, optional per-language files |
 | `compliance-reviewer/skills/compliance-report/` | Validate/aggregate/render script (`scripts/compliance_report.py`, Python 3) and report template |
+| `VERSION`, `CHANGELOG.md` | The tool's current version and its release history ([details](#versioning)) |
 | `AGENTS.md` | Auto-read by Codex/ChatGPT agents and many other tools (agents.md convention) |
 | `.claude/skills/compliance-reviewer/SKILL.md`, `.claude/agents/compliance-subject-reviewer.md`, `.claude/settings.json` | Claude Code adapters and pre-approved permissions |
 | `.github/prompts/compliance-review.prompt.md`, `.github/agents/compliance-subject-reviewer.agent.md` | GitHub Copilot adapters |
@@ -185,6 +188,56 @@ A `--prices` file is JSON keyed by model name, in USD per million tokens. Cache 
 - A review takes several minutes and uses model credit, roughly the same as running `/compliance-reviewer` yourself.
 - With `--advanced` under Claude, the CLI analyzers need shell commands that the fixed `--allowedTools` list doesn't include, so they're denied. Allow the ones you want with `--allow-tool`, for example `--allow-tool "Bash(dotnet list:*)"`.
 - The test harness in [`test/logic/`](../test/README.md#automated-validation) uses the same approach to run and score the reviewer against the sample apps.
+- To run reviews from a browser or over HTTP instead, use the [API and Web UI](#api-and-web-ui), which call this script for you.
+
+## API and Web UI
+
+Two optional applications put the headless reviewer and the validation testers behind an HTTP API and a browser UI. They add nothing to the review itself: every review still runs `scripts/run_review.py`, and every tester runs its `test/logic/test_*.py` script.
+
+```mermaid
+flowchart LR
+    B[Browser] --> UI["comp-review-ui<br/>webui/ · Angular · :12101"]
+    UI -->|HTTP JSON| API["comp-review-api<br/>api/ · FastAPI · :12001"]
+    C[curl / scripts] --> API
+    API -->|unzip upload, background job| R[scripts/run_review.py]
+    API -->|background job| T[test/logic/test_*.py]
+    R --> AI[claude / copilot CLI]
+    T --> R2[harness: build, review, score]
+```
+
+**comp-review-api** ([`api/`](../api/README.md)): a Python FastAPI application on port 12001 with a Swagger UI at `/swagger`.
+
+- `GET /api/about` returns the reviewer version (from `VERSION`) and the API's configuration. `GET /api/health` is the health check.
+- `POST /api/reviews` takes a zip of the source code. The API unzips it into a temporary folder and runs the reviewer on it as a background job.
+- `POST /api/testers/{name}` runs one of the nine validation testers (`api-dotnet` … `mcp-python`).
+- Poll `GET /api/jobs/{id}` for status and console output. When the job finishes, the result holds the Markdown report and, for a tester, the test result. You can also cancel and delete jobs.
+- Each request can name the AI tool (`claude`, `copilot` or `auto`) and the **model**. The `DefaultTool` and `DefaultModel` settings apply when a request names none.
+- The `Environment` setting is `development` or `production`. In production the tester endpoints are switched off: they're absent from the Swagger UI, and a direct call gets 404.
+- Settings come from `api/appsettings.json`, overridden by `COMP_REVIEW_API_*` environment variables. There's no authentication and it binds to `127.0.0.1`, so keep it local or put authentication in front of it.
+
+**comp-review-ui** ([`webui/`](../webui/README.md)): an Angular application on port 12101.
+
+- The Review page uploads a zip, or a directory that it zips in the browser first. Both are picked with the browser's Browse dialogs, because browsers can't read a typed path. Pick the tool, model, subjects, advanced usage and time limit there too.
+- The Testers page runs one or several testers.
+- The Jobs and Job pages follow progress and, when a job finishes, show the final report, plus the test result for a tester.
+- The About page shows the reviewer version, the API's health and its configuration.
+- `webui/public/config.json` sets `environment` (`production` hides the Testers page) and the API URL. You can change it without rebuilding.
+
+**Running both.**
+
+```powershell
+# terminal 1: API (http://127.0.0.1:12001/swagger)
+cd compliance-reviewer_any-ai\api
+python -m venv .venv; .venv\Scripts\Activate.ps1; pip install -r requirements.txt
+python run.py
+
+# terminal 2: Web UI (http://localhost:12101)
+cd compliance-reviewer_any-ai\webui
+npm install
+npm start
+```
+
+The API needs the same prerequisites as `run_review.py` (Python 3.10+ and a signed-in `claude` or `copilot` CLI); the testers also need the sample apps' build tools. Both applications have unit tests that never call an AI tool: `python -m pytest` in `api/` (99 tests) and `npm test` in `webui/` (81 tests).
 
 ## Resuming After an Interruption
 
@@ -205,6 +258,16 @@ No subject judges these topics today (recorded by the cross-skill follow-up revi
 - **Vulnerable library versions without analyzer output.** DEP-03 is analyzer-only, so with no approved analyzer (always the case with advanced usage off) no subject reports them (add `no-analyzer-output` to `notes`).
 - **MCP servers over HTTP.** MCP-15 (remote transport security) is localized but no test app exercises it yet; the MCP test apps use stdio only.
 - **Infrastructure-as-code with advanced usage off** (the default). IaC files aren't reviewed by any subject; turn on `--advanced` to include them.
+
+## Versioning
+
+The tool is versioned as a whole with [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html). The current version is in [`VERSION`](../VERSION) (one line, e.g. `1.0.0`) and each release is described in [`CHANGELOG.md`](../CHANGELOG.md). Version 1.0.0 (2026-11-16) is the baseline; earlier changes are listed under [Maintenance](#maintenance).
+
+- **Major** — a change that breaks callers or makes reports incomparable across the board: a breaking `schemaVersion` bump, a removed or renamed operational flag or command, a changed `--programmatic` output contract, or a scoring-rubric change that shifts every overall score.
+- **Minor** — a backward-compatible addition or a scoped change in results: a new subject, check, language, flag or analyzer, or a standards refresh that changes a subject's checks, severities or denominator (call out which subject scores aren't comparable, as the Maintenance notes do).
+- **Patch** — no change to results or contracts: wording fixes, documentation, pin-only standards refreshes, and script bug fixes that don't change valid output.
+
+When you release, update `VERSION` and add a dated `CHANGELOG.md` entry in the same change. The tool version is separate from `schemaVersion`, which only tracks the finding and transition file formats.
 
 ## Keeping the standards current
 
@@ -255,6 +318,6 @@ Every subject reviews against local, pinned summaries of its external sources (`
 - **Subject and sub-subject labels were pinned on 2026-11-10** (`docs/plan-fix-labels.md`). Each checklist now owns its labels (`Subject:` line and `Sub-subject` column), and the report script rewrites the labels workers write. Subject rows were renamed: `Implementation` → `Dependency Management`, `Operations` → `Performance`, `Operations / Reliability` → `Reliability`, and `Security / Identity & Access` folded into `Security`. Sub-subject headings in Full Results are now fixed per check. The overall score is unaffected. Subject scores are comparable across runs only from this date on, but re-running `aggregate` and `render` on an older run brings it onto the new labels.
 - **Add a language:** add `references/languages/<id>.md` to the skills needing it and a detection signal in `compliance-review-core/references/languages.md`.
 - Check for overlap with existing skills before adding a subject or check. Gate IaC-only subjects on `iacFound`.
-- Version the schemas (`finding-schema.md`, `transition-schema.md`); bump `schemaVersion` on breaking changes.
+- Version the schemas (`finding-schema.md`, `transition-schema.md`); bump `schemaVersion` on breaking changes. Bump the tool version in `VERSION` and `CHANGELOG.md` for every release ([Versioning](#versioning)).
 - Cost levers: `maxFilesPerSubject` and batching in `compliance-inventory`, output size caps in `finding-schema.md`, workers writing their own files, the deterministic report script.
 - Test changes on a small sample repo before real reviews.

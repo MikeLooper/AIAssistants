@@ -8,6 +8,7 @@ AI Assistants to accomplish a multitude of tasks.
 
 `compliance-reviewer_any-ai` - An agent for determining how well application source code is complying with standards and best-practices.  This assistant uses only agents, skills, and related AI tooling.  This assistant is designed to work with any AI provider.
 - [README](compliance-reviewer_any-ai\compliance-reviewer\README.md)
+- [API](compliance-reviewer_any-ai/api/README.md) (`comp-review-api`, FastAPI with Swagger UI, port 12001) and [Web UI](compliance-reviewer_any-ai/webui/README.md) (`comp-review-ui`, Angular, port 12101). They run reviews of uploaded source code and the validation testers from a browser or over HTTP, and show the final report.
 
 `copilot-instructions` - Rules to use with Copilot.  Topic-specific guidance that loads when you work on matching files.
 - [Instructions](copilot-instructions\copilot-instructions.md)

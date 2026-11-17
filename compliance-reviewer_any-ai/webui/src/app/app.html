@@ -1,0 +1,20 @@
+<header class="topbar">
+  <a class="brand" routerLink="/review">Compliance Reviewer</a>
+  <nav aria-label="Main">
+    <a routerLink="/review" routerLinkActive="active">Review</a>
+    @if (!config.isProduction()) {
+      <a routerLink="/testers" routerLinkActive="active" data-testid="nav-testers">Testers</a>
+    }
+    <a routerLink="/jobs" routerLinkActive="active">Jobs</a>
+    <a routerLink="/about" routerLinkActive="active">About</a>
+  </nav>
+  <span class="spacer"></span>
+  <span class="api-state" [class]="'api-state api-' + apiState()" [title]="'API: ' + apiState()">
+    API {{ apiState() }}
+  </span>
+  <span class="badge badge-env" data-testid="environment">{{ config.environment() }}</span>
+</header>
+
+<main class="container">
+  <router-outlet />
+</main>

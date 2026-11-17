@@ -1,0 +1,98 @@
+<p><a routerLink="/jobs">← All jobs</a></p>
+
+@if (error()) {
+  <div class="alert alert-error" role="alert">{{ error() }}</div>
+}
+
+@if (job(); as j) {
+  <h1>
+    {{ j.kind === 'test' ? 'Tester' : 'Review' }}: {{ j.name }}
+    <app-status-badge [value]="j.status" />
+    @if (j.verdict) { <app-status-badge [value]="j.verdict" /> }
+  </h1>
+
+  <div class="card summary-grid">
+    <div><span class="label">Job</span><span class="mono">{{ j.id }}</span></div>
+    <div><span class="label">Started</span>{{ (j.startedAt ?? j.createdAt) | date: 'medium' }}</div>
+    <div><span class="label">Duration</span>{{ formatDuration(j.durationSeconds) }}</div>
+    @if (j.overallScore !== null) {
+      <div><span class="label">Overall score</span><strong>{{ j.overallScore }}</strong> {{ j.overallBand }}</div>
+    }
+    @if (finished()) {
+      <div><span class="label">Cost</span>{{ cost() }}</div>
+    }
+    @if (j.result?.runId) {
+      <div><span class="label">Run ID</span><span class="mono">{{ j.result?.runId }}</span></div>
+    }
+  </div>
+
+  @if (optionRows().length) {
+    <details class="card">
+      <summary>Options</summary>
+      <dl class="kv">
+        @for (row of optionRows(); track row.key) {
+          <dt>{{ row.key }}</dt><dd>{{ row.value }}</dd>
+        }
+      </dl>
+    </details>
+  }
+
+  @if (j.error) {
+    <div class="alert alert-error pre-line" role="alert">{{ j.error }}</div>
+  }
+  @if (actionError()) {
+    <div class="alert alert-error" role="alert">{{ actionError() }}</div>
+  }
+
+  <div class="actions">
+    @if (!finished()) {
+      <button type="button" (click)="cancel()">Cancel job</button>
+      <span class="muted">
+        {{ j.status === 'queued' ? 'Waiting for a free slot…' : 'Running — this page updates by itself.' }}
+      </span>
+    } @else {
+      <button type="button" (click)="remove()">Delete job</button>
+    }
+  </div>
+
+  @if (testResult()) {
+    <section class="card">
+      <div class="section-head">
+        <h2>Test result</h2>
+        <button type="button" (click)="downloadTestResult()">Download .md</button>
+      </div>
+      <app-markdown-view [markdown]="testResult()" />
+    </section>
+  }
+
+  @if (report()) {
+    <section class="card">
+      <div class="section-head">
+        <h2>Compliance report</h2>
+        <span>
+          <button type="button" (click)="showRaw.set(!showRaw())">{{ showRaw() ? 'Formatted' : 'Markdown source' }}</button>
+          <button type="button" (click)="downloadReport()">Download .md</button>
+        </span>
+      </div>
+      @if (showRaw()) {
+        <pre class="raw">{{ report() }}</pre>
+      } @else {
+        <app-markdown-view [markdown]="report()" />
+      }
+    </section>
+  } @else if (finished() && j.status === 'completed') {
+    <p class="muted">The job finished without a report.</p>
+  }
+
+  <section class="card">
+    <div class="section-head">
+      <h2>Console output <span class="muted">({{ j.logLineCount }} lines{{ j.logLineCount > j.log.length ? ', latest ' + j.log.length + ' shown' : '' }})</span></h2>
+      <button type="button" (click)="showLog.set(!showLog())">{{ showLog() ? 'Hide' : 'Show' }}</button>
+    </div>
+    @if (showLog()) {
+      <pre class="log" #logBox>{{ j.log.join('\n') || 'No output yet.' }}</pre>
+    }
+  </section>
+} @else if (!error()) {
+  <p class="muted">Loading job…</p>
+}

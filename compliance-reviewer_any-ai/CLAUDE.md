@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-A provider-neutral **Compliance Reviewer**: a set of Markdown instructions and skills that let an AI tool review an *external* target codebase (architecture, coding standards, security, testing, operations) and produce one scored Markdown report. It's mostly prompt content, plus the report script and a maintainer-only source-drift script. There's no build, package manager or test suite.
+A provider-neutral **Compliance Reviewer**: a set of Markdown instructions and skills that let an AI tool review an *external* target codebase (architecture, coding standards, security, testing, operations) and produce one scored Markdown report. It's mostly prompt content, plus the report script and a maintainer-only source-drift script. The reviewer itself has no build, package manager or test suite. The optional `api/` (FastAPI) and `webui/` (Angular) applications do; see "API and Web UI" below.
 
 `AGENTS.md` is the cross-tool entry point. Full docs: [compliance-reviewer/README.md](compliance-reviewer/README.md).
 
@@ -35,6 +35,12 @@ python -m unittest discover -s compliance-reviewer/skills/compliance-report/scri
 
 **Labels are data, not model output.** Each `review-*/references/checklist.md` owns its `Subject:` line and a `Sub-subject` column; `aggregate`/`render` rewrite every worker label from it, and `validate` warns on drift and blocks unknown `checkId`s or missing check results. After editing any checklist, run `labels` (lint). Plan: [docs/plan-fix-labels.md](docs/plan-fix-labels.md).
 
+## API and Web UI
+
+- `api/` is **comp-review-api** (Python, FastAPI, port 12001, Swagger at `/swagger`). It wraps `scripts/run_review.py` (uploaded zip → temp folder → background job) and the nine `test/logic/test_*.py` testers. Settings: `api/appsettings.json` plus `COMP_REVIEW_API_*` variables. With `Environment=production`, the tester router isn't registered (absent from OpenAPI, 404 on a direct call). Run `python run.py`; test with `python -m pytest` (the tests use fake scripts in `api/tests/fakes/`, never an AI tool). Docs: [api/README.md](api/README.md).
+- `webui/` is **comp-review-ui** (Angular 22, zoneless, Vitest, port 12101). Its runtime config is `webui/public/config.json` (`environment`, `apiBaseUrl`, `pollIntervalMs`); production hides the Testers page. Run `npm start`; test with `npm test`. Docs: [webui/README.md](webui/README.md).
+- When you change `run_review.py` or the harness CLI options, check `api/comp_review_api/commands.py` (it builds their command lines) and the result-file names read in `api/comp_review_api/services.py`.
+
 ## Architecture
 
 - **Neutral content, thin adapters.** All real rules live once under `compliance-reviewer/`. Tool-specific files only point at the neutral files and map generic capabilities ("ask the user", "delegate to a worker", "shell", "todo list"; there is no fetch capability, because reviews never fetch URLs) to that tool's names:
@@ -56,6 +62,7 @@ python -m unittest discover -s compliance-reviewer/skills/compliance-report/scri
 - **Resumability.** `transitions/<runId>/state.json` tracks step status. `resume run <id> from step <NN>` moves later files into `superseded/`.
 - **Aggregation logic** is in the script, not in prompts: dedup by evidence-location IoU ≥ 0.5 (same check + same `standard` within a subject, or across different subject skills; different checks in one skill never merge), scoring from `severity-and-scoring.md`, and top-5 risk ordering. If you change the scoring or dedup rules, update the script and `compliance-report/SKILL.md` together.
 - **Schemas** live in `compliance-review-core/references/` (`finding-schema.md`, `transition-schema.md`). Bump `schemaVersion` on breaking changes. Keep the script's `FILE_RE` and `HEADER_KEYS` in sync with them.
+- **Tool version** is in [VERSION](VERSION) (SemVer, started at 1.0.0) with history in [CHANGELOG.md](CHANGELOG.md). It's separate from `schemaVersion`. When a change is released, bump `VERSION` and add a dated changelog entry together; the major/minor/patch rules are in the README's "Versioning" section.
 
 ## Extending
 
