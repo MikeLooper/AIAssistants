@@ -98,16 +98,19 @@ def extract_zip(zip_path: Path, dest: Path, max_bytes: int, max_files: int) -> P
             target = (dest / Path(*rel.parts)).resolve()
             if dest_resolved not in target.parents:
                 raise ArchiveError(f"the archive holds a path outside its folder: {info.filename!r}")
-            target.parent.mkdir(parents=True, exist_ok=True)
-            with zf.open(info) as src, target.open("wb") as out:
-                while True:
-                    chunk = src.read(CHUNK)
-                    if not chunk:
-                        break
-                    total += len(chunk)
-                    if total > max_bytes:  # sizes in the header can lie
-                        raise ArchiveError(f"the archive expands past the {max_bytes // (1024 * 1024)} MB limit")
-                    out.write(chunk)
+            try:
+                target.parent.mkdir(parents=True, exist_ok=True)
+                with zf.open(info) as src, target.open("wb") as out:
+                    while True:
+                        chunk = src.read(CHUNK)
+                        if not chunk:
+                            break
+                        total += len(chunk)
+                        if total > max_bytes:  # sizes in the header can lie
+                            raise ArchiveError(f"the archive expands past the {max_bytes // (1024 * 1024)} MB limit")
+                        out.write(chunk)
+            except (FileExistsError, NotADirectoryError, IsADirectoryError) as e:
+                raise ArchiveError("the archive contains conflicting file and directory paths") from e
     return review_root(dest)
 
 

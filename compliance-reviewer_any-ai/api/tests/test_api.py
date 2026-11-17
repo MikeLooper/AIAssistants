@@ -192,6 +192,8 @@ def test_review_crash_without_summary(client):
     ({}, ("notes.txt", b"hello"), "must be a .zip"),
     ({}, ("bad.zip", b"not a zip"), "not a zip"),
     ({}, ("evil.zip", make_zip({"../evil.py": "x"})), "outside"),
+    ({}, ("conflict.zip", make_zip({"a": "x", "a/b": "y"})), "conflicting"),
+    ({}, ("conflict.zip", make_zip({"a/b": "y", "a": "x"})), "conflicting"),
 ])
 def test_review_bad_requests(client, form, files, message):
     if files:
