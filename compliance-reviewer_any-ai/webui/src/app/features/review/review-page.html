@@ -1,0 +1,110 @@
+<h1>Run a compliance review</h1>
+<p class="muted">
+  Upload an application's source code. The API unzips it into a temporary folder, runs the reviewer on it
+  and shows the report when it finishes. A review uses model credit and usually takes several minutes.
+</p>
+
+@if (aboutError()) {
+  <div class="alert alert-warning">Could not load the API's settings: {{ aboutError() }}</div>
+}
+
+<form class="card" (submit)="$event.preventDefault(); submit()">
+  <fieldset [disabled]="busy()">
+    <legend>Source code</legend>
+    <div class="segmented" role="radiogroup" aria-label="Source type">
+      <label><input type="radio" name="sourceType" value="zip" [checked]="sourceType() === 'zip'"
+                    (change)="sourceType.set('zip')" /> Zip file</label>
+      <label><input type="radio" name="sourceType" value="directory" [checked]="sourceType() === 'directory'"
+                    (change)="sourceType.set('directory')" /> Directory</label>
+    </div>
+
+    @if (sourceType() === 'zip') {
+      <label class="field">
+        <span>Zip file</span>
+        <input type="file" name="zip" accept=".zip,application/zip,application/x-zip-compressed"
+               (change)="onZipPicked($event)" />
+      </label>
+      @if (zipFile(); as zip) {
+        <p class="muted" data-testid="zip-summary">{{ zip.name }} · {{ formatBytes(zip.size) }}</p>
+      }
+    } @else {
+      <label class="field">
+        <span>Directory</span>
+        <input type="file" name="directory" webkitdirectory multiple (change)="onDirectoryPicked($event)" />
+      </label>
+      <label class="check">
+        <input type="checkbox" name="skipBuildOutput" [checked]="skipBuildOutput()"
+               (change)="skipBuildOutput.set($any($event.target).checked)" />
+        Leave out build output, dependencies and VCS folders
+      </label>
+      <p class="hint">{{ skippedFolders.join(', ') }}</p>
+      @if (selection(); as sel) {
+        <p class="muted" data-testid="directory-summary">
+          {{ sel.rootName }}: {{ sel.files.length }} files, {{ formatBytes(sel.totalBytes) }}
+          @if (sel.skippedCount) { ({{ sel.skippedCount }} left out) }
+          — zipped in the browser and uploaded as {{ sel.rootName }}.zip
+        </p>
+      }
+    }
+  </fieldset>
+
+  <fieldset [disabled]="busy()">
+    <legend>Reviewer</legend>
+    <app-tool-model-picker [about]="about()" [(tool)]="tool" [(modelName)]="model" />
+
+    <div class="segmented" role="radiogroup" aria-label="Subjects">
+      <label><input type="radio" name="subjectsMode" [checked]="subjectsMode() === 'all'"
+                    (change)="subjectsMode.set('all')" /> All subjects</label>
+      <label><input type="radio" name="subjectsMode" [checked]="subjectsMode() === 'selected'"
+                    (change)="subjectsMode.set('selected')" /> Selected subjects</label>
+    </div>
+    @if (subjectsMode() === 'selected') {
+      <div class="subject-grid">
+        @for (s of about()?.subjects ?? []; track s) {
+          <label class="check">
+            <input type="checkbox" [checked]="selectedSubjects().has(s)"
+                   (change)="toggleSubject(s, $any($event.target).checked)" /> {{ s }}
+          </label>
+        } @empty {
+          <p class="muted">No subjects loaded from the API.</p>
+        }
+      </div>
+    }
+
+    <label class="check">
+      <input type="checkbox" name="advanced" [checked]="advanced()"
+             (change)="advanced.set($any($event.target).checked)" />
+      Advanced usage (infrastructure-as-code review and CLI analyzers)
+    </label>
+    <div class="field-row">
+      @if (advanced()) {
+        <label class="field">
+          <span>Analyzers</span>
+          <input name="analyzers" [value]="analyzers()" (input)="analyzers.set($any($event.target).value)" />
+        </label>
+      }
+      <label class="field">
+        <span>Time limit (minutes)</span>
+        <input type="number" name="timeoutMin" min="1" placeholder="API default"
+               [value]="timeoutMin() ?? ''" (input)="timeoutMin.set(numberOrNull($any($event.target).value))" />
+      </label>
+    </div>
+  </fieldset>
+
+  @if (error()) {
+    <div class="alert alert-error" role="alert">{{ error() }}</div>
+  }
+
+  <div class="actions">
+    <button type="submit" class="primary" [disabled]="!!validationError() || busy()">
+      @switch (phase()) {
+        @case ('zipping') { Zipping… }
+        @case ('uploading') { Uploading{{ uploadPercent() !== null ? ' ' + uploadPercent() + '%' : '…' }} }
+        @default { Start review }
+      }
+    </button>
+    @if (validationError() && !busy()) {
+      <span class="muted">{{ validationError() }}</span>
+    }
+  </div>
+</form>

@@ -1,0 +1,71 @@
+<h1>Validation testers</h1>
+<p class="muted">
+  Each tester builds one of the sample apps in <code>test/</code>, reviews it and scores the findings against the
+  answer key. Every run is a full review: it uses model credit and takes several minutes. The API runs queued
+  jobs one after another (MaxConcurrentJobs).
+</p>
+
+<div class="card">
+  <fieldset [disabled]="starting()">
+    <legend>Options</legend>
+    <app-tool-model-picker [about]="about()" [(tool)]="tool" [(modelName)]="model" />
+    <div class="field-row">
+      <label class="field">
+        <span>Required share of flaws (%)</span>
+        <input type="number" name="minFound" min="0" max="100" [value]="minFound()"
+               (input)="minFound.set(+$any($event.target).value)" />
+      </label>
+      <label class="field">
+        <span>Time limit (minutes)</span>
+        <input type="number" name="timeoutMin" min="1" placeholder="API default" [value]="timeoutMin() ?? ''"
+               (input)="timeoutMin.set(numberOrNull($any($event.target).value))" />
+      </label>
+    </div>
+    <label class="check">
+      <input type="checkbox" name="noBuild" [checked]="noBuild()" (change)="noBuild.set($any($event.target).checked)" />
+      Skip the fresh build of the sample app
+    </label>
+  </fieldset>
+  @if (optionsError()) {
+    <div class="alert alert-warning">{{ optionsError() }}</div>
+  }
+</div>
+
+@if (error()) {
+  <div class="alert alert-error pre-line" role="alert">{{ error() }}</div>
+}
+
+@if (loading()) {
+  <p class="muted">Loading testers…</p>
+} @else if (testers().length) {
+  <table class="table">
+    <thead>
+      <tr>
+        <th><input type="checkbox" aria-label="Select all" [checked]="allSelected()"
+                   (change)="toggleAll($any($event.target).checked)" /></th>
+        <th>Tester</th>
+        <th>Script</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (t of testers(); track t.name) {
+        <tr>
+          <td><input type="checkbox" [attr.aria-label]="'Select ' + t.title" [checked]="selected().has(t.name)"
+                     (change)="toggle(t.name, $any($event.target).checked)" /></td>
+          <td>{{ t.title }} <span class="muted">({{ t.name }})</span></td>
+          <td><code>{{ t.script }}</code></td>
+          <td class="right">
+            <button type="button" [disabled]="starting() || !!optionsError()" (click)="run(t.name)">Run</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <div class="actions">
+    <button type="button" class="primary" [disabled]="!selected().size || starting() || !!optionsError()"
+            (click)="runSelected()">Run selected ({{ selected().size }})</button>
+  </div>
+} @else if (!error()) {
+  <p class="muted">The API found no tester scripts.</p>
+}

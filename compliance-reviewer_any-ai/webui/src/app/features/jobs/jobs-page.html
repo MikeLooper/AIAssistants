@@ -1,0 +1,33 @@
+<h1>Jobs</h1>
+<p class="muted">Jobs live in the API's memory, so they're lost when it restarts. The newest finished jobs are kept.</p>
+
+@if (error()) {
+  <div class="alert alert-error" role="alert">{{ error() }}</div>
+}
+
+@if (!loaded()) {
+  <p class="muted">Loading jobs…</p>
+} @else if (jobs().length) {
+  <table class="table">
+    <thead>
+      <tr><th>Job</th><th>Kind</th><th>Status</th><th>Score</th><th>Started</th><th>Duration</th></tr>
+    </thead>
+    <tbody>
+      @for (j of jobs(); track j.id) {
+        <tr>
+          <td><a [routerLink]="['/jobs', j.id]">{{ j.name }}</a> <span class="muted mono">{{ j.id }}</span></td>
+          <td>{{ j.kind }}</td>
+          <td>
+            <app-status-badge [value]="j.status" />
+            @if (j.verdict) { <app-status-badge [value]="j.verdict" /> }
+          </td>
+          <td>{{ j.overallScore ?? '—' }}{{ j.overallBand ? ' (' + j.overallBand + ')' : '' }}</td>
+          <td>{{ (j.startedAt ?? j.createdAt) | date: 'short' }}</td>
+          <td>{{ formatDuration(j.durationSeconds) }}</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+} @else {
+  <p class="muted">No jobs yet.</p>
+}

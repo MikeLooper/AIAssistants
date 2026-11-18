@@ -1,0 +1,57 @@
+<div class="section-head">
+  <h1>About</h1>
+  <button type="button" (click)="refresh()">Refresh</button>
+</div>
+
+<section class="card">
+  <h2>Web UI</h2>
+  <dl class="kv">
+    <dt>Environment</dt><dd><app-status-badge [value]="config.environment()" /></dd>
+    <dt>API base URL</dt><dd class="mono">{{ config.apiBaseUrl() }}</dd>
+    <dt>Poll interval</dt><dd>{{ config.config().pollIntervalMs }} ms</dd>
+  </dl>
+  @if (config.error()) {
+    <div class="alert alert-warning">{{ config.error() }}</div>
+  }
+</section>
+
+<section class="card">
+  <h2>API health</h2>
+  @if (health(); as h) {
+    <p><app-status-badge [value]="h.status" /></p>
+    <dl class="kv">
+      @for (c of entries(h.checks); track c.key) {
+        <dt>{{ c.key }}</dt>
+        <dd>{{ c.value ? 'ok' : 'failing' }}{{ h.details[c.key] ? ' — ' + h.details[c.key] : '' }}</dd>
+      }
+    </dl>
+  } @else if (healthError()) {
+    <div class="alert alert-error" role="alert">{{ healthError() }}</div>
+  } @else {
+    <p class="muted">Checking…</p>
+  }
+</section>
+
+<section class="card">
+  <h2>Reviewer and API</h2>
+  @if (about(); as a) {
+    <dl class="kv">
+      <dt>Reviewer version</dt><dd data-testid="reviewer-version">{{ a.reviewerVersion ?? 'unknown' }}</dd>
+      <dt>API environment</dt><dd><app-status-badge [value]="a.environment" /></dd>
+      <dt>Python</dt><dd>{{ a.pythonVersion }}</dd>
+      <dt>AI tools</dt>
+      <dd>
+        @for (t of a.tools; track t.name) {
+          <div>{{ t.name }}: {{ t.found ? 'found (' + t.path + ')' : 'not found on PATH' }}</div>
+        }
+      </dd>
+      <dt>Subjects</dt><dd>{{ a.subjects.length }}: {{ a.subjects.join(', ') }}</dd>
+    </dl>
+    <h3>Configuration</h3>
+    <pre class="raw">{{ a.configuration | json }}</pre>
+  } @else if (aboutError()) {
+    <div class="alert alert-error" role="alert">{{ aboutError() }}</div>
+  } @else {
+    <p class="muted">Loading…</p>
+  }
+</section>
