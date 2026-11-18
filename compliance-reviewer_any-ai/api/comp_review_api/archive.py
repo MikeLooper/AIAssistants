@@ -3,6 +3,7 @@ extracting a zip without path traversal, symlinks or zip bombs."""
 
 from __future__ import annotations
 
+import os
 import re
 import shutil
 import stat
@@ -62,6 +63,23 @@ def _member_path(name: str) -> PurePosixPath | None:
     return PurePosixPath(*parts)
 
 
+def _check_path_conflicts(paths: list[PurePosixPath]) -> None:
+    """Raise when one member's path is also a folder of another member (e.g. `a` and `a/b`).
+
+    Checked before anything is written, because the OS error for writing a file over a folder differs
+    by platform (IsADirectoryError on POSIX, PermissionError on Windows). Paths are compared with the
+    platform's case rules, so `A` and `a/b` conflict on Windows."""
+    files: set[str] = set()
+    dirs: set[str] = set()
+    for rel in paths:
+        parts = [os.path.normcase(p) for p in rel.parts]
+        files.add("/".join(parts))
+        for i in range(1, len(parts)):
+            dirs.add("/".join(parts[:i]))
+    if files & dirs:
+        raise ArchiveError("the archive contains conflicting file and directory paths")
+
+
 def _is_symlink(info: zipfile.ZipInfo) -> bool:
     return stat.S_ISLNK(info.external_attr >> 16)
 
@@ -93,6 +111,7 @@ def extract_zip(zip_path: Path, dest: Path, max_bytes: int, max_files: int) -> P
         if declared > max_bytes:
             raise ArchiveError(f"the archive expands to {declared // (1024 * 1024)} MB; "
                                f"the limit is {max_bytes // (1024 * 1024)} MB")
+        _check_path_conflicts([rel for _, rel in files])
         total = 0
         for info, rel in files:
             target = (dest / Path(*rel.parts)).resolve()
