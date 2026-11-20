@@ -149,7 +149,7 @@ Common options (every script; run any script with `--help` for the full list):
 | `--min-found PCT` | `90` | Share of the 12 seeded flaws that must be found for a pass (90% means 11). Also `COMPLIANCE_TEST_MIN_FOUND`. |
 | `--timeout MIN` | `60` | Time limit for each review, in minutes. Also `COMPLIANCE_TEST_TIMEOUT_MIN`. |
 | `--progress SEC` | `30` | While a review runs, print a line each time the reviewer finishes a step (read from `transitions/<runId>/state.json`), plus a "still running" heartbeat every SEC seconds. `0` turns progress output off. Also `COMPLIANCE_TEST_PROGRESS_SEC`. |
-| `--model NAME` | tool default | Model, passed to the tool's `--model` option. |
+| `--model NAME` | tool default | Model, passed to the tool's `--model` option. With Claude this sets the orchestrator's model only; the worker subagent always runs on Sonnet. |
 | `--tool-arg ARG` | none | Extra argument for the AI tool's CLI; repeat it for more, e.g. `--tool-arg=--max-budget-usd --tool-arg=5`. |
 | `--results-dir DIR` | `test/logic/results` | Where results are written. |
 | `--no-build` | off | Skip the fresh build. Old build output is still deleted. |
@@ -189,7 +189,7 @@ Each run writes a folder under `test/logic/results/` (git-ignored), named `<time
 
 | File | Contents |
 |------|----------|
-| `<app>-result.md` | The verdict, a found/missed row per flaw with the finding IDs that matched, and tables of unexpected and related findings |
+| `<app>-result.md` | The verdict, duration and cost (with Claude also the cost per model, which splits the orchestrator from the Sonnet worker), a found/missed row per flaw with the finding IDs that matched, and tables of unexpected and related findings |
 | `<app>-result.json` | The same data, for scripts |
 | `<app>-report.md` | The reviewer's own scored report |
 | `<app>-<tool>.log` | The AI tool's raw output and exit code, for troubleshooting |

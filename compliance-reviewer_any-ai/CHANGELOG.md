@@ -2,6 +2,11 @@
 
 All notable changes to the Compliance Reviewer are recorded here. The tool follows [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html); the current version is in [VERSION](VERSION). See [Versioning](compliance-reviewer/README.md#versioning) for what counts as a major, minor or patch change.
 
+## [1.0.1] - 2026-11-20
+
+- Claude Code: the worker subagent (`.claude/agents/compliance-subject-reviewer.md`) now runs on Sonnet (`model: sonnet`) instead of inheriting the session's model, which should roughly halve the cost of a run (recommendation 1 of [docs/ai/improvements-review_2026-11-20.md](docs/ai/improvements-review_2026-11-20.md)). `--model` in `run_review.py`, the testers and the API now sets only the orchestrator's model.
+- Test harness: `<app>-result.json` and `<app>-result.md` record the Claude cost per model (`costByModel`), so orchestrator and worker cost can be compared.
+
 ## [1.0.0] - 2026-11-16
 
 First versioned release. It establishes the baseline: everything the tool did on this date is 1.0.0.

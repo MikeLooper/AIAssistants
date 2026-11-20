@@ -222,6 +222,16 @@ class ToolDetectionTests(unittest.TestCase):
         self.assertEqual(harness.parse_status(text)["runId"], "r1")
         self.assertIsNone(harness.parse_status("no json"))
 
+    def test_model_costs_split_orchestrator_and_worker(self):
+        envelope = {"total_cost_usd": 3.0, "modelUsage": {
+            "claude-opus-5-5": {"costUSD": 1.0}, "claude-sonnet-5-5": {"costUSD": 2.0}, "odd": {}}}
+        self.assertEqual(harness.model_costs(envelope), {"claude-opus-5-5": 1.0, "claude-sonnet-5-5": 2.0})
+        self.assertEqual(harness.model_costs({}), {})
+        md = harness.render_markdown({"app": "apis-dotNET", "verdict": "pass", "tool": "claude", "toolReason": "flag",
+                                      "costUsd": 3.0, "costByModel": {"claude-opus-5-5": 1.0,
+                                                                      "claude-sonnet-5-5": 2.0}})
+        self.assertIn("- Cost by model: claude-sonnet-5-5 $2.00, claude-opus-5-5 $1.00", md)
+
 
 if __name__ == "__main__":
     unittest.main()

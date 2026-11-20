@@ -48,7 +48,7 @@ flowchart TD
 
 ## Using it with each AI tool
 
-- **Claude Code** — run `/compliance-reviewer <path-to-target>` (or ask for a compliance review). The skill adapter loads the orchestrator; the worker runs as the `compliance-subject-reviewer` subagent. `.claude/settings.json` pre-approves writes to `transitions/` and `docs/reports/` and the report script. For a target outside this workspace use `--add-dir <path>` or `/add-dir <path>`.
+- **Claude Code** — run `/compliance-reviewer <path-to-target>` (or ask for a compliance review). The skill adapter loads the orchestrator; the worker runs as the `compliance-subject-reviewer` subagent. The worker is pinned to Sonnet (`model: sonnet` in its frontmatter), whatever model the session uses, because the per-subject checks don't need the larger model and the worker accounts for most of a run's tokens; to use another worker model, change that line or set Claude Code's `CLAUDE_CODE_SUBAGENT_MODEL` environment variable. `.claude/settings.json` pre-approves writes to `transitions/` and `docs/reports/` and the report script. For a target outside this workspace use `--add-dir <path>` or `/add-dir <path>`.
 - **GitHub Copilot (VS Code / CLI / agent mode)** — run the prompt `/compliance-review <path-to-target>`, or ask in agent mode. The worker is the custom agent `compliance-subject-reviewer`, invoked as a subagent. Copilot also reads `AGENTS.md` and `.github/copilot-instructions.md`. Note: recent VS Code versions also discover `.claude/` agents/skills, so the adapters may appear twice; both point at the same neutral files.
 - **ChatGPT / OpenAI Codex** — Codex-style agents read `AGENTS.md` automatically; ask for a compliance review. They normally lack subagents, so the orchestrator's fallback runs each batch in-session. For ChatGPT web, upload the `compliance-reviewer/` folder and the target code, then paste the prompt from `compliance-reviewer/PROMPT.md`. If it cannot write files or run Python, it returns the transition JSON in chat and you run `python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py validate|aggregate|render` yourself.
 - **Any other AI tool** — point it at `AGENTS.md` or paste `compliance-reviewer/PROMPT.md`. Needs: file read/search, file write (or manual copy-out), optionally shell. No URL fetch is needed, because reviews never read external sources. To add native support, create a small adapter in that tool's discovery location that says "read `compliance-reviewer/ORCHESTRATOR.md`" — do not copy the content.
@@ -146,7 +146,7 @@ python scripts/run_review.py C:\src\myapp --dry-run                         # sh
 3. While the review runs, prints a progress line to stderr each time the reviewer finishes a step (read from `transitions/<runId>/state.json`), and a heartbeat every `--progress` seconds.
 4. Prints the report (Markdown) to stdout. The report is also saved under `docs/reports/` as usual, and at `--out-file` if you gave one.
 5. Prints a **run summary**: status, run ID, overall score and band, report path, wall-clock duration, and cost:
-   - **Claude:** the `total_cost_usd` reported by Claude Code, API time, turns and subagent count. The cost is at API list prices; on a subscription plan you're billed differently.
+   - **Claude:** the `total_cost_usd` reported by Claude Code, API time, turns and subagent count. Because the orchestrator and the Sonnet worker run on different models, the per-model token-cost tables split the cost between them. The cost is at API list prices; on a subscription plan you're billed differently.
    - **Copilot:** the premium requests Copilot CLI reports, an estimated dollar cost at `--copilot-request-usd` per request (default `0.04`), and Copilot's own usage block. Requests included in your plan cost nothing extra. If the tool doesn't report usage, the summary says so.
 6. Prints the **token costs**: for each model the run used, a table of the four token types (input, output, cache read, cache write) with the token count, the price per million tokens, the cost and its share of the model's cost, then a total.
    - Prices come from a table of Anthropic API list prices in the script (`MODEL_PRICES`, dated in a comment). Model names are matched by prefix, so `claude-opus-4-8[1m]` and `claude-sonnet-4.5` are found. Replace or add prices with `--prices FILE`.
@@ -168,7 +168,7 @@ A `--prices` file is JSON keyed by model name, in USD per million tokens. Cache 
 |--------|---------|--------------|
 | `target` | required | Application code directory to review. Read-only; may be outside this workspace, but must not be or contain this workspace. |
 | `--tool auto\|claude\|copilot` | `auto` | AI tool that runs the review (see step 1). |
-| `--model NAME` | tool default | Passed to the tool's `--model` option. |
+| `--model NAME` | tool default | Passed to the tool's `--model` option. With Claude this sets the orchestrator's model only; the worker subagent stays on Sonnet. |
 | `--subjects`, `--advanced`, `--analyzers` | `all`, off, `auto` | Passed to the reviewer as the [operational flags](#operational-flags) of the same name. |
 | `--out-file PATH` | none | Also keep the report at this path (not inside the target). Without it, the report is kept only under `docs/reports/`. |
 | `--no-report` | off | Don't print the report; print only the run summary. |

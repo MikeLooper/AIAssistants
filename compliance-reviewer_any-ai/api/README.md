@@ -30,7 +30,7 @@ For a review, the API saves the upload, checks it and unzips it into `<WorkDir>/
 
 At most `MaxConcurrentJobs` jobs run at a time; the rest wait as `queued`. Jobs live in memory: restarting the API forgets them and deletes their working folders. Only the newest `MaxRetainedJobs` finished jobs are kept.
 
-**Choosing the AI model.** Every review and tester request takes an optional `tool` (`auto`, `claude` or `copilot`) and `model` (passed to the tool's `--model` option). Leave them out to use the `DefaultTool` and `DefaultModel` settings. With no `DefaultModel`, the tool uses its own default model. `AvailableModels` lists the models the Web UI suggests for each tool; you can still type any model name. Names are limited to letters, digits and `. _ : / [ ] -`, and can't start with `-`.
+**Choosing the AI model.** Every review and tester request takes an optional `tool` (`auto`, `claude` or `copilot`) and `model` (passed to the tool's `--model` option). Leave them out to use the `DefaultTool` and `DefaultModel` settings. With no `DefaultModel`, the tool uses its own default model. With Claude, the model applies to the orchestrator only; the worker subagent always runs on Sonnet. `AvailableModels` lists the models the Web UI suggests for each tool; you can still type any model name. Names are limited to letters, digits and `. _ : / [ ] -`, and can't start with `-`.
 
 ## Endpoints
 
