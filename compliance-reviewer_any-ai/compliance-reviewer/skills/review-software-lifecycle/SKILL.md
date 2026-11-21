@@ -62,9 +62,8 @@ config, Dockerfiles and scripts used by CI, version-bearing manifests, settings-
     confidence `medium` unless the evidence is unambiguous.
 11. Severity: every Finding takes the check's default severity from `checklist.md`;
     `checkResults.severityIfFailed` is always that default.
-12. Citations: `standard` = "<source name> — <element ID>" (source names in each standards file header);
-    `url` = citation base + page path + "#" + primary anchor (SSDF: the PDF URL + `#page=N`). Never cite
-    `lifecycle-signals.md`. `urlsFetched` stays empty.
+12. Citations: set `element` to the failed element's ID (e.g. `SSDF-02`); the report script derives `standard` and
+    `url` from it, so don't write them. Never cite `lifecycle-signals.md`.
 
 ## Output
 

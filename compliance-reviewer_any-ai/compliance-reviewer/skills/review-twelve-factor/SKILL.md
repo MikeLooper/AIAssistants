@@ -53,13 +53,12 @@ Review only those files.
    (review-testing). TF-07 accepts TLS termination at a platform router; never recommend a plain-HTTP public listener.
 8. Severity: every Finding takes the check's default severity from `checklist.md`;
    `checkResults.severityIfFailed` is always that default.
-9. Citations: `standard` = "<source name> — <element ID>" of the failed element (source names in each standards
-   file header); `url` = `https://12factor.net/` + the element's page path, or for rubric elements the
-   `docs/reports/`-relative path + `#tfr-NN`. `urlsFetched` stays empty.
+9. Citations: set `element` to the failed element's ID (e.g. `TFA-01`); the report script derives `standard` and `url`
+   from it, so don't write them.
 10. Note strengths where config is cleanly externalized with a documented template, images are built once and
     promoted, processes are stateless with graceful shutdown, or development mirrors production services.
 
 ## Output
 
-Labels: copy `subject`/`subSubject` from `references/checklist.md` (the `Subject:` line and the check's `Sub-subject`
-column); never invent or combine labels. Follow `compliance-review-core`'s `finding-schema.md`.
+Labels: don't write `subject` or `subSubject`; the report script takes them from `references/checklist.md`
+(the `Subject:` line and the check's `Sub-subject` column). Follow `compliance-review-core`'s `finding-schema.md`.

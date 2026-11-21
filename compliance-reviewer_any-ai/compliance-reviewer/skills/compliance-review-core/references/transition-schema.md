@@ -7,7 +7,7 @@ All transition files for one run live in `transitions/<runId>/`.
 - `runId` format: `<YYYY-MM-DD_HHmm>-<short-target-name>`, e.g. `2026-09-26_1420-myapp`.
 - Step files: `NN-<name>.json`, e.g. `00-init.json`, `01-inventory.json`, `10-review-software-quality.json`.
 - A worker call covers one `fileBatches` entry and writes one `NN-<skill>.json` file per subject in that batch. Each subject is in exactly one batch, so there are no `.part-K` files. (Older runs may contain `NN-<skill>.part-K.json` files; the aggregation script still merges them.) Each file carries the originating `batchId`.
-- Workers write their own subject files; the orchestrator writes only `00`, `01`, `02`, the N/A subject files and `state.json`; the report script writes `90` and `99`.
+- Workers write their own subject files. The report script writes `00` (`init`), `01` (`inventory`), the N/A subject files (`na`), `90` (`aggregate`), `99` (`render`) and every `state.json` update (`init`, `inventory`, `na`, `dispatch`, `validate --mark`, `step`, `resume`). The orchestrator writes only `02-analyzers.json`, and only when it runs analyzers.
 - Step numbers (fixed; `18` is retired):
 
 | Step | Skill | Step | Skill |
@@ -26,11 +26,11 @@ All transition files for one run live in `transitions/<runId>/`.
 
 ## Required Header Fields
 
-Every step file (00–99) starts with this header, followed by step-specific content:
+Every step file (00–99) starts with this header, followed by step-specific content. `schemaVersion` is `2` for files written since the compact worker schema (see `finding-schema.md`); the report script still reads `1`.
 
 ```json
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "runId": "2026-09-26_1420-myapp",
   "stepId": "10-review-software-quality",
   "status": "started | completed | failed",
@@ -38,15 +38,17 @@ Every step file (00–99) starts with this header, followed by step-specific con
   "completedAt": "ISO-8601 timestamp or null",
   "targetPath": "path supplied by the user",
   "targetGitHead": "commit sha, or null if the target isn't a git repo",
-  "inputsHash": "hash of {targetPath, targetGitHead, chosen subjects, run flags (advanced, analyzers), analyzer approvals}"
+  "inputsHash": "hash of {targetPath, targetGitHead, chosen subjects, run flags (advanced, analyzers)}"
 }
 ```
+
+`init` computes `targetGitHead` and `inputsHash`; `resume` recomputes them the same way. The analyzers that actually ran are recorded in `analyzerApproval`, not hashed: with `--analyzers` they follow from the hashed flag.
 
 ## `state.json` Layout
 
 ```json
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "runId": "string",
   "targetPath": "string",
   "targetGitHead": "string | null",
@@ -74,8 +76,10 @@ Every step file (00–99) starts with this header, followed by step-specific con
 
 In programmatic mode (`--programmatic`), rule 1 is skipped, and in rule 4 any mismatch fails the run instead of asking.
 
+The report script does the mechanical part: `resume <runDir>` recomputes `targetGitHead` and `inputsHash`, reports whether either changed and names the next step (rules 2 and 4); `resume <runDir> --from <NN>` also moves the superseded files, batch siblings included, and resets their steps (rule 3).
+
 1. On startup, list subdirectories of `transitions/` whose `state.json` has `status != completed` and offer to resume the most recent one.
 2. `resume run <id>`: read `state.json`, find the first step that is not `completed`, and continue from there. Steps already `completed` are not re-run.
 3. `resume run <id> from step <NN>`: move every transition file for step `NN` and all later steps (including their `.part-K` files) into `transitions/<id>/superseded/`, mark those steps `not-started` in `state.json`, then run from step `NN`. Since one batch call writes several subjects' files together, identify every subject transition file with the same `batchId` as a call being superseded and supersede them together, even if a sibling subject's step number is earlier than `NN`; mark all those sibling subject steps `not-started` as well. Re-running that batch call must not leave stale sibling-subject results in place.
 4. Before resuming, recompute `targetGitHead` (if applicable) and `inputsHash`. If either differs from the stored value, warn the user and ask whether to continue, restart, or abort.
-5. A subject step is only marked `completed` in `state.json` after its transition file exists with `status: "completed"` and passes the report script's `validate` command.
+5. A subject step is only marked `completed` in `state.json` after its transition file exists with `status: "completed"` and passes the report script's `validate` command (`validate --mark` records this).

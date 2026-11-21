@@ -120,8 +120,15 @@ class AppKey:
 
 def load_app_key(kind: str, lang: str, path: Path = ANSWER_KEY) -> AppKey:
     data = json.loads(path.read_text(encoding="utf-8"))["kinds"][kind]
-    flaws = [Flaw(f["id"], f["title"], f["checks"], f["locations"][lang]) for f in data["flaws"]]
-    return AppKey(kind, lang, flaws, data["incidentalChecks"])
+    flaws, incidental = [], list(data["incidentalChecks"])
+    for f in data["flaws"]:
+        locations = f["locations"].get(lang)
+        if locations is None:
+            # Not scored for this language (null or absent): a finding for it counts as incidental, not unexpected.
+            incidental.extend(c for c in f["checks"] if c not in incidental)
+            continue
+        flaws.append(Flaw(f["id"], f["title"], f["checks"], locations))
+    return AppKey(kind, lang, flaws, incidental)
 
 
 def check_matches(check_id: str, patterns: list[str]) -> bool:

@@ -81,9 +81,9 @@ The scripts in [logic/](logic) do the review-and-compare work for you. Each test
 | [logic/test_api_dotnet.py](logic/test_api_dotnet.py) | C# API ([apis/dotNET](apis/dotNET)) | A1–A12 |
 | [logic/test_ui_dotnet.py](logic/test_ui_dotnet.py) | C# UI ([uis/dotNET](uis/dotNET)) | U1–U12 |
 | [logic/test_api_java.py](logic/test_api_java.py) | Java API ([apis/java](apis/java)) | A1–A12 |
-| [logic/test_ui_java.py](logic/test_ui_java.py) | Java UI ([uis/java](uis/java)) | U1–U12 |
+| [logic/test_ui_java.py](logic/test_ui_java.py) | Java UI ([uis/java](uis/java)) | U1, U3–U9, U12 (U2, U10, U11 not scored) |
 | [logic/test_api_python.py](logic/test_api_python.py) | Python API ([apis/python](apis/python)) | A1–A12 |
-| [logic/test_ui_python.py](logic/test_ui_python.py) | Python UI ([uis/python](uis/python)) | U1–U12 |
+| [logic/test_ui_python.py](logic/test_ui_python.py) | Python UI ([uis/python](uis/python)) | U1, U3–U9, U12 (U2, U10, U11 not scored) |
 | [logic/test_mcp_dotnet.py](logic/test_mcp_dotnet.py) | C# MCP server ([mcps/dotNET](mcps/dotNET)) | M1–M12 |
 | [logic/test_mcp_java.py](logic/test_mcp_java.py) | Java MCP server ([mcps/java](mcps/java)) | M1–M12 |
 | [logic/test_mcp_python.py](logic/test_mcp_python.py) | Python MCP server ([mcps/python](mcps/python)) | M1–M12 |
@@ -180,7 +180,7 @@ The test reads the run's transition files (`transitions/<runId>/`), not the Mark
   - **Incidental:** its check is listed under [Expected incidental findings](#expected-incidental-findings). Counted, not scored.
   - **Related:** it cites one of a flaw's expected checks, but in a different file. Reported only.
   - **Unexpected:** everything else. An unexpected **Error** fails the test; unexpected Warnings and Information findings are reported only.
-- **A test passes** when the review completed, it found at least `--min-found` percent of the 12 flaws, and it has no unexpected Error findings. Missed flaws are always listed, but they fail the test only when they push the share found below the threshold.
+- **A test passes** when the review completed, it found at least `--min-found` percent of the app's scored flaws (12, or 9 for the Java and Python UIs), and it has no unexpected Error findings. Missed flaws are always listed, but they fail the test only when they push the share found below the threshold.
 - **Exit codes:** `0` pass, `1` fail, `2` error: the AI tool is missing, the app's build failed, the review failed or timed out, or the run couldn't be scored. `test_all.py` returns the worst code of the tests it ran.
 
 ### Results
@@ -229,7 +229,7 @@ The flaws are numbered so that the same number means the same flaw in every lang
 | # | Flaw | Expected checks | C# ([uis/dotNET](uis/dotNET)) | Java ([uis/java](uis/java)) | Python ([uis/python](uis/python)) |
 |---|------|-----------------|------|------|--------|
 | U1 | Stored XSS: to-do titles rendered without encoding | SEC-II-08 | `Pages/Index.cshtml` `@Html.Raw(item.Title)` | `templates/index.html` `th:utext` | `templates/index.html` `\|safe` |
-| U2 | No CSRF protection on state-changing forms | SEC-IA-05 | `Pages/Index.cshtml.cs` `[IgnoreAntiforgeryToken]` | no CSRF protection configured (no Spring Security) | no CSRF protection (no Flask-WTF or equivalent) |
+| U2 | No CSRF protection on state-changing forms | SEC-IA-05 | `Pages/Index.cshtml.cs` `[IgnoreAntiforgeryToken]` | not scored | not scored |
 | U3 | Hard-coded admin password (and, in Python, a hard-coded Flask `SECRET_KEY`), stored in plain text as a sample-style default | SEC-OP-05, SEC-OP-06, TF-03, SEC-IA-06, SEC-IA-10 | `appsettings.json` `AdminPassword` | `application.properties` `admin.password` | `app.py` `ADMIN_PASSWORD`, `SECRET_KEY` |
 | U4 | Admin password sent in the query string to a state-changing GET, compared in plain text, with no authentication, authorization, throttling or audit | SEC-WA-10, SEC-IA-01, SEC-IA-02, SEC-IA-07, SEC-IA-09, API-09 | `Index.cshtml.cs` `OnGetClear`; `Program.cs` (no authentication or authorization configured) | `TodoController.clear` | `app.py` `clear` |
 | U5 | Open redirect: the user-supplied return URL is redirected to without validation | SEC-IA-04, SEC-II-01 | `Index.cshtml.cs` `OnPostAdd` `Redirect(returnUrl)` | `TodoController.add` `"redirect:" + returnUrl` | `app.py` `add` `redirect(request.form.get("return_url"))` |
@@ -237,9 +237,11 @@ The flaws are numbered so that the same number means the same flaw in every lang
 | U7 | Unsynchronized static/global mutable state used as the data store | DP-01, TF-06, REL-05 | `IndexModel` static `Items`/`nextId` | `TodoController` static `items`/`nextId` | `app.py` global `items`/`next_id` |
 | U8 | Exception silently swallowed (invalid priority ignored) | SEC-OP-02, SQ-06 | `OnPostAdd` empty `catch { }` | `add` empty `catch (Exception e)` | `add` `except Exception: pass` |
 | U9 | App writes its own log file instead of a stdout event stream; log lines are concatenated with user input | TF-11, SEC-OP-04, OBS-01 | `File.AppendAllText("todo-ui.log", ...)` | `logging.file.name=todo-ui.log` | `logging.basicConfig(filename="todo-ui.log")` |
-| U10 | Commented-out code | SQ-08 | `OnPostComplete` | `complete` | `complete` |
-| U11 | No security headers (CSP, frame-ancestors, nosniff and so on) | SEC-WA-01, SEC-WA-03, SEC-WA-04, SEC-WA-11 | whole app | whole app | whole app |
+| U10 | Commented-out code | SQ-08 | `OnPostComplete` | not scored | not scored |
+| U11 | No security headers (CSP, frame-ancestors, nosniff and so on) | SEC-WA-01, SEC-WA-03, SEC-WA-04, SEC-WA-11 | whole app | not scored | not scored |
 | U12 | No automated tests | TST-07 (and other TST checks N/A or failed) | whole app | whole app | whole app |
+
+**Java and Python UIs:** U2, U10 and U11 are not scored for the Java and Python apps (`null` locations in `answer_key.json`). Repeated runs with different models didn't report them, so they were dropped from those keys. Only the C# UI still scores them, and the flaws themselves are still in all three apps. If the reviewer does report one of their checks, the finding counts as incidental, not unexpected. The other UI numbers are unchanged, so a number still means the same flaw in every language.
 
 ### MCP servers
 

@@ -24,7 +24,7 @@ Applies to the `AZ-*` and `SDK-*` elements of `review-api-design`. Those element
 
 ### Skills with localized standards
 
-When a skill reviews against local standards elements (`references/standards/`), each `Finding.severity` comes from the failed element's level, using the table above, unless the skill's `SKILL.md` states its own severity rule (e.g. `review-cost-sustainability`, `review-disaster-recovery`, `review-monitoring`, `review-software-lifecycle`, `review-software-quality`, `review-testing` and `review-twelve-factor` use the check's default severity for every Finding). `checkResults.severityIfFailed` is always the check's default severity from the skill's `checklist.md`, so scoring stays stable from run to run.
+When a skill reviews against local standards elements (`references/standards/`), each `Finding.severity` comes from the failed element's level, using the table above, unless the skill's `SKILL.md` states its own severity rule (e.g. `review-cost-sustainability`, `review-disaster-recovery`, `review-monitoring`, `review-software-lifecycle`, `review-software-quality`, `review-testing` and `review-twelve-factor` use the check's default severity for every Finding). Each check is always scored at its default severity from the skill's `checklist.md` (`severityIfFailed`, which the report script fills in from the checklist; workers don't write it), so scoring stays stable from run to run.
 
 ## Fallback Rubric
 

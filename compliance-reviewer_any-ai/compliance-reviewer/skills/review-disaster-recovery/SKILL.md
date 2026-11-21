@@ -55,10 +55,8 @@ region and traffic-routing IaC, deployment pipeline files, and DR documentation 
    evidence is unambiguous.
 8. Severity: every Finding takes the check's default severity from `checklist.md` regardless of element level;
    `checkResults.severityIfFailed` is always that default.
-9. Citations: `standard` = "<source name> — <element ID>" (source name from the standards file header).
-   WAF `url` = citation base + page path + "#" + primary anchor (first listed). NIST `url` = citation base +
-   "#page=" + PDF page, with the primary section in `notes`. OSM `url` = citation base + "#" + anchor.
-   `urlsFetched` stays empty.
+9. Citations: set `element` to the failed element's ID (e.g. `SP34-01`); the report script derives `standard` and
+   `url` from it, so don't write them. For a NIST element, put the primary section in `notes`.
 10. Boundaries: **owned here** — cross-region posture (DR-04/08), backups (DR-01), delete protection (WAFR-31,
     DR-06), restore tests (DR-02) and DR drills (DR-09). **Don't fail for** in-region HA, zone redundancy, instance
     counts, routing and restart probes (review-reliability AZRL-27/29/48–51); alert rules on replication lag or

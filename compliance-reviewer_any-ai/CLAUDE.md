@@ -21,19 +21,26 @@ A provider-neutral **Compliance Reviewer**: a set of Markdown instructions and s
   - With no flags, interview the user (subjects "all" or a subset, and advanced usage). With any flag, or `--programmatic`, don't ask: use the given flags and defaults for the rest. `--programmatic` also suppresses all chat and returns only the report text or a one-line JSON status.
 - Operational flags (`--subjects`, `--advanced`, `--analyzers`, `--programmatic`, `--output`, `--out-file`, `--readme`) are defined in the orchestrator's "Operational flags" section and described for users in the README. Keep the two in sync.
 
-## Report script (Python 3, stdlib only)
+## Run script (Python 3, stdlib only)
 
 ```
-python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py validate  transitions/<runId>
+python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py init      <target> [--subjects all|a,b] [--advanced on|off] [--analyzers auto|none|a,b] [--out-file <path>]
+python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py inventory transitions/<runId> [--picks <picks.json>]
+python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py na        transitions/<runId>
+python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py dispatch  transitions/<runId> [--only <skill>]
+python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py step      transitions/<runId> <stepId> <status> [--approval a,b]
+python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py resume    transitions/<runId> [--from <NN>]
+python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py validate  transitions/<runId> [--mark]
 python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py aggregate transitions/<runId>
 python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py render    transitions/<runId> --out docs/reports/<target>-compliance-review-<YYYY-MM-DD_HHmm>.md [--copy-to <out-file>]
 python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py labels    [skill ...]
+python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py packs     build|check [skill ...]
 python -m unittest discover -s compliance-reviewer/skills/compliance-report/scripts
 ```
 
-`validate` prints `{ok, missing, problems, warnings}` and exits non-zero on failure. [.claude/settings.json](.claude/settings.json) pre-approves this script and writes to `transitions/**` and `docs/reports/**`. The only tests are the label-normalization regression tests above. The README says to check changes against a small sample repo.
+`validate` prints `{ok, missing, problems, warnings}` and exits non-zero on failure. [.claude/settings.json](.claude/settings.json) pre-approves this script and writes to `transitions/**` and `docs/reports/**`. Helpers: `scripts/standards.py` (citation resolution, review packs) and `compliance-inventory/scripts/inventory.py` (step 01, driven by `compliance-inventory/references/subject-file-map.json`). The unit tests cover label normalization, the compact v2 schema, citations, and the scripted init/inventory/na/dispatch/validate/resume flow. The README says to check changes against a small sample repo.
 
-**Labels are data, not model output.** Each `review-*/references/checklist.md` owns its `Subject:` line and a `Sub-subject` column; `aggregate`/`render` rewrite every worker label from it, and `validate` warns on drift and blocks unknown `checkId`s or missing check results. After editing any checklist, run `labels` (lint). Plan: [docs/plan-fix-labels.md](docs/plan-fix-labels.md).
+**Labels, severities and citations are data, not model output.** Each `review-*/references/checklist.md` owns its `Subject:` line, `Sub-subject` column and `Default severity` column; each standards file's header and rows own its citations. Workers write `schemaVersion: 2` files (compact `checks`, `element` IDs, no labels/`severityIfFailed`/`standard`/`url`). `validate`/`aggregate`/`render` expand them from those sources, and still read v1 files. After editing any checklist, standards file, signal or language file, or `SKILL.md`, run `packs build` and then `labels`. `labels` also lints citations, pack freshness and the inventory map. Plan: [docs/plan-fix-labels.md](docs/plan-fix-labels.md).
 
 ## API and Web UI
 
@@ -51,27 +58,28 @@ python -m unittest discover -s compliance-reviewer/skills/compliance-report/scri
 
   Keep adapters to a few lines and never copy rules into them.
 - **Pipeline** (step numbers come from `compliance-review-core/references/transition-schema.md`):
-  1. `00` init
-  2. `01` inventory, done by the orchestrator using `compliance-inventory`. It gives each subject a capped file list (max 12) and groups subjects with overlapping lists into `fileBatches`.
-  3. `02` optional analyzers
+  1. `00` init (script: `init`)
+  2. `01` inventory (script: `inventory`, per `compliance-inventory`). It gives each subject a capped file list (max 12) and groups subjects with overlapping lists into `fileBatches`. The orchestrator only reviews the default sample of subjects that matched more than 12 files and may re-run with `--picks`.
+  3. `02` optional analyzers (orchestrator; recorded with `step`)
   4. `10–29` subject reviews. Step `18` is unused because coding standards fall under `review-software-quality`; step `28` is `review-mcp-server`.
   5. `90` aggregate
   6. `99` render
-- **Orchestrator / worker split.** The orchestrator makes one worker call per `fileBatches` entry, using the `compliance-subject-reviewer` subagent, which follows [compliance-reviewer/WORKER.md](compliance-reviewer/WORKER.md). The worker writes its own `transitions/<runId>/NN-review-<subject>.json` files and returns only a short `written`/`failed` status, so the orchestrator never handles the findings itself. Without subagents, the orchestrator runs WORKER.md in-session, one batch at a time.
-- **N/A subjects.** `review-api-design` is marked N/A when no API is found. `review-mcp-server` is N/A when no MCP server is found; for a stdio-only MCP server (no HTTP surface), `review-api-design` and `review-security-web-api` are N/A. Disaster recovery, monitoring and cost/sustainability are marked N/A when `iacFound` is false, which is always the case with `--advanced` off (the inventory then skips IaC and excludes IaC files from every subject). For these, the orchestrator writes a minimal transition file itself instead of calling a worker.
-- **Resumability.** `transitions/<runId>/state.json` tracks step status. `resume run <id> from step <NN>` moves later files into `superseded/`.
+- **Orchestrator / worker split.** `dispatch` prints one payload per `fileBatches` entry; the orchestrator passes each one verbatim to the `compliance-subject-reviewer` subagent, which follows [compliance-reviewer/WORKER.md](compliance-reviewer/WORKER.md). The worker reads the generated review packs (`compliance-reviewer/packs/<skill>[.<language>].md`) instead of the skill files, writes its own `transitions/<runId>/NN-review-<subject>.json` files and returns only a short `written`/`failed` status, so the orchestrator never handles the findings itself. Without subagents, the orchestrator runs WORKER.md in-session, one batch at a time.
+- **N/A subjects.** `review-api-design` is marked N/A when no API is found. `review-mcp-server` is N/A when no MCP server is found; for a stdio-only MCP server (no HTTP surface), `review-api-design` and `review-security-web-api` are N/A. Disaster recovery, monitoring and cost/sustainability are marked N/A when `iacFound` is false, which is always the case with `--advanced` off (the inventory then skips IaC and excludes IaC files from every subject). For these, the script's `na` command writes a minimal transition file instead of a worker call.
+- **Resumability.** `transitions/<runId>/state.json` tracks step status; only the script writes it. `resume run <id> from step <NN>` moves later files (and batch siblings) into `superseded/` via `resume --from`.
 - **Aggregation logic** is in the script, not in prompts: dedup by evidence-location IoU ≥ 0.5 (same check + same `standard` within a subject, or across different subject skills; different checks in one skill never merge), scoring from `severity-and-scoring.md`, and top-5 risk ordering. If you change the scoring or dedup rules, update the script and `compliance-report/SKILL.md` together.
-- **Schemas** live in `compliance-review-core/references/` (`finding-schema.md`, `transition-schema.md`). Bump `schemaVersion` on breaking changes. Keep the script's `FILE_RE` and `HEADER_KEYS` in sync with them.
+- **Schemas** live in `compliance-review-core/references/` (`finding-schema.md`, `transition-schema.md`), currently `schemaVersion` 2. Bump `schemaVersion` on breaking changes. Keep the script's `FILE_RE`, `HEADER_KEYS` and `SCHEMA_VERSION` in sync with them.
 - **Tool version** is in [VERSION](VERSION) (SemVer, started at 1.0.0) with history in [CHANGELOG.md](CHANGELOG.md). It's separate from `schemaVersion`. When a change is released, bump `VERSION` and add a dated changelog entry together; the major/minor/patch rules are in the README's "Versioning" section.
 
 ## Extending
 
 - **New subject:**
   1. Add `compliance-reviewer/skills/review-<name>/` containing `SKILL.md`, `references/checklist.md` and `references/sources.md`.
-  2. Register it in the subject table in `ORCHESTRATOR.md`, the step table in `transition-schema.md`, `compliance-inventory/references/subject-file-map.md` and `approved-sources.md`.
-  3. Gate IaC-only subjects on `iacFound`, and check for overlap with existing subjects first.
-- **Localized standards:** summarize external sources into `references/standards/<source>.md` (pinned version, at most 100 elements per skill per website unless an exception is recorded, an anchor per element) and declare them in `SKILL.md` under `## Standards (local, authoritative)`. List the exact source pages as maintenance-only entries in `approved-sources.md`. Put maintainer-only refresh notes in `references/standards/MAINTENANCE.md`. The refresh strategy (cadence, triggers, steps, AI-tool usage) is centralized in [compliance-reviewer/STANDARDS-MAINTENANCE.md](compliance-reviewer/STANDARDS-MAINTENANCE.md); refreshing is the only time fetching approved pages is allowed, and never during a review. Run it with `/refresh-standards [<skill>... | all] [check | gaps | full]` (procedure: [compliance-reviewer/REFRESH.md](compliance-reviewer/REFRESH.md)). Each localized skill keeps its source pins in `references/standards/pins.json`; `python compliance-reviewer/scripts/check_source_drift.py lint|check [skill]` validates them against the headers and the live sources. Keep `pins.json` in step with header pins. See [compliance-reviewer/README.md](compliance-reviewer/README.md); for a worked example, see [compliance-reviewer/skills/review-api-design/](compliance-reviewer/skills/review-api-design/).
-- **New language:** add `references/languages/<id>.md` to the skills that need it, and add a detection signal in `compliance-review-core/references/languages.md`. The C#, Java, Python and JavaScript/TypeScript files already exist in the security skills.
+  2. Register it in the subject table in `ORCHESTRATOR.md`, the step table in `transition-schema.md`, `compliance-inventory/references/subject-file-map.md` and `subject-file-map.json`, and `approved-sources.md`.
+  3. Gate IaC-only subjects on `iacFound` (`"iacOnly": true` in the map), and check for overlap with existing subjects first.
+  4. Run `packs build <skill>` and `labels`.
+- **Localized standards:** summarize external sources into `references/standards/<source>.md` (pinned version, at most 100 elements per skill per website unless an exception is recorded, an anchor per element) and declare them in `SKILL.md` under `## Standards (local, authoritative)`. List the exact source pages as maintenance-only entries in `approved-sources.md`. Put maintainer-only refresh notes in `references/standards/MAINTENANCE.md`. The refresh strategy (cadence, triggers, steps, AI-tool usage) is centralized in [compliance-reviewer/STANDARDS-MAINTENANCE.md](compliance-reviewer/STANDARDS-MAINTENANCE.md); refreshing is the only time fetching approved pages is allowed, and never during a review. Run it with `/refresh-standards [<skill>... | all] [check | gaps | full]` (procedure: [compliance-reviewer/REFRESH.md](compliance-reviewer/REFRESH.md)). Each localized skill keeps its source pins in `references/standards/pins.json`; `python compliance-reviewer/scripts/check_source_drift.py lint|check [skill]` validates them against the headers and the live sources. Keep `pins.json` in step with header pins. Each standards file needs a "Source name for `Finding.standard`" line and a citation base, because the report script builds citations from them; after any edit, run `packs build <skill>` and `labels`. See [compliance-reviewer/README.md](compliance-reviewer/README.md); for a worked example, see [compliance-reviewer/skills/review-api-design/](compliance-reviewer/skills/review-api-design/).
+- **New language:** add `references/languages/<id>.md` to the skills that need it, add a detection signal in `compliance-review-core/references/languages.md` and `subject-file-map.json` (`languages`), add the id to `LANGUAGES` in `compliance-report/scripts/standards.py`, and rebuild the packs. The C#, Java, Python and JavaScript/TypeScript files already exist in the security skills.
 
 ## Environment notes (from `.github/copilot-instructions.md`)
 

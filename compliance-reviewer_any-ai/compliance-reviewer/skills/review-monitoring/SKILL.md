@@ -53,8 +53,8 @@ settings, and telemetry-store IaC, per `compliance-inventory`.
    `medium` unless the evidence is unambiguous.
 8. Severity: every Finding takes the check's default severity from `checklist.md` regardless of element level;
    `checkResults.severityIfFailed` is always that default.
-9. Citations: `standard` = "<source name> — <element ID>" (source name from the standards file header);
-   `url` = citation base + page path + "#" + primary anchor (first listed). `urlsFetched` stays empty.
+9. Citations: set `element` to the failed element's ID (e.g. `WAFM-01`); the report script derives `standard` and
+   `url` from it, so don't write them.
 10. Boundaries: **owned here** — all alert rules (MON-01/03), including latency-percentile, retry/failure-rate,
     dead-letter and security-event alerts (sign-in failure spikes, privileged changes, secret-access anomalies,
     WAF/firewall blocks) and their routing to a security owner or SIEM (MON-04); dashboards (MON-05); external probes

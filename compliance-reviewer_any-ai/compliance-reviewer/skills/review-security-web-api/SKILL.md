@@ -57,11 +57,11 @@ endpoints, and HTML layout templates, per `compliance-inventory`.
    (Error → Warning, Warning → Information); HDR-11 is advisory and never fails on its own. When several elements
    fail on the same evidence, write one finding at the highest severity. `checkResults.severityIfFailed` is the
    check's default.
-7. Citations: prefer a vendor element, then a cheat-sheet element, then an A02 element (cite A02 only when nothing
-   more specific fits). For an element marked (Default), cite the OWASP element it supports and name the vendor
-   element in the recommendation. Where vendor guidance is weaker than an OWASP element, the OWASP element decides.
-   `standard` = "<source name> — <element ID>" (source name from the standards file header); `url` = citation base
-   + "#" + primary anchor (first anchor listed). `urlsFetched` stays empty.
+7. Citations: set `element` to the failed element's ID (e.g. `HDR-01`); the report script derives `standard` and `url`
+   from it, so don't write them. Prefer a vendor element, then a cheat-sheet element, then an A02 element (cite A02
+   only when nothing more specific fits). For an element marked (Default), cite the OWASP element it supports and name
+   the vendor element in the recommendation. Where vendor guidance is weaker than an OWASP element, the OWASP element
+   decides.
 8. If the reference date (date part of `startedAt`) is more than 9 months after a standards file's "Localized"
    date, add `localized-standard-stale: <file> localized <date>` to `notes`.
 

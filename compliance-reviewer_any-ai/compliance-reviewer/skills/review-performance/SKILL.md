@@ -59,10 +59,8 @@ registration, caching code and config, background-job code, web-server config, a
    expiration, `clientAffinityEnabled: true`). Use confidence `medium` unless the evidence is unambiguous.
 9. Severity: every Finding takes the check's default severity from `checklist.md`;
    `checkResults.severityIfFailed` is always that default.
-10. Citations: `standard` = "<source name> — <element ID>", where the source name is that of the element's
-    primary page in the standards file (Src column: W = Azure Well-Architected Framework, A = Azure Architecture
-    Center); `url` = citation base + page path + "#" + primary anchor. Never cite the language or config-signals
-    files. `urlsFetched` stays empty.
+10. Citations: set `element` to the failed element's ID (e.g. `AZPE-01`); the report script derives `standard` and
+    `url` from it, so don't write them. Never cite the language or config-signals files.
 
 ## Output
 

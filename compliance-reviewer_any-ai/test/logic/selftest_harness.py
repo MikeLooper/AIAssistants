@@ -8,6 +8,9 @@ from pathlib import Path
 
 import harness
 
+# Apps whose answer key leaves some flaws unscored (null locations): app name -> number of scored flaws.
+UNSCORED = {"uis-java": 9, "uis-python": 9}
+
 
 def finding(fid, check, file, severity="Warning", line=1):
     return {"id": fid, "checkId": check, "severity": severity, "title": fid,
@@ -30,7 +33,7 @@ class AnswerKeyTests(unittest.TestCase):
         for kind in harness.KINDS:
             for lang in harness.LANGS:
                 key = harness.load_app_key(kind, lang)
-                self.assertEqual(len(key.flaws), 12, key.name)
+                self.assertEqual(len(key.flaws), UNSCORED.get(key.name, 12), key.name)
                 self.assertTrue(all(f.checks for f in key.flaws))
 
     def test_locations_exist_on_disk(self):

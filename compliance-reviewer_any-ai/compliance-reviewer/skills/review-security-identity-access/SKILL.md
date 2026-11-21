@@ -60,10 +60,9 @@ tokens, per `compliance-inventory`.
    passwords, session IDs or tokens over plain `http://` (ATN-09, OAU-11); JWT signature not verified (JWT-01).
    When several elements fail on the same evidence, write one finding at the highest severity.
    `checkResults.severityIfFailed` is the check's default.
-6. Citations: prefer a framework element, then a cheat-sheet element, then a T10 element (cite T10 only when
-   nothing more specific fits; otherwise name it in the recommendation). `standard` = "<source name> — <element ID>"
-   (source name from the standards file header); `url` = citation base + "#" + primary anchor (first anchor listed).
-   `urlsFetched` stays empty.
+6. Citations: set `element` to the failed element's ID (e.g. `ATN-01`); the report script derives `standard` and `url`
+   from it, so don't write them. Prefer a framework element, then a cheat-sheet element, then a T10 element (cite T10
+   only when nothing more specific fits; otherwise name it in the recommendation).
 7. If the reference date (date part of `startedAt`) is more than 9 months after a standards file's "Localized"
    date, add `localized-standard-stale: <file> localized <date>` to `notes`.
 

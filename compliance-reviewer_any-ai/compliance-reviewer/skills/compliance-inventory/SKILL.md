@@ -6,7 +6,21 @@ user-invocable: false
 
 # Compliance Inventory
 
-## Procedure
+## Scripted inventory (default)
+
+Step 01 is deterministic. The orchestrator runs:
+
+```
+python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py inventory transitions/<runId> [--picks <picks.json>]
+```
+
+The script (`scripts/inventory.py`) applies the rules below, using the machine-readable map in [`references/subject-file-map.json`](./references/subject-file-map.json), and writes `01-inventory.json`. It detects languages, frameworks, API specs and routes, MCP servers, the HTTP surface and IaC (only with `advanced` on). It maps each subject's files by tier in sampling priority order, caps each list at 12 files, builds `testInventory`, groups the batches and records `skippedSubjects`. The same input always gives the same inventory. Besides the fields in step 8, the file records `entryPoints`, `apiSpecs`, `folderListing` (the top two folder levels, passed to `review-maintainability`), `targetFiles` and `sampling`: for each subject that matched more than 12 files, `totalMatched` and up to 60 `candidates`.
+
+The model's only inventory decision is the sample for a capped subject. The script's default sample takes up to `max` files from each tier in order, spread across folders, then fills from the remaining matches. If that sample misses something the checklist clearly needs, the orchestrator writes `{"<skill>": ["file", ...]}` (at most 12 files from the target) and re-runs with `--picks`; the subject is then marked `picked: true`.
+
+When you change which files feed a subject, edit `subject-file-map.json` and the matching row of `subject-file-map.md` together, then run `compliance_report.py labels`, which also lints the map.
+
+## Manual procedure (fallback when Python is unavailable)
 
 Work from the target's working files only: list files from the working tree, minus the generated and build-output folders in `references/subject-file-map.md`. Never run Git or read `.git/` (see "Repository contents" in `compliance-review-core`'s `finding-schema.md`).
 
@@ -83,7 +97,8 @@ Work from the target's working files only: list files from the working tree, min
 `advanced` echoes the input (optional and non-breaking; older runs lack it and were effectively `true`). `mcpFound`, `mcpServers` (entries like `{"path": "src/TodoMcp", "language": "csharp", "sdk": "ModelContextProtocol 2.3.1", "transports": ["stdio"]}`) and `httpSurfaceFound` are optional and non-breaking too; older runs lack them and had no MCP subject. `subjects[*].batch` is a single batch id (or `null` when not applicable); add `sampled` and `totalMatched` for any subject whose list was capped. `testInventory` is optional and non-breaking (older runs lack it); write it whenever `review-testing` is among the chosen subjects. The orchestrator passes it to the worker call that covers `review-testing`. The orchestrator makes one worker call per `fileBatches` entry, in order.
 ## References
 
-- [`references/subject-file-map.md`](./references/subject-file-map.md) — which file globs feed which subject skill.
+- [`references/subject-file-map.md`](./references/subject-file-map.md) — which files feed which subject skill (human description).
+- [`references/subject-file-map.json`](./references/subject-file-map.json) — the same rules as globs, content patterns and sampling tiers, read by `scripts/inventory.py`.
 - [`references/analyzers.md`](./references/analyzers.md) — the optional analyzer step (step 02), run only when advanced usage is on and only for approved analyzers.
 
 

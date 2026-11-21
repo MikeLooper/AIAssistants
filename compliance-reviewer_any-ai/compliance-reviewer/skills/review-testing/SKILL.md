@@ -72,14 +72,13 @@ present), and any authorization or integration-client file it lists for this sub
    logic is review-reliability's, and its performance is review-performance's.
 8. Severity: every Finding takes the check's default severity from `checklist.md`;
    `checkResults.severityIfFailed` is always that default.
-9. Citations: `standard` = "<source name> — <element ID>" of the failed element (source names in each standards
-   file header, or per row in `security-testing.md`); `url` = citation base + page path + "#" + primary anchor, or
-   for rubric elements the `docs/reports/`-relative path + `#tsr-NN`. `urlsFetched` stays empty.
+9. Citations: set `element` to the failed element's ID (e.g. `TSR-01`); the report script derives `standard` and `url`
+   from it, so don't write them.
 10. Note strengths where the suite is clearly well shaped, coverage is published, tests are deterministic and
     readable, contract tests guard service boundaries, authorization has thorough negative tests, or load and
     fault-injection tests gate the pipeline.
 
 ## Output
 
-Labels: copy `subject`/`subSubject` from `references/checklist.md` (the `Subject:` line and the check's `Sub-subject`
-column); never invent or combine labels. Follow `compliance-review-core`'s `finding-schema.md`.
+Labels: don't write `subject` or `subSubject`; the report script takes them from `references/checklist.md`
+(the `Subject:` line and the check's `Sub-subject` column). Follow `compliance-review-core`'s `finding-schema.md`.

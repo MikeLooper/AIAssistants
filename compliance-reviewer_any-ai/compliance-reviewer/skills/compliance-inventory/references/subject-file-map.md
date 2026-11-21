@@ -1,5 +1,7 @@
 # Subject-to-File Map
 
+The scripted inventory reads the machine-readable form of this table, [`subject-file-map.json`](./subject-file-map.json): globs, content patterns and sampling tiers in the order given below. Keep the two in step; `compliance_report.py labels` lints the JSON.
+
 Every list below is expanded to concrete file paths and capped at `maxFilesPerSubject` (12) per `SKILL.md` step 6. Generated, vendored and build-output folders (`bin/`, `obj/`, `node_modules/`, `target/`, `dist/`) are always excluded. When the run's `advanced` flag is off (the default), IaC files (as defined in `SKILL.md`) are excluded from every row below, including the Kubernetes, Helm, Terraform and hosting/IaC entries; the three IaC-only subjects are then N/A.
 
 | Subject skill | Files to include | Exclusions |

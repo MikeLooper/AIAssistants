@@ -43,9 +43,8 @@ The orchestrator marks this subject N/A when `iacFound` is false.
    still be evaluated.
 6. Severity: every element's level is REVIEW, so each Finding takes the check's default severity from
    `checklist.md`; `checkResults.severityIfFailed` is always that default.
-7. Citations: `standard` = "<source name> — <element ID>" (source name from the standards file header);
-   `url` = the citation the standards file header defines (WAF: citation base + page path + "#" + primary anchor;
-   GSFL: base + page + "/#" + anchor; GSP: base + page path + "#solution"). `urlsFetched` stays empty.
+7. Citations: set `element` to the failed element's ID (e.g. `WAF-01`); the report script derives `standard` and `url`
+   from it, so don't write them.
 8. Boundaries: **owned here** — autoscale maximums, over-provisioning, data archive and purge; excess backup/DR
    capacity (COST-08, see step 5); telemetry volume and over-retention. **Don't fail for** too few instances or
    zones, or too little redundancy (review-reliability AZRL-27/48; this skill fails only *excess*); missing or
