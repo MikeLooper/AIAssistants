@@ -63,14 +63,13 @@ lists. Review only those files.
    `[ISO 25010:2023 Maintainability › Analysability, ISO-29]` (the rubric's ISO column is the default).
 9. Severity: every Finding takes the check's default severity from `checklist.md`;
    `checkResults.severityIfFailed` is always that default.
-10. Citations: `standard` = "<source name> — <element ID>" of the failed element (source names in each standards
-    file header); `url` = citation base + page path + "#" + primary anchor, or for rubric elements the
-    `docs/reports/`-relative path + `#sqr-NN`. Name the matching FRC remedy (with its URL) in `recommendation`;
-    never put an FRC or ISO element in `standard`. `urlsFetched` stays empty.
+10. Citations: set `element` to the failed element's ID (e.g. `SQR-01`); the report script derives `standard` and
+    `url` from it, so don't write them. Name the matching FRC remedy (name and ID, e.g. *Extract Function* (FRC-01))
+    in `recommendation`; never put an FRC or ISO element in `element`.
 11. Note strengths where a module is clearly well factored, a pattern clearly simplifies the design, layering is
     clean, or a file is a good example of its language standard.
 
 ## Output
 
-Labels: copy `subject`/`subSubject` from `references/checklist.md` (the `Subject:` line and the check's `Sub-subject`
-column); never invent or combine labels. Follow `compliance-review-core`'s `finding-schema.md`.
+Labels: don't write `subject` or `subSubject`; the report script takes them from `references/checklist.md`
+(the `Subject:` line and the check's `Sub-subject` column). Follow `compliance-review-core`'s `finding-schema.md`.

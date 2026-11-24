@@ -46,7 +46,7 @@ This file is AI-provider neutral. All paths are relative to the repository root.
 7. **Apply the approved changes.** Edit element rows; update each file header (pins, "Localized" date, element counts); update the checklist, `sources.md`, the coverage map and `pins.json` (copy the new pin values exactly as written in the header, and drop the `baseline` mark where the header now records the value). Keep each site within its element budget.
 8. **Verify.**
    - Run `lint` again; it must report `ok: true`.
-   - If `checklist.md` changed, run `python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py labels <skill>`; it must report `ok: true`.
+   - Run `python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py packs build <skill>`, then `python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py labels <skill>`; it must report `ok: true` (checklist labels and severities, every element resolving to a citation, and a fresh review pack).
    - Run `check <skill>` again; refreshed sources must now be `unchanged`.
    - Do the script checks the skill's `MAINTENANCE.md` verify step lists (IDs contiguous, element-to-check mapping, every cited anchor in the pinned source, coverage map with zero unaccounted).
    - Tell the user which sample-repo review the verify step asks for. It runs separately (`/compliance-reviewer <sample> <skill>` or the tool's equivalent), followed by `compliance_report.py validate`.

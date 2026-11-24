@@ -120,8 +120,15 @@ class AppKey:
 
 def load_app_key(kind: str, lang: str, path: Path = ANSWER_KEY) -> AppKey:
     data = json.loads(path.read_text(encoding="utf-8"))["kinds"][kind]
-    flaws = [Flaw(f["id"], f["title"], f["checks"], f["locations"][lang]) for f in data["flaws"]]
-    return AppKey(kind, lang, flaws, data["incidentalChecks"])
+    flaws, incidental = [], list(data["incidentalChecks"])
+    for f in data["flaws"]:
+        locations = f["locations"].get(lang)
+        if locations is None:
+            # Not scored for this language (null or absent): a finding for it counts as incidental, not unexpected.
+            incidental.extend(c for c in f["checks"] if c not in incidental)
+            continue
+        flaws.append(Flaw(f["id"], f["title"], f["checks"], locations))
+    return AppKey(kind, lang, flaws, incidental)
 
 
 def check_matches(check_id: str, patterns: list[str]) -> bool:
@@ -257,6 +264,7 @@ class Invocation:
     error: str | None = None
     duration_s: float = 0.0
     cost_usd: float | None = None
+    cost_by_model: dict[str, float] = field(default_factory=dict)  # Claude: modelUsage[*].costUSD
     command: list[str] = field(default_factory=list)
 
 
@@ -512,6 +520,16 @@ class ProgressReporter:
                 self._say("still running: waiting for the reviewer to start its run")
 
 
+def model_costs(envelope: dict) -> dict[str, float]:
+    """Cost per model from a Claude JSON envelope's modelUsage block. The orchestrator and the
+    worker subagent run on different models, so this splits the run's cost between them."""
+    usage = envelope.get("modelUsage")
+    if not isinstance(usage, dict):
+        return {}
+    return {name: u["costUSD"] for name, u in usage.items()
+            if isinstance(u, dict) and isinstance(u.get("costUSD"), (int, float))}
+
+
 def invoke(tool: str, key: AppKey, out_file: Path, log_file: Path, timeout_min: float,
            model: str | None, extra: list[str], progress_interval: float = 30) -> Invocation:
     cmd = build_command(tool, key, out_file, model, extra)
@@ -553,6 +571,7 @@ def invoke(tool: str, key: AppKey, out_file: Path, log_file: Path, timeout_min: 
             envelope = json.loads(stdout)
             text = envelope.get("result") or ""
             inv.cost_usd = envelope.get("total_cost_usd")
+            inv.cost_by_model = model_costs(envelope)
         except (json.JSONDecodeError, AttributeError):
             pass
     status = parse_status(text)
@@ -586,6 +605,9 @@ def render_markdown(r: dict) -> str:
               f"- Run: `{r.get('runId')}`" + (f" — report: {r['reportFile']}" if r.get("reportFile") else ""),
               f"- Reviewer score: {r.get('overallScore')} ({r.get('overallBand')})",
               f"- Duration: {r.get('durationSeconds', 0):.0f} s" + (f", cost ${r['costUsd']:.2f}" if r.get("costUsd") else "")]
+    if r.get("costByModel"):
+        lines.append("- Cost by model: " + ", ".join(f"{m} ${c:.2f}" for m, c in
+                                                      sorted(r["costByModel"].items(), key=lambda kv: -kv[1])))
     if r.get("build"):
         b = r["build"]
         lines.append(f"- Fresh build: {b['status']}"
@@ -703,7 +725,8 @@ def run_test(kind: str, lang: str, args: argparse.Namespace, session_dir: Path |
 
     result.update(runId=inv.run_id, runDir=str(inv.run_dir) if inv.run_dir else None, reportFile=inv.report_file,
                   overallScore=inv.overall_score, overallBand=inv.overall_band,
-                  durationSeconds=round(inv.duration_s, 1), costUsd=inv.cost_usd, command=inv.command)
+                  durationSeconds=round(inv.duration_s, 1), costUsd=inv.cost_usd,
+                  costByModel=inv.cost_by_model or None, command=inv.command)
 
     if inv.status != "completed" or not inv.run_dir:
         result.update(verdict="error", error=inv.error or "review did not complete")

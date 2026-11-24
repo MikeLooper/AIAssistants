@@ -43,9 +43,8 @@ templates (`.env.example`), toolchain pin files, package manifests and a few rep
    was retired); `SECURITY.md` belongs to `review-software-lifecycle`.
 7. Severity: every Finding takes the check's default severity from `checklist.md`; `checkResults.severityIfFailed`
    is always that default.
-8. Citations: `standard` = "Compliance Reviewer Maintainability Rubric — <element ID>"; `url` = the rubric's
-   citation base + "#" + lower-case element ID (e.g. `…/maintainability-rubric.md#mr-14`). Give each distinct
-   element violation its own finding. `urlsFetched` stays empty.
+8. Citations: set `element` to the failed element's ID (e.g. `MR-14`); the report script derives `standard` and `url`
+   from it, so don't write them. Give each distinct element violation its own finding.
 
 ## Output
 

@@ -60,9 +60,8 @@ middleware, health check endpoints and probe manifests, SLO docs, per `complianc
    if the language file's signals were searched across the whole file list.
 9. Severity: every Finding takes the check's default severity from `checklist.md` regardless of element level;
    `checkResults.severityIfFailed` is always that default.
-10. Citations: `standard` = "<source name> — <element ID>" (source name from the standards file header);
-    `url` = citation base + page path + "#" + primary anchor (first listed; `pat-hem` uses its full path from
-    https://learn.microsoft.com/). `urlsFetched` stays empty.
+10. Citations: set `element` to the failed element's ID (e.g. `OTO-01`); the report script derives `standard` and
+    `url` from it, so don't write them.
 
 ## Output
 

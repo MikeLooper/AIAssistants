@@ -8,6 +8,9 @@ from pathlib import Path
 
 import harness
 
+# Apps whose answer key leaves some flaws unscored (null locations): app name -> number of scored flaws.
+UNSCORED = {"uis-java": 9, "uis-python": 9}
+
 
 def finding(fid, check, file, severity="Warning", line=1):
     return {"id": fid, "checkId": check, "severity": severity, "title": fid,
@@ -30,7 +33,7 @@ class AnswerKeyTests(unittest.TestCase):
         for kind in harness.KINDS:
             for lang in harness.LANGS:
                 key = harness.load_app_key(kind, lang)
-                self.assertEqual(len(key.flaws), 12, key.name)
+                self.assertEqual(len(key.flaws), UNSCORED.get(key.name, 12), key.name)
                 self.assertTrue(all(f.checks for f in key.flaws))
 
     def test_locations_exist_on_disk(self):
@@ -221,6 +224,16 @@ class ToolDetectionTests(unittest.TestCase):
         text = 'noise {"a":1}\n{"status":"completed","runId":"r1","reportFile":"x.md","overallScore":41.5,"overallBand":"Poor"}\n'
         self.assertEqual(harness.parse_status(text)["runId"], "r1")
         self.assertIsNone(harness.parse_status("no json"))
+
+    def test_model_costs_split_orchestrator_and_worker(self):
+        envelope = {"total_cost_usd": 3.0, "modelUsage": {
+            "claude-opus-5-5": {"costUSD": 1.0}, "claude-sonnet-5-5": {"costUSD": 2.0}, "odd": {}}}
+        self.assertEqual(harness.model_costs(envelope), {"claude-opus-5-5": 1.0, "claude-sonnet-5-5": 2.0})
+        self.assertEqual(harness.model_costs({}), {})
+        md = harness.render_markdown({"app": "apis-dotNET", "verdict": "pass", "tool": "claude", "toolReason": "flag",
+                                      "costUsd": 3.0, "costByModel": {"claude-opus-5-5": 1.0,
+                                                                      "claude-sonnet-5-5": 2.0}})
+        self.assertIn("- Cost by model: claude-sonnet-5-5 $2.00, claude-opus-5-5 $1.00", md)
 
 
 if __name__ == "__main__":

@@ -61,8 +61,8 @@ per `compliance-inventory`.
    speculation. Use confidence `medium` unless the evidence is unambiguous.
 7. Severity: practice elements take the check's default from `checklist.md`, except that a plain-`http://` package
    source or unmapped mixed public/private feeds is Error. `checkResults.severityIfFailed` is the check's default.
-8. Citations: `standard` = "<source name> — <element ID>" (source name from the standards file header);
-   `url` = citation base + "#" + primary anchor (first anchor listed). `urlsFetched` stays empty.
+8. Citations: set `element` to the failed element's ID (e.g. `OTT-02`); the report script derives `standard` and `url`
+   from it, so don't write them.
 9. Boundaries: **owned here** — vulnerable or outdated library versions, through analyzer output only (DEP-03);
    EOL runtimes and frameworks (DEP-04); pinning (DEP-01); lock files (DEP-02, sole owner); SBOM (DEP-05); update
    automation (DEP-07); manifest-referenced binaries (DEP-08); test-only packages in production dependency scope

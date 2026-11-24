@@ -93,9 +93,9 @@ Run this in a **maintenance session**, not during a review. Fetching is allowed 
    - Don't add elements another subject owns (each skill's `SKILL.md` lists its boundaries).
    - Update the file header pins and "Localized" date, `sources.md`, the coverage map, and `approved-sources.md` if a URL or version path changed.
 4. **Verify.**
-   - Run `python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py labels <skill>`; it must report `ok: true`.
+   - Rebuild the skill's review pack with `python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py packs build <skill>`, then run `python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py labels <skill>`; it must report `ok: true`. Besides the checklist labels, it checks that every active element still resolves to a citation (the report script builds `standard` and `url` from the header's source name and citation base and the row's anchors) and that the pack is current.
    - Script-check as the skill describes: IDs contiguous, element-to-check mapping holds, every cited anchor exists in the pinned source, every normative anchor of the pinned pages is in the coverage map with zero unaccounted.
-   - Run a review of the subject against the small sample repos described in the skill's verify step, then `python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py validate transitions/<runId>`. Expect `ok: true`, `urlsFetched: []`, the expected check count, and citations that use pinned URLs and element IDs.
+   - Run a review of the subject against the small sample repos described in the skill's verify step, then `python compliance-reviewer/skills/compliance-report/scripts/compliance_report.py validate transitions/<runId>`. Expect `ok: true`, no fetched URLs, the expected check count, and citations that use pinned URLs and element IDs.
 5. **Record.**
    - Add a dated entry to the skill's localization log (snapshot pins, what changed and why). Clear handled "Refresh due" and "Open items" entries, and add new dated ones for the next known vendor events.
    - If the check count, a check's meaning or severities changed, add a dated **score-comparability note** to the Maintenance section of `compliance-reviewer/README.md` ("scores before and after that date aren't directly comparable").

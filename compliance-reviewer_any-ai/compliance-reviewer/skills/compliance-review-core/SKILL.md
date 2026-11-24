@@ -19,6 +19,7 @@ Shared reference material for the compliance review pipeline. This skill has no 
 
 ## When to Load What
 
-- The orchestrator loads the five review-time references (all except `approved-sources.md`) once at the start of a run.
-- The worker (see `compliance-reviewer/WORKER.md`) loads `finding-schema.md` (for its transition-file shape and size caps), `severity-and-scoring.md` (for severity assignment) and `languages.md` (to know which language files to load from its assigned skill).
+- The orchestrator loads `status-format.md` in interactive runs, and `transition-schema.md` only when resuming. The report script applies the rest (transition files, `state.json`, language detection, scoring), so the orchestrator doesn't load them.
+- The worker (see `compliance-reviewer/WORKER.md`) loads `finding-schema.md` (for its transition-file shape and size caps) and `severity-and-scoring.md` (for severity assignment). Its dispatch payload already names the review packs for the detected languages, so it doesn't need `languages.md`.
+- `languages.md` stays the reference for language signals and the per-language file convention; the scripted inventory and the review packs follow it.
 - Nobody loads `approved-sources.md` during a review. Maintainers use it when they refresh a skill's local standards.

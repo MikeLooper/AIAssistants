@@ -1,90 +1,83 @@
 # Finding, Strength and Check-Result Schemas
 
-`schemaVersion: 1` for all shapes below.
+`schemaVersion: 2` for everything a worker writes. Workers write only what the report script can't work out for itself. The script takes labels and check severities from the skill's `checklist.md`, and builds citations from the element ID. (Older `schemaVersion: 1` files, with labels, `severityIfFailed`, `standard`/`url` and a `checkResults` array, are still read.)
 
 ## Finding
 
 ```json
 {
-  "id": "string, e.g. SEC-IA-003#1",
-  "subject": "string, e.g. Security",
-  "subSubject": "string, e.g. Identity & Access",
-  "checkId": "string, matches an id in the skill's checklist.md",
+  "id": "API-05#1",
+  "checkId": "API-05",
+  "element": "AZ-031",
   "severity": "Error | Warning | Information",
   "title": "short one-line summary",
   "evidence": [
     { "file": "relative/path/from/target/root", "lineStart": 1, "lineEnd": 10, "excerpt": "short verbatim snippet, trimmed" }
   ],
-  "standard": "name of the standard or guideline, e.g. OWASP Authentication Cheat Sheet",
-  "url": "https://... (or a path relative to docs/reports/ for a local standard), including a #anchor when possible",
   "recommendation": "concrete, actionable fix",
   "confidence": "High | Medium | Low",
   "effort": "Small | Medium | Large"
 }
 ```
 
-- `subject` and `subSubject` are copied verbatim from the skill's `checklist.md`: `subject` from its `Subject:` line, `subSubject` from the check's `Sub-subject` column. Never invent or combine labels (no `Operations / Reliability`). This applies to strengths and check results too. The report script rewrites both labels from the checklist (by skill and `checkId`) before scoring, so drift can't change a report, but `validate` warns about it.
-- `checkId` must be an active id in the checklist. An unknown id blocks `validate`; a retired id only warns and is dropped from scoring.
+- `checkId` must be an active id in the skill's `checklist.md`. An unknown id blocks `validate`; a retired id only warns and is dropped from scoring.
+- `element` is the ID of the failed standards element (the ID column of the skill's `references/standards/*.md`, as shown in its review pack). The report script turns it into `standard` (`"<source name> — <element ID>"`) and `url` (citation base + page + primary anchor). Don't write `standard` or `url`.
+  - Give each distinct element violation its own finding: two findings of one check merge only when they cite the same element.
+  - `page` (optional): only for an element whose source has one page per version, such as the OpenAPI Specification. Give the spec's version line (`3.0.x`, `3.1.x`, `3.2.x`, `2.0`).
+  - When no element fits, leave `element` out. Then give `standard` (and optionally `url`) yourself; this is rare. A `url` with no scheme is a repo path relative to `docs/reports/`.
+- Don't write `subject` or `subSubject`; the script takes them from the checklist (by skill and `checkId`).
 - `evidence` may have more than one entry after aggregation collapses duplicate findings across files.
-- `standard` is part of the aggregator's duplicate key: two findings of the same check merge only when they cite the same `standard` string. Skills with element IDs put the ID in it (e.g. `Microsoft Azure REST API Guidelines — AZ-054`); give each distinct rule violation its own finding.
-- `url` may be empty; the report then shows `standard` as plain text. A `url` with no scheme is a repo path written relative to `docs/reports/` (e.g. `../../compliance-reviewer/skills/<skill>/references/standards/<file>.md#<anchor>`); `render` rebases it onto the folder the report is actually written to.
-- `id` should be stable across a re-run of the same step so the aggregator can detect duplicates: `<skill-prefix>-<checkId>#<sequence>`.
+- `id` is `<checkId>#<sequence>`, stable across a re-run of the same step.
 
 ## Repository contents
 
-In every check, *committed*, *in the repository*, *checked in* and *tracked* mean *present in the target's working files*. Judge only files on disk. Never run Git commands or read `.git/` to find tracked, ignored, staged or historical content. Read `.gitignore` as a plain file when a skill needs it (e.g. SL-12). The orchestrator's single `git -C <target> rev-parse HEAD` call (for `targetGitHead`) is the only Git command in a review.
+In every check, *committed*, *in the repository*, *checked in* and *tracked* mean *present in the target's working files*. Judge only files on disk. Never run Git commands or read `.git/` to find tracked, ignored, staged or historical content. Read `.gitignore` as a plain file when a skill needs it (e.g. SL-12). The orchestrator's single `git -C <target> rev-parse HEAD` call (run by the report script's `init`, for `targetGitHead`) is the only Git command in a review.
 
 ## Strength
 
 ```json
-{
-  "id": "string",
-  "subject": "string",
-  "subSubject": "string",
-  "checkId": "string, optional — a checklist item done well",
-  "title": "short one-line summary",
-  "evidence": [ { "file": "...", "lineStart": 1, "lineEnd": 10, "excerpt": "..." } ],
-  "standard": "optional",
-  "url": "optional"
-}
+{ "id": "API-09#s1", "checkId": "API-09", "title": "short one-line summary", "evidence": [ { "file": "...", "lineStart": 1, "lineEnd": 10, "excerpt": "..." } ], "element": "AZ-009" }
 ```
 
-## Check Result
+`checkId` and `element` are optional.
 
-One entry per checklist item, regardless of outcome, so `compliance-report` can render Full Results.
+## Check results (`checks`)
+
+Every active checklist item appears exactly once, under one of three keys:
 
 ```json
-{
-  "checkId": "string",
-  "subject": "string",
-  "subSubject": "string",
-  "severityIfFailed": "Error | Warning | Information",
-  "result": "pass | fail | N/A",
-  "reason": "short explanation, required when result is fail or N/A",
-  "findingIds": ["ids of findings raised by this check, if any"]
+"checks": {
+  "pass": ["API-01", "API-02", "API-04"],
+  "fail": { "API-05": { "findingIds": ["API-05#1"], "reason": "optional one sentence" } },
+  "na":   { "API-13": "no long-running operations" }
 }
 ```
 
-- When `compliance-report`'s aggregate step (step 90) identifies a cross-subject semantic duplicate — a finding from a different subject skill whose evidence overlaps an existing finding's file+line range — the *suppressed* check still reports `result: fail` here with its own `reason`, but `findingIds` points at the other subject's finding id instead of creating a new one. This keeps every subject's Full Results accurate while the deduplicated `findings` array (and severity counts, top-5 risks) only lists the issue once. Workers don't need to do this themselves; it happens only at aggregation, across all subjects' transition files.
+- `pass`: a list of check ids.
+- `fail`: check id → `findingIds` (required) and an optional `reason`. When `reason` is left out, the report shows the first finding's title.
+- `na`: check id → the reason (one sentence, required).
+- The script adds each check's label and default severity (`severityIfFailed`) from `checklist.md`, and scores from these results.
+- A cross-subject duplicate is handled only at aggregation (step 90): a suppressed finding's check stays `fail` in its own subject, and the report points at the other subject's finding. Workers don't do this themselves.
 
 ## Output Size Caps
 
 Every token a worker writes is paid for, so keep results compact:
 
+- Write the file as compact JSON (no indentation).
 - At most **3 strengths** per subject skill (pick the most significant).
 - `excerpt`: one or two lines, at most about 200 characters. `evidence` lists at most 3 locations per finding (the aggregator can still merge more).
-- `reason` only for `fail` and `N/A` check results; omit it for `pass`. Keep it to one sentence.
+- `reason`: one sentence, for `na` and, only when the finding titles don't explain the failure, for `fail`.
 - `recommendation`: one or two sentences.
 
 ## Subject Transition File (written by the worker)
 
-The worker writes one file per subject it was given, directly to `transitions/<runId>/<stepId>.json`, as a single JSON object: the required header fields from `transition-schema.md` (with `status: "completed"`) followed by the subject content below. The orchestrator supplies the header values and the `stepId` for each skill.
+The worker writes one file per subject it was given, to the `out` path in its dispatch payload (`transitions/<runId>/<stepId>.json`), as one JSON object: the payload's `header` values plus `stepId`, `status: "completed"` and `completedAt`, followed by the subject content.
 
 ```json
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "runId": "...",
-  "stepId": "10-review-software-quality",
+  "stepId": "13-review-api-design",
   "status": "completed",
   "startedAt": "ISO-8601",
   "completedAt": "ISO-8601",
@@ -92,19 +85,16 @@ The worker writes one file per subject it was given, directly to `transitions/<r
   "targetGitHead": null,
   "inputsHash": "...",
   "batchId": "batch-1",
-  "skill": "review-<name>",
-  "subject": "string",
-  "findings": [ /* Finding[] */ ],
-  "strengths": [ /* Strength[] */ ],
-  "checkResults": [ /* CheckResult[] */ ],
-  "urlsFetched": ["https://..."],
+  "skill": "review-api-design",
+  "findings": [],
+  "strengths": [],
+  "checks": { "pass": [], "fail": {}, "na": {} },
   "notes": "optional short string"
 }
 ```
 
-- Finding ids are `<checkId>#<sequence>` (no batch suffix; a subject runs in exactly one batch).
-- Every checklist item gets one `checkResults` entry; every `fail` result names its `findingIds`.
 - Each file is self-contained, so a malformed file only costs a single-subject retry.
+- `validate` checks that every active check id appears exactly once and that every `fail` names its findings.
 
 ## Worker Status Reply
 
@@ -114,7 +104,7 @@ The worker returns only this short JSON object (no prose, no fences). It does no
 {
   "batchId": "batch-1",
   "written": [
-    { "skill": "review-api-design", "path": "transitions/<runId>/13-review-api-design.json", "findings": 2, "strengths": 1, "checks": 8 }
+    { "skill": "review-api-design", "path": "transitions/<runId>/13-review-api-design.json", "findings": 2, "strengths": 1, "checks": 15 }
   ],
   "failed": [
     { "skill": "review-security-web-api", "reason": "short reason" }

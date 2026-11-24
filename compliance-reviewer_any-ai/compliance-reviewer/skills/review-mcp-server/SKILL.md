@@ -46,10 +46,9 @@ the inventory found no MCP server, mark the whole subject N/A with a `notes` exp
    NOT/RECOMMENDED → Warning; MAY/OPTIONAL → Information; REVIEW → the check's default. For a merged element with
    mixed levels, use the level of the part that failed. `checkResults.severityIfFailed` is always the check's
    default severity from `checklist.md`.
-6. Citations: `standard` = "<source name> — <element ID>" (source name from the standards file header; for CSA and
-   The New Stack add the section or item, e.g. "CSA Agentic MCP Security Best Practices — CSA-05 (§3.6)");
-   `url` = the citation base for the element's page + "#" + its primary anchor (first anchor listed), or the base
-   alone when the anchor is `(page)`, a section number or an item number. `urlsFetched` stays empty.
+6. Citations: set `element` to the failed element's ID (e.g. `MCPS-01`); the report script derives `standard` and
+   `url` from it, so don't write them. For CSA and The New Stack elements the script adds the section or item to
+   `standard`.
 7. Boundaries: **owned here** — the stdio `stdout` contract, MCP tool schemas and descriptions, `isError`
    semantics, exposure of over-broad tools, MCP annotations and confirmation, handle design, per-invocation
    audit logging and MCP remote-transport rules. **Report also, but don't replace:** injection mechanics in tool
@@ -65,6 +64,6 @@ the inventory found no MCP server, mark the whole subject N/A with a `notes` exp
 
 ## Output
 
-Labels: copy `subject`/`subSubject` from `references/checklist.md` (the `Subject:` line and the check's `Sub-subject`
-column); never invent or combine labels. Findings, strengths and check results per `compliance-review-core`'s
+Labels: don't write `subject` or `subSubject`; the report script takes them from `references/checklist.md`
+(the `Subject:` line and the check's `Sub-subject` column). Findings, strengths and check results per `compliance-review-core`'s
 `finding-schema.md`.

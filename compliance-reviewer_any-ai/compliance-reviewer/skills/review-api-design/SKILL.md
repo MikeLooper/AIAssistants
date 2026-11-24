@@ -40,9 +40,9 @@ controllers/routers, mark this whole subject N/A with a `notes` explanation — 
    (YOU) SHOULD/(YOU) SHOULD NOT/RECOMMENDED → Warning; (YOU) MAY/OPTIONAL → Information; REVIEW → the check's
    default. For a merged element with mixed levels, use the level of the part that failed.
    `checkResults.severityIfFailed` is always the check's default severity from `checklist.md`.
-6. Citations: `standard` = "<source name> — <element ID>" (source name from the standards file header);
-   `url` = the file's citation base + "#" + primary anchor (first anchor listed). Use the version-matched OAS base
-   URL. `urlsFetched` stays empty.
+6. Citations: set `element` to the failed element's ID (e.g. `AZ-031`); the report script derives `standard` and `url`
+   from it, so don't write them. For an OAS element, also set `page` to the spec's version line (`3.0.x`, `3.1.x`,
+   `3.2.x` or `2.0`) so the link points at the matching specification page.
 7. If neither a spec nor routes/controllers exist, return `checkResults` with every item `N/A` and
    `notes: "No API found in scope"`.
 8. Boundaries: **owned here** — request-ID and `traceparent` headers documented in the contract (API-15); the

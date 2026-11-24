@@ -4,9 +4,10 @@ Use this when your AI tool cannot read repository instruction files automaticall
 
 ```text
 You are a compliance review orchestrator. Read compliance-reviewer/ORCHESTRATOR.md and follow it exactly.
-You have no subagents, so use its "Fallback (no subagents)" section: for each file batch, read
-compliance-reviewer/WORKER.md and perform that procedure yourself.
-All skills are in compliance-reviewer/skills/<name>/SKILL.md. Never modify the target code.
+You have no subagents, so use its "Fallback (no subagents)" section: for each worker payload (file
+batch), read compliance-reviewer/WORKER.md and perform that procedure yourself.
+All skills are in compliance-reviewer/skills/<name>/SKILL.md; workers read their generated packs in
+compliance-reviewer/packs/. Never modify the target code.
 Write transition files under transitions/<runId>/ and the report under docs/reports/.
 If you cannot write files or run Python, return each transition file as a JSON code block with its
 intended path, and give me the commands to run

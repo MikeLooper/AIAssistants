@@ -1,5 +1,5 @@
 {
-  "$comment": "Machine-readable copy of the answer key in test/README.md. Keep the two in sync. 'checks' are the expected checklist IDs; a trailing '*' is a prefix wildcard (e.g. 'TST-*'). 'locations' are file paths relative to the app directory; an empty list means 'whole app' (any evidence location counts). A flaw is found when a finding cites one of its checks with evidence in one of its locations.",
+  "$comment": "Machine-readable copy of the answer key in test/README.md. Keep the two in sync. 'checks' are the expected checklist IDs; a trailing '*' is a prefix wildcard (e.g. 'TST-*'). 'locations' are file paths relative to the app directory; an empty list means 'whole app' (any evidence location counts); null means the flaw isn't scored for that language (its checks then count as incidental). A flaw is found when a finding cites one of its checks with evidence in one of its locations.",
   "kinds": {
     "apis": {
       "incidentalChecks": [
@@ -163,8 +163,8 @@
           "checks": ["SEC-IA-05"],
           "locations": {
             "dotNET": ["Pages/Index.cshtml.cs", "Pages/Index.cshtml", "Program.cs"],
-            "java": ["src/main/java/com/example/todoui/TodoController.java", "src/main/resources/templates/index.html", "pom.xml"],
-            "python": ["app.py", "templates/index.html", "requirements.txt"]
+            "java": null,
+            "python": null
           }
         },
         {
@@ -243,15 +243,15 @@
           "checks": ["SQ-08"],
           "locations": {
             "dotNET": ["Pages/Index.cshtml.cs"],
-            "java": ["src/main/java/com/example/todoui/TodoController.java"],
-            "python": ["app.py"]
+            "java": null,
+            "python": null
           }
         },
         {
           "id": "U11",
           "title": "No security headers (CSP, frame-ancestors, nosniff and so on)",
           "checks": ["SEC-WA-01", "SEC-WA-03", "SEC-WA-04", "SEC-WA-11"],
-          "locations": { "dotNET": [], "java": [], "python": [] }
+          "locations": { "dotNET": [], "java": null, "python": null }
         },
         {
           "id": "U12",
