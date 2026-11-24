@@ -9,7 +9,7 @@ _Generated {{generatedAt}} · Run `{{runId}}`_
 | Subject | Score | Band |
 |---------|-------|------|
 {{#subjectScores}}
-| {{subject}} | {{score}}/100 | {{band}} |
+| {{subject}} | {{score}} | {{band}} |
 {{/subjectScores}}
 
 **Findings by severity:** Error: {{errorCount}} · Warning: {{warningCount}} · Information: {{infoCount}}

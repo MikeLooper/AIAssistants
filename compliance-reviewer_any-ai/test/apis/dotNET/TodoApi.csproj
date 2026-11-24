@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="*" />
+    <PackageReference Include="Sentry.AspNetCore" Version="7.0.1" />
   </ItemGroup>
 
 </Project>

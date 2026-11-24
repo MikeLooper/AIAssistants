@@ -1,0 +1,16 @@
+# Detection signals — C# (Data Protection)
+
+Detection signals only. They cite no standard. Report findings against the element IDs listed (defined in
+`../standards/`). EF Core value-converter, ASP.NET Core Data Protection and `System.Text.Json` defaults aren't
+localized: judge explicit code only, and add a `localized-standard-gap` note when a decision depends on a default.
+
+| Signal (API, setting or pattern) | Look in | Indicates | Element(s) |
+|---|---|---|---|
+| `public string Ssn`, `CardNumber`, `NationalId`, `DateOfBirth` properties on `DbSet<>` entities with no `HasConversion(...)`, `[Encrypted]`-style attribute or `IDataProtector.Protect` | entities, `DbContext.OnModelCreating` | Sensitive personal data stored in plaintext | A04-04, CSD-01 |
+| `Aes.Create()` with `Mode = CipherMode.ECB`, `CipherMode.CBC` with no HMAC, `RSAEncryptionPadding.Pkcs1`, MD5/SHA1 over personal fields | crypto helpers | Weak storage encryption | CSD-03, A04-05 |
+| Controller action returning an EF entity (`return Ok(user)`, `return await _db.Users.ToListAsync()`, minimal API `Results.Ok(entity)`) | controllers, endpoints | Over-exposure on output | BOP-03, BOP-01 |
+| `[JsonIgnore]` missing on `PasswordHash`, `SecurityStamp` or internal flags of a returned type | entities, DTOs | Sensitive properties serialized | BOP-01 |
+| `[FromQuery] string email`, `MapGet("/users/{email}")`, `RedirectToAction(..., new { email })` | controllers, Razor pages | Personal data in URLs | QSE-01 |
+| `o.SendDefaultPii = true`, `"Sentry": { "SendDefaultPii": true }` | `Program.cs`, `appsettings*.json` | Error tracker sends user data | TPS-01 |
+| `[PersonalData]`, `DataClassificationAttribute` subclasses, `AddRedaction` present | entities, `Program.cs` | Data classification in code (strength) | DND-01 |
+| `HasData(new Customer { Email = "…", CardNumber = "…" })`, seed JSON under `Data/Seed` | `DbContext`, seed folders | Seed data (synthetic or real-looking) | SP122-06, RSV-01 |

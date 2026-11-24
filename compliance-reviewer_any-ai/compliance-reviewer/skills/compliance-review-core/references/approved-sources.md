@@ -68,6 +68,41 @@
   - https://patterns.greensoftware.foundation/ (pattern pages and `sitemap.xml`; pages listed in the skill's MAINTENANCE.md coverage map)
 - Drift checks (maintainers): https://api.github.com/repos/Green-Software-Foundation/learn/commits, https://api.github.com/repos/Green-Software-Foundation/patterns/commits
 
+## Data Protection
+
+**Maintenance-only** since 2026-11-24: `review-data-protection` declares local standards. Workers don't fetch these during a review.
+Exact pages only — this entry does not allowlist other pages on these sites.
+
+- OWASP Cheat Sheets (pinned by commit in the skill's `references/sources.md`):
+  - https://cheatsheetseries.owasp.org/cheatsheets/Cryptographic_Storage_Cheat_Sheet.html
+  - https://cheatsheetseries.owasp.org/cheatsheets/User_Privacy_Protection_Cheat_Sheet.html
+  - https://cheatsheetseries.owasp.org/cheatsheets/HTML5_Security_Cheat_Sheet.html (`#local-storage`, `#client-side-databases` and `#credential-and-personally-identifiable-information-pii-input-hints` only; also listed under Security — Web & API for other sections)
+  - https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html (ownership reference only; nothing localized — input binding belongs to Security — Input & Injection)
+- OWASP Top 10:2025 (also listed under Security — OWASP Top 10):
+  - https://top10.owasp.org/2025/A04_2025-Cryptographic_Failures/
+- OWASP API Security Top 10:2023 and OWASP community pages:
+  - https://owasp.org/API-Security/editions/2023/en/0xa3-broken-object-property-level-authorization/
+  - https://owasp.org/www-community/vulnerabilities/Information_exposure_through_query_strings_in_url
+- NIST:
+  - https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-122.pdf
+  - https://csrc.nist.gov/pubs/sp/800/122/final (publication record; revision and withdrawal check)
+- GDPR (principle summaries of Art. 5, 25 and 32 only):
+  - https://eur-lex.europa.eu/eli/reg/2016/679/oj (official text; manual refresh: the site refuses automated retrieval)
+  - https://gdpr-info.eu/art-5-gdpr/, https://gdpr-info.eu/art-25-gdpr/, https://gdpr-info.eu/art-32-gdpr/ (verbatim reading copies used for localization; citations point at EUR-Lex)
+- RFC 2606:
+  - https://www.rfc-editor.org/rfc/rfc2606.html
+  - https://www.rfc-editor.org/info/rfc2606 (updated-by / obsoleted-by check)
+- Vendor guidance:
+  - https://docs.sentry.io/platforms/dotnet/data-management/data-collected/
+  - https://docs.sentry.io/platforms/java/data-management/data-collected/
+  - https://docs.sentry.io/platforms/python/data-management/data-collected/
+  - https://docs.sentry.io/platforms/javascript/data-management/data-collected/
+  - https://learn.microsoft.com/azure/azure-monitor/app/application-insights-faq (`#privacy-and-responsible-use` only)
+  - https://learn.microsoft.com/dotnet/core/extensions/data-classification
+  - https://github.com/FasterXML/jackson-annotations/wiki/Jackson-Annotations (`@JsonIgnore`, `@JsonIgnoreProperties`, `@JsonView` only)
+  - https://www.django-rest-framework.org/api-guide/serializers/ (field selection and `extra_kwargs` only)
+- Drift checks (maintainers): https://api.github.com/repos/OWASP/CheatSheetSeries/commits, https://api.github.com/repos/OWASP/Top10/commits (both also listed under other subjects), https://api.github.com/repos/OWASP/API-Security/commits, https://api.github.com/repos/OWASP/www-community/commits, https://api.github.com/repos/encode/django-rest-framework/commits
+
 ## Dependency Management
 
 **Maintenance-only** since 2026-11-07: `review-dependency-management` declares local standards. Workers don't fetch these during a review. Vulnerability data comes only from approved analyzers, never from these or other URLs. Exact pages only — this entry does not allowlist other pages on these sites.
@@ -231,6 +266,7 @@ below is also listed in the section of the subject that localizes it.
 - https://top10.owasp.org/2025/A01_2025-Broken_Access_Control/ (Security — Identity & Access; also Testing, testing sentences only)
 - https://top10.owasp.org/2025/A02_2025-Security_Misconfiguration/ (Security — Web & API)
 - https://top10.owasp.org/2025/A03_2025-Software_Supply_Chain_Failures/ (Dependency Management)
+- https://top10.owasp.org/2025/A04_2025-Cryptographic_Failures/ (Data Protection)
 - https://top10.owasp.org/2025/A05_2025-Injection/ (Security — Input & Injection; also Testing, testing sentences only)
 - https://top10.owasp.org/2025/A07_2025-Authentication_Failures/ (Security — Identity & Access)
 - https://top10.owasp.org/2025/A09_2025-Security_Logging_and_Alerting_Failures/ (Security — Operational)

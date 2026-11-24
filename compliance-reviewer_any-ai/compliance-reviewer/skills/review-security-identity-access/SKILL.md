@@ -51,7 +51,8 @@ tokens, per `compliance-inventory`.
    `@EnableGlobalMethodSecurity`, `System.Web` Forms auth) are judged against the same elements; whether the
    framework version is supported belongs to `review-dependency-management`.
 4. Ownership: don't report security headers, CORS or site-wide HTTPS (web-api), secrets in logs or hardcoded
-   secrets (operational), input validation (input-injection), general API rate limiting (reliability), missing
+   secrets (operational), personal data other than credentials in client storage, URLs or responses
+   (review-data-protection), input validation (input-injection), general API rate limiting (reliability), missing
    tests (testing) or out-of-order workflow execution (review-software-quality SQR-37 under AP-02; per-step
    authorization stays here under SEC-IA-02). CSRF for cookie-authenticated state changes is reported here under SEC-IA-05. JWT-08 still
    flags a weak or password-derived HMAC secret.

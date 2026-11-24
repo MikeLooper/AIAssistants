@@ -19,4 +19,4 @@ remembered error-page, logging or secret-store defaults.
 Not used: the OWASP Java Security Cheat Sheet (no error-handling, logging or secrets content). OWASP has no Python
 security cheat sheet; Python guidance comes from the Django and Python documentation.
 
-Element levels: MUST/REVIEW take the check's default severity; SHOULD one level lower (`SKILL.md` step 6).
+Element levels: MUST/REVIEW take the check's default severity; SHOULD one level lower (`SKILL.md` step 7).

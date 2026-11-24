@@ -45,6 +45,7 @@ score = (weighted checks passed) / (weighted checks that apply) * 100
 - Weights: Error = 5, Warning = 2, Information = 1.
 - A check result of **N/A** is excluded from both numerator and denominator.
 - Compute one score per subject, then an overall score. The overall score is the weighted average of subject scores; when subjects have different total applicable weights, weight each subject's contribution by its own total applicable weight so subjects with more applicable checks aren't diluted.
+- Every subject that was reviewed counts toward the overall score, with no fixed subject list; Data Protection (added in tool version 2.1.0) counts like any other. A subject that is entirely N/A has no score and adds nothing, so overall scores of runs with and without a subject aren't directly comparable.
 
 ## Rating Bands
 

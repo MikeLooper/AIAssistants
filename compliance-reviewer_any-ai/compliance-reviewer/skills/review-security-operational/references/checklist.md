@@ -36,12 +36,20 @@ Totals: 48 OWASP cheat-sheet + 15 Top 10 + 16 DNO + 6 JVO + 9 PYO + 5 NDO = 99 e
 - **SEC-OP-03:** fail when a log call or logging configuration writes a value that is a secret or sensitive personal
   data (variables or properties named like password/secret/token/apiKey/connectionString/cardNumber,
   `Authorization`/`Cookie` headers, whole request or entity objects known to contain them), or enables body/header
-  logging of such data.
+  logging of such data. The finding's excerpt names the logged field but never shows a logged value
+  (`<redacted:kind>`; see "Redaction" in `finding-schema.md`).
 - **SEC-OP-05:** fail on literal credential values in source or configuration files in the repository: keys named like
   password/secret/api_key/token/connectionString with a non-placeholder value; private-key blocks; recognizable cloud
   key formats; `.env` files with values present in the repository; plain Kubernetes `Secret` manifests with data. Placeholders (`${…}`,
   `<secret>`, `changeme`-style samples clearly marked as such), password-less local development connection strings and
-  files outside the subject's list don't fail. Use confidence `medium` unless the value is unambiguous.
+  files outside the subject's list don't fail, except the lines named in the payload's `secretCandidates`, which the
+  worker reads wherever they are (`../SKILL.md` step 4). Use confidence `medium` unless the value is unambiguous.
+  Coverage includes CI workflow files (literal values in `env:` blocks or `run:` steps), Dockerfile `ARG`/`ENV`
+  defaults, notebook outputs, and package-manager auth files (`.npmrc` `_authToken`, `.pypirc`, Maven
+  `settings.xml` `<password>`, `NuGet.config` `ClearTextPassword`), judged with SMG-02/SMG-03; where no element fits a
+  case, add `localized-standard-gap` to `notes` instead of failing. **Redaction:** the excerpt keeps the key name and
+  replaces the value with `<redacted:kind>` (e.g. `"ApiKey": "<redacted:api-key>"`); `validate` rejects an excerpt that
+  still contains a secret.
 - **SEC-OP-06:** secrets injected as environment variables by the platform or orchestrator at deploy time pass.
   SMG-07 and DNO-11 never fail on their own; name them in recommendations only. Environment-variable values hardcoded
   in container or compose definitions in the repository fail SMG-02 (SEC-OP-05).

@@ -8,7 +8,7 @@ All transition files for one run live in `transitions/<runId>/`.
 - Step files: `NN-<name>.json`, e.g. `00-init.json`, `01-inventory.json`, `10-review-software-quality.json`.
 - A worker call covers one `fileBatches` entry and writes one `NN-<skill>.json` file per subject in that batch. Each subject is in exactly one batch, so there are no `.part-K` files. (Older runs may contain `NN-<skill>.part-K.json` files; the aggregation script still merges them.) Each file carries the originating `batchId`.
 - Workers write their own subject files. The report script writes `00` (`init`), `01` (`inventory`), the N/A subject files (`na`), `90` (`aggregate`), `99` (`render`) and every `state.json` update (`init`, `inventory`, `na`, `dispatch`, `validate --mark`, `step`, `resume`). The orchestrator writes only `02-analyzers.json`, and only when it runs analyzers.
-- Step numbers (fixed; `18` is retired):
+- Step numbers (fixed; `18` is retired; `29` added in 2.1.0):
 
 | Step | Skill | Step | Skill |
 |------|-------|------|-------|
@@ -21,6 +21,7 @@ All transition files for one run live in `transitions/<runId>/`.
 | 16 | review-security-web-api | 26 | review-cost-sustainability |
 | 17 | review-security-operational | 27 | review-maintainability |
 | 19 | review-testing | 28 | review-mcp-server |
+|  |  | 29 | review-data-protection |
 - Superseded files (from a `resume ... from step NN`) move to `transitions/<runId>/superseded/` keeping their original names.
 - `state.json` lives at `transitions/<runId>/state.json`.
 
@@ -43,6 +44,25 @@ Every step file (00–99) starts with this header, followed by step-specific con
 ```
 
 `init` computes `targetGitHead` and `inputsHash`; `resume` recomputes them the same way. The analyzers that actually ran are recorded in `analyzerApproval`, not hashed: with `--analyzers` they follow from the hashed flag.
+
+## `01-inventory.json` scan fields
+
+Written by the report script's `inventory` command (additive; `schemaVersion` stays 2):
+
+- `secretCandidates`: up to 50 `{ "file", "line", "rule", "confidence" }` entries from the secret pattern pass over every
+  text file the inventory walks (IaC files only with `--advanced`), highest confidence first. `line` is `null` for a
+  name-only match (key files, keystores). The matched value is never stored. `secretCandidatesTotal` counts all
+  candidates before the cap. `dispatch` passes them to `review-security-operational`, merged with `gitleaks` results
+  from `02-analyzer-gitleaks.raw.json` when that file exists (one entry per file and line).
+- `piiCandidates` / `piiCandidatesTotal`: the same shape, for personal data (Luhn-valid card numbers, US SSN and UK NI
+  number shapes, checksum-valid IBANs, emails on non-reserved domains) in test, fixture, seed and sample files only.
+  `dispatch` passes them to `review-data-protection`.
+- `personalDataFound` and `personalDataSignals` (up to 10 `{ "file", "signal" }`): personal-data fields in entities,
+  models and DTOs, data-classification attributes, user or customer tables in migrations, or any `piiCandidates`.
+  When `personalDataFound` is false, `review-data-protection` is in `skippedSubjects` ("no personal data found") and
+  `na` writes its N/A file.
+
+The patterns are data, in `compliance-inventory/references/secret-patterns.json`.
 
 ## `state.json` Layout
 

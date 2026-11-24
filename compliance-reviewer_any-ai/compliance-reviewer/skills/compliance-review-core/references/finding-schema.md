@@ -12,7 +12,7 @@
   "severity": "Error | Warning | Information",
   "title": "short one-line summary",
   "evidence": [
-    { "file": "relative/path/from/target/root", "lineStart": 1, "lineEnd": 10, "excerpt": "short verbatim snippet, trimmed" }
+    { "file": "relative/path/from/target/root", "lineStart": 1, "lineEnd": 10, "excerpt": "short snippet, trimmed, values redacted" }
   ],
   "recommendation": "concrete, actionable fix",
   "confidence": "High | Medium | Low",
@@ -28,6 +28,19 @@
 - Don't write `subject` or `subSubject`; the script takes them from the checklist (by skill and `checkId`).
 - `evidence` may have more than one entry after aggregation collapses duplicate findings across files.
 - `id` is `<checkId>#<sequence>`, stable across a re-run of the same step.
+
+## Redaction
+
+An `excerpt` (and any `title`, `reason` or `recommendation`) must never contain a secret value or personal data.
+Replace the value with `<redacted:kind>` and keep the key or field name and the line numbers, for example
+`"ApiKey": "<redacted:api-key>"`, `password=<redacted:password>`, `"cardNumber": "<redacted:card-number>"`. Use a
+short kind: `api-key`, `token`, `password`, `secret`, `private-key`, `connection-string`, `card-number`, `iban`,
+`national-id`, `email`, `phone`.
+
+- `validate` runs the shared secret and personal-data patterns (`compliance-inventory/references/secret-patterns.json`)
+  over every evidence excerpt and reports a match as a problem, which blocks the subject until it is rewritten.
+- `aggregate` and `render` also mask any remaining match, so no value reaches `90-aggregate.json`, `docs/reports/`
+  or `--out-file`.
 
 ## Repository contents
 

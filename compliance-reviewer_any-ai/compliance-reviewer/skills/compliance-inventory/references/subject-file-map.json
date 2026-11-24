@@ -1,5 +1,5 @@
 {
-  "$comment": "Machine-readable subject-to-file map for `compliance_report.py inventory` (step 01). subject-file-map.md is the human description of the same rules; keep the two in sync. Glob rules: matched against the target-relative path with '/' separators, case-sensitive; '**' spans any number of folders, '*' and '?' stay inside one name, '{a,b}' lists alternatives; a pattern with no '/' matches the file name in any folder; a leading '/' anchors it to the target root. 'contains' is a regular expression searched in the file text (a value starting with '@' names an entry in 'patterns'). Each subject's tiers are in sampling priority order: when more than maxFilesPerSubject files match, the sample takes up to 'max' files from each tier in order ('perDir' spreads them across folders), then fills from the remaining matches. Tests: tiers exclude test files unless 'tests' is 'include' or 'only'.",
+  "$comment": "Machine-readable subject-to-file map for `compliance_report.py inventory` (step 01). subject-file-map.md is the human description of the same rules; keep the two in sync. Glob rules: matched against the target-relative path with '/' separators, case-sensitive; '**' spans any number of folders, '*' and '?' stay inside one name, '{a,b}' lists alternatives; a pattern with no '/' matches the file name in any folder; a leading '/' anchors it to the target root. 'contains' is a regular expression searched in the file text (a value starting with '@' names an entry in 'patterns'). Each subject's tiers are in sampling priority order: when more than maxFilesPerSubject files match, the sample takes up to 'max' files from each tier in order ('perDir' spreads them across folders), then fills from the remaining matches. Tests: tiers exclude test files unless 'tests' is 'include' or 'only'. 'includeExcluded': true keeps generated files (e.g. migrations) and test-excluded files (e.g. fixtures) in that tier.",
   "maxFilesPerSubject": 12,
   "maxTargetFiles": 50000,
   "maxReadBytes": 524288,
@@ -359,7 +359,13 @@
     "drIac": "(?i:backup|geo|replica|replication|failover|Microsoft\\.Sql|Microsoft\\.DBfor|Microsoft\\.Storage|Microsoft\\.DocumentDB|Microsoft\\.KeyVault|Microsoft\\.RecoveryServices|aws_db_instance|aws_rds|aws_s3_bucket|aws_dynamodb|aws_kms|aws_backup|google_sql|google_storage|PersistentVolumeClaim|StatefulSet|volumeClaimTemplates|trafficManager|frontDoor|route53|vault)",
     "monitoringIac": "(?i:metricAlerts|scheduledQueryRules|activityLogAlerts|actionGroups|smartDetectorAlertRules|aws_cloudwatch_metric_alarm|aws_cloudwatch_dashboard|aws_sns_topic|google_monitoring|PrometheusRule|ServiceMonitor|datadog_monitor|dashboard|workbook|webtests|availability|diagnosticSettings|Microsoft\\.Insights|Microsoft\\.OperationalInsights|aws_cloudwatch_log_group|google_logging|\\balert:)",
     "costIac": "(?i:\\bsku\\b|vmSize|instance_type|machine_type|replicas|resources:|requests:|limits:|autoscal|HorizontalPodAutoscaler|minReplicas|maxReplicas|lifecycle|retention|budget|Microsoft\\.Consumption|aws_budgets|CronJob|schedule|dailyQuota|sampling)",
-    "statefulIac": "(?i:Microsoft\\.Sql|Microsoft\\.DBfor|Microsoft\\.Storage|Microsoft\\.DocumentDB|aws_db_instance|aws_rds|aws_s3_bucket|aws_dynamodb|aws_ebs|google_sql|google_storage|PersistentVolumeClaim|StatefulSet|volumeClaimTemplates|Microsoft\\.Compute/disks)"
+    "statefulIac": "(?i:Microsoft\\.Sql|Microsoft\\.DBfor|Microsoft\\.Storage|Microsoft\\.DocumentDB|aws_db_instance|aws_rds|aws_s3_bucket|aws_dynamodb|aws_ebs|google_sql|google_storage|PersistentVolumeClaim|StatefulSet|volumeClaimTemplates|Microsoft\\.Compute/disks)",
+    "piiFields": "(?i:(?<![A-Za-z])(?:e[_-]?mail(?:[_-]?address)?|phone(?:[_-]?number)?|mobile(?:[_-]?number)?|street(?:[_-]?address)?|home[_-]?address|postal[_-]?code|zip[_-]?code|date[_-]?of[_-]?birth|birth[_-]?date|dob|ssn|social[_-]?security|national[_-]?id|tax[_-]?id|passport|iban|card[_-]?number|credit[_-]?card|first[_-]?name|last[_-]?name|full[_-]?name|surname)(?![A-Za-z]))",
+    "dataClassification": "\\[(?:PersonalData|SensitiveData|ProtectedPersonalData|EUII|EUPI|PII)\\b|DataClassification|Microsoft\\.Extensions\\.Compliance|AddRedaction|@PersonalData\\b|@Sensitive\\w*\\b|@JsonIgnore\\b|@JsonView\\b|\\[JsonIgnore\\b|exclude\\s*=|read_only_fields|write_only|Field\\(.*exclude=True",
+    "thirdPartyPii": "Sentry|sendDefaultPii|send_default_pii|SendDefaultPii|before_send|beforeSend|ApplicationInsights|TelemetryClient|TelemetryInitializer|gtag\\(|analytics\\.|mixpanel|segment|amplitude|posthog|OpenAI|openai|anthropic|Anthropic|ChatClient|AzureOpenAI|bedrock|SendGrid|sendgrid|Twilio|twilio|Mailgun|mailgun|smtplib|SmtpClient|JavaMailSender|nodemailer|MailKit",
+    "clientStorage": "localStorage|sessionStorage|document\\.cookie|indexedDB|cookies\\.set|Cookies\\.set|Response\\.Cookies\\.Append|set_cookie\\(|ResponseCookie|new Cookie\\(|res\\.cookie\\(|HttpOnly|httponly",
+    "dataLifecycle": "(?i:\\b(?:delete|erase|purge|anonymi[sz]e|pseudonymi[sz]e|forget|retention|ttl|expire[sd]?|expiresAfter|expireAfterSeconds|data[_-]?export|right[_-]?to)\\w*)",
+    "prodDataCopy": "(?i:pg_dump|pg_restore|mysqldump|mongodump|mongorestore|sqlpackage|bcp\\s|BACKUP DATABASE|RESTORE DATABASE|bacpac|copy[_-]?prod|prod[_-]?(?:copy|dump|snapshot|refresh)|anonymi[sz]|mask)"
   },
   "subjects": {
     "review-software-quality": {
@@ -951,6 +957,39 @@
     },
     "review-security-operational": {
       "tiers": [
+        {
+          "name": "sensitive files",
+          "globs": [
+            ".env",
+            ".env.*",
+            "*.env",
+            "*.pem",
+            "*.key",
+            "id_rsa",
+            "id_dsa",
+            "id_ecdsa",
+            "id_ed25519",
+            "credentials.json",
+            "*service-account*.json",
+            ".npmrc",
+            ".pypirc",
+            ".netrc",
+            "settings.xml"
+          ],
+          "exclude": [
+            ".env.example",
+            ".env.sample",
+            ".env.template",
+            ".env.dist",
+            "*.example",
+            "*.sample",
+            "*.template",
+            "*.dist",
+            "*.pub"
+          ],
+          "tests": "include",
+          "max": 2
+        },
         {
           "name": "error handlers",
           "source": true,
@@ -1689,6 +1728,138 @@
           "source": true,
           "contains": "@debtMarkers",
           "max": 3
+        }
+      ]
+    },
+    "review-data-protection": {
+      "tiers": [
+        {
+          "name": "entities and models with personal data",
+          "globs": [
+            "**/Models/**",
+            "**/models/**",
+            "**/models.py",
+            "**/Entities/**",
+            "**/entities/**",
+            "**/*Entity.*",
+            "**/Domain/**",
+            "**/domain/**",
+            "**/model/**",
+            "**/*Model.*",
+            "**/*DbContext.*",
+            "**/schema.prisma"
+          ],
+          "contains": "@piiFields",
+          "perDir": true,
+          "max": 3
+        },
+        {
+          "name": "other source with personal-data fields",
+          "source": true,
+          "contains": "(?:class|record|interface|struct|type)\\s+\\w+[^\\n]*(?:\\n[^\\n]*){0,40}?@piiFields",
+          "max": 2
+        },
+        {
+          "name": "controllers returning data",
+          "source": true,
+          "contains": "@route",
+          "perDir": true,
+          "max": 2
+        },
+        {
+          "name": "DTOs and serializers",
+          "globs": [
+            "**/Dtos/**",
+            "**/DTOs/**",
+            "**/dto/**",
+            "**/dtos/**",
+            "**/*Dto.*",
+            "**/*DTO.*",
+            "**/*Response.*",
+            "**/schemas.py",
+            "**/schemas/**",
+            "**/serializers.py",
+            "**/serializers/**"
+          ],
+          "source": true,
+          "max": 2
+        },
+        {
+          "name": "third-party SDK setup",
+          "globs": [
+            "@entryPoints",
+            "**/*.{cs,java,kt,py,js,ts,jsx,tsx}",
+            "appsettings*.json",
+            "application*.{yml,yaml,properties}",
+            "settings*.py",
+            "sentry*.{js,ts,properties}"
+          ],
+          "contains": "@thirdPartyPii",
+          "max": 2
+        },
+        {
+          "name": "fixtures and seed data",
+          "globs": [
+            "**/fixtures/**",
+            "**/testdata/**",
+            "**/test-data/**",
+            "**/seed/**",
+            "**/seeds/**",
+            "**/seeders/**",
+            "**/*{seed,Seed,SEED}*",
+            "**/sample-data/**",
+            "**/mock-data/**"
+          ],
+          "tests": "include",
+          "includeExcluded": true,
+          "max": 2
+        },
+        {
+          "name": "client storage and cookies",
+          "globs": [
+            "**/*.{js,jsx,ts,tsx,vue,cs,java,py}"
+          ],
+          "contains": "@clientStorage",
+          "max": 1
+        },
+        {
+          "name": "migrations and schema",
+          "globs": [
+            "**/Migrations/**",
+            "**/migrations/**",
+            "**/*.sql",
+            "**/flyway/**",
+            "**/liquibase/**",
+            "**/alembic/**"
+          ],
+          "contains": "(?i:create\\s+table|CreateTable\\(|add_column|AddColumn)",
+          "includeExcluded": true,
+          "max": 1
+        },
+        {
+          "name": "classification and redaction setup",
+          "source": true,
+          "contains": "@dataClassification",
+          "max": 1
+        },
+        {
+          "name": "deletion, retention and data-copy code",
+          "globs": [
+            "**/*.{cs,java,kt,py,js,ts}",
+            "/scripts/**",
+            "/tools/**",
+            "**/*.{sh,ps1,sql}"
+          ],
+          "contains": "@dataLifecycle|@prodDataCopy",
+          "max": 1
+        },
+        {
+          "name": "stateful-store IaC",
+          "globs": [
+            "@iac"
+          ],
+          "contains": "@statefulIac",
+          "max": 1
         }
       ]
     }

@@ -1,0 +1,6 @@
+{
+  "environment": "staging",
+  "region": "eu-west-1",
+  "bucket": "todo-mcps-staging-artifacts",
+  "awsAccessKeyId": "AKIAZQ4T7FAKEKEY2B9X"
+}

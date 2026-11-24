@@ -51,7 +51,8 @@ writes to the DOM, serialization/deserialization code and message consumers, per
    speculation. Use confidence `medium` unless the evidence is unambiguous.
 4. Ownership: don't report CSP or Trusted Types (web-api), log injection or hardcoded credentials (operational),
    upload authorization or CSRF (identity-access), outdated library versions (dependency-management), or
-   download/request rate limits (reliability). Request body size limits are evaluated here (IV-04, FU-05). SSRF is
+   download/request rate limits (reliability). Over-exposure of properties on output is review-data-protection
+   DPR-02; mass assignment on input stays here (SEC-II-01). Request body size limits are evaluated here (IV-04, FU-05). SSRF is
    judged here (SEC-II-10; decision D-1, 2026-11-09); network egress controls and cloud metadata settings in IaC
    aren't judged by any subject (known coverage gap).
 5. Severity: MUST/REVIEW elements take the check's default from `checklist.md`; SHOULD elements one level lower

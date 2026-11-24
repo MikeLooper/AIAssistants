@@ -1,4 +1,5 @@
-"""Regression tests for label normalization in compliance_report.py (stdlib unittest).
+"""Regression tests for compliance_report.py: labels, compact schema, citations, scripted steps, redaction and
+the secret/personal-data pattern pass (stdlib unittest).
 
 Run: python -m unittest discover -s compliance-reviewer/skills/compliance-report/scripts
 """
@@ -236,6 +237,138 @@ class CitationTests(unittest.TestCase):
         self.assertIn("not in review-api-design's standards", warnings[0])
 
 
+def luhn_number(prefix):
+    """A Luhn-valid card number built at run time (no card-like literal in the source)."""
+    scan = cr.scanner()
+    return next(prefix + str(d) for d in range(10) if scan.luhn(prefix + str(d)))
+
+
+FAKE_AWS = "AKIA" + "ZQ4T7FAKEKEY2B9X"          # pattern-valid, clearly fake, not on the allowlist
+FAKE_GH = "ghp_" + "Fake0Token0For0Unit0Tests0Only0000000"
+
+
+class SecretPatternTests(unittest.TestCase):
+    """secret-patterns.json via sensitive_scan: true positives, placeholders, allowlist, PII checks, masking."""
+
+    def setUp(self):
+        self.s = cr.scanner()
+
+    def test_true_positives(self):
+        hits = self.s.excerpt_hits
+        self.assertIn("aws-access-key-id", hits(f'key = "{FAKE_AWS}"'))
+        self.assertIn("github-token", hits(f"token: {FAKE_GH}"))
+        self.assertIn("secret-assignment", hits('"ApiKey": "s3cr3t-value"', "appsettings.json"))
+        self.assertIn("connection-string-password", hits('"Server=db;User Id=sa;Password=Hunter2x;"'))
+        self.assertIn("config-secret-assignment", hits("DB_PASSWORD=Hunter2x", ".env"))
+        self.assertIn("private-key-block", hits("-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEAx1y2z3"))
+        self.assertIn("jwt", hits("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NSJ9.c2lnbmF0dXJlLXZhbHVl"))
+
+    def test_placeholders_allowlist_and_header_only(self):
+        hits = self.s.excerpt_hits
+        for text in ('"ApiKey": "${API_KEY}"', '"ApiKey": "<redacted:api-key>"', 'password = "changeme"',
+                     'password: "your-password-here"', '"ClientSecret": "<secret>"', "token: str",
+                     "key = AKIAIOSFODNN7EXAMPLE", "-----BEGIN PRIVATE KEY-----"):
+            self.assertEqual(hits(text, "config.yml"), [], text)
+
+    def test_pii_rules(self):
+        hits = self.s.excerpt_hits
+        card = luhn_number("492900001234567")
+        self.assertIn("payment-card-number", hits(f'"cardNumber": "{card}"'))
+        self.assertEqual(hits('"cardNumber": "4242424242424242"'), [])          # published test number
+        broken = card[:-1] + str((int(card[-1]) + 1) % 10)
+        self.assertEqual(hits(f'"cardNumber": "{broken}"'), [])                # Luhn fails
+        self.assertIn("iban", hits("iban: DE44500105175407324931"))
+        self.assertEqual(hits("iban: DE44500105175407324932"), [])             # bad checksum
+        self.assertEqual(hits("email: jane@example.com"), [])                  # emails aren't excerpt problems
+
+    def test_mask_keeps_key_names(self):
+        masked = self.s.mask(f'"AwsKey": "{FAKE_AWS}", "Password": "Hunter2x"', "appsettings.json")
+        self.assertNotIn(FAKE_AWS, masked)
+        self.assertNotIn("Hunter2x", masked)
+        self.assertIn('"AwsKey": "<redacted:', masked)
+        self.assertEqual(self.s.excerpt_hits(masked, "appsettings.json"), [])
+
+    def test_scan_target_never_stores_values_and_skips_binaries(self):
+        tmp = tempfile.mkdtemp()
+        try:
+            files = {"src/settings.py": f'AWS_KEY = "{FAKE_AWS}"\n',
+                     "tests/fixtures/users.json": '{"email": "maria.rossi@realmail.it",\n "card": "' +
+                                                  luhn_number("453201511283036") + '"}',
+                     "package-lock.json": f'"{FAKE_AWS}"', "certs/server.pfx": None,
+                     ".env": "API_TOKEN=abcd1234efgh\n", ".env.example": "API_TOKEN=abcd1234efgh\n", "bin.dat": None}
+            for rel, text in files.items():
+                path = os.path.join(tmp, rel)
+                os.makedirs(os.path.dirname(path), exist_ok=True)
+                with open(path, "wb") as f:
+                    f.write(b"\0\1\2" + FAKE_AWS.encode() if text is None else text.encode())
+
+            class T:
+                root = tmp
+            secrets, _s_total, pii, _p_total = self.s.scan_target(T, sorted(files), ["tests/fixtures/users.json"])
+            by_file = {c["file"]: c for c in secrets}
+            self.assertEqual(by_file["src/settings.py"]["rule"], "aws-access-key-id")
+            self.assertEqual(by_file["src/settings.py"]["confidence"], "high")
+            self.assertIsNone(by_file["certs/server.pfx"]["line"])                 # binary key file: name only
+            self.assertIn(".env", by_file)
+            self.assertNotIn(".env.example", by_file)
+            self.assertNotIn("package-lock.json", by_file)                         # lock files skipped
+            self.assertNotIn("bin.dat", by_file)                                   # binaries skipped
+            self.assertEqual({c["rule"] for c in pii}, {"payment-card-number", "email-address"})
+            self.assertNotIn(FAKE_AWS, json.dumps(secrets))
+            self.assertTrue(all(set(c) == {"file", "line", "rule", "confidence"} for c in secrets + pii))
+        finally:
+            shutil.rmtree(tmp)
+
+
+class RedactionTests(unittest.TestCase):
+    """Phase 1: validate rejects excerpts with secrets; aggregate and render mask them."""
+
+    def setUp(self):
+        self.run = tempfile.mkdtemp()
+        cr._CHECKLISTS.clear()
+
+    def tearDown(self):
+        shutil.rmtree(self.run)
+
+    def quiet(self, fn, *args):
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            code = fn(*args)
+        return code, out.getvalue()
+
+    def write_run(self, excerpt, title):
+        skill = "review-security-operational"
+        ids = list(cr.load_checklist(skill)["checks"])
+        finding = {"id": "SEC-OP-05#1", "checkId": "SEC-OP-05", "element": "SMG-02", "severity": "Error",
+                   "title": title, "recommendation": "Move it to a secret store.",
+                   "confidence": "High", "effort": "Small",
+                   "evidence": [{"file": "appsettings.json", "lineStart": 3, "lineEnd": 3, "excerpt": excerpt}]}
+        checks = {"pass": [i for i in ids if i != "SEC-OP-05"], "fail": {"SEC-OP-05": {"findingIds": ["SEC-OP-05#1"]}}}
+        cr.write_json(os.path.join(self.run, "state.json"), {"runId": "t", "subjects": [skill], "targetPath": "t"})
+        cr.write_json(os.path.join(self.run, "17-review-security-operational.json"),
+                      v2_file(skill, "17", checks, [finding]))
+
+    def test_secret_in_excerpt_fails_validate_and_renders_masked(self):
+        self.write_run(f'"AwsKey": "{FAKE_AWS}"', f"Hardcoded AWS key {FAKE_AWS}")
+        code, out = self.quiet(cr.validate, self.run)
+        self.assertEqual(code, 1)
+        self.assertIn("aws-access-key-id", out)
+        self.assertNotIn(FAKE_AWS, out)
+        self.quiet(cr.aggregate, self.run)
+        agg = cr.read_json(os.path.join(self.run, "90-aggregate.json"))
+        self.assertNotIn(FAKE_AWS, json.dumps(agg))
+        out_md = os.path.join(self.run, "report.md")
+        self.quiet(cr.render, self.run, out_md)
+        with open(out_md, encoding="utf-8") as f:
+            report = f.read()
+        self.assertNotIn(FAKE_AWS, report)
+        self.assertIn("<redacted:api-key>", report)
+
+    def test_redacted_excerpt_passes(self):
+        self.write_run('"AwsKey": "<redacted:api-key>"', "Hardcoded AWS key")
+        code, out = self.quiet(cr.validate, self.run)
+        self.assertEqual(code, 0, out)
+
+
 class InventoryAndRunTests(unittest.TestCase):
     """Scripted steps 00/01, N/A files, dispatch payloads, validate --mark and resume."""
 
@@ -254,6 +387,7 @@ class InventoryAndRunTests(unittest.TestCase):
             "tests/Todo.Tests/Todo.Tests.csproj": "<Project Sdk=\"Microsoft.NET.Sdk\"></Project>",
             "tests/Todo.Tests/TodoTests.cs": "using Xunit; public class T { [Fact] public void A() {} }",
             "infra/main.bicep": "resource sa 'Microsoft.Storage/storageAccounts@2023-01-01' = {}",
+            "scripts/deploy/legacy/upload.sh": "export AWS_ACCESS_KEY_ID=" + FAKE_AWS + "\n",
         }
         for rel, text in files.items():
             path = os.path.join(self.target, rel)
@@ -306,9 +440,28 @@ class InventoryAndRunTests(unittest.TestCase):
         state = cr.read_json(os.path.join(run, "state.json"))
         self.assertEqual(state["steps"]["02-analyzers"], "skipped")
 
+        # secret candidates: values never stored; IaC skipped with advanced off; no personal data -> N/A
+        cands = {c["file"]: c for c in inv["secretCandidates"]}
+        self.assertEqual(cands["scripts/deploy/legacy/upload.sh"]["confidence"], "high")
+        self.assertIn("appsettings.json", cands)
+        self.assertNotIn(FAKE_AWS, json.dumps(inv))
+        self.assertFalse(inv["personalDataFound"])
+        self.assertEqual(inv["skippedSubjects"]["review-data-protection"], "no personal data found")
+        # a gitleaks report in the run folder is merged into the candidates (deduplicated by file and line)
+        cr.write_json(os.path.join(run, cr.GITLEAKS_RAW), [
+            {"File": os.path.join(self.target, "scripts", "deploy", "legacy", "upload.sh"), "StartLine": 1,
+             "RuleID": "aws-access-token", "Secret": "REDACTED", "Match": "REDACTED"},
+            {"File": "Program.cs", "StartLine": 4, "RuleID": "generic-api-key", "Secret": "REDACTED"}])
+
         code, out = self.run_cmd(cr.write_na, run)
         self.assertIn("24-review-disaster-recovery.json", out[0]["written"])
+        self.assertIn("29-review-data-protection.json", out[0]["written"])
         code, payloads = self.run_cmd(cr.dispatch, run)
+        secop = next(s for p in payloads for s in p["subjects"] if s["skill"] == "review-security-operational")
+        keys = [(c["file"], c["line"]) for c in secop["secretCandidates"]]
+        self.assertEqual(len(keys), len(set(keys)))
+        self.assertIn(("Program.cs", 4), keys)
+        self.assertEqual(secop["secretCandidatesTotal"], len(keys))
         self.assertEqual(len(payloads), len(inv["fileBatches"]))
         first = payloads[0]["subjects"][0]
         self.assertTrue(first["out"].endswith(f"{first['stepId']}.json"))
@@ -338,6 +491,34 @@ class InventoryAndRunTests(unittest.TestCase):
         self.assertTrue({f"{s['stepId']}.json" for s in sibling} <= moved)
         self.assertIn("90-aggregate.json", moved)
         self.assertFalse(out[0]["inputsHashChanged"])
+
+    def test_personal_data_makes_data_protection_applicable(self):
+        extra = {"Models/Customer.cs": "public class Customer { public string Email { get; set; } "
+                                       "public string CardNumber { get; set; } }",
+                 "tests/Todo.Tests/fixtures/customers.json": '[{"name": "Maria Rossi", "card": "' +
+                                                              luhn_number("453201511283036") + '"}]'}
+        for rel, text in extra.items():
+            path = os.path.join(self.target, rel)
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(text)
+        self.run_cmd(cr.init_run, self.target, "review-data-protection,review-security-operational", "off", "auto",
+                     None, "r5", transitions_dir=self.transitions)
+        run = os.path.join(self.transitions, "r5")
+        code, out = self.run_cmd(cr.run_inventory, run)
+        self.assertEqual(code, 0, out)
+        self.assertTrue(out[0]["personalDataFound"])
+        inv = cr.read_json(os.path.join(run, "01-inventory.json"))
+        self.assertNotIn("review-data-protection", inv["skippedSubjects"])
+        self.assertEqual(inv["piiCandidates"][0]["rule"], "payment-card-number")
+        signals = {s["signal"] for s in inv["personalDataSignals"]}
+        self.assertIn("personal-data fields", signals)
+        code, payloads = self.run_cmd(cr.dispatch, run)
+        dp = next(s for p in payloads for s in p["subjects"] if s["skill"] == "review-data-protection")
+        self.assertEqual(dp["stepId"], "29-review-data-protection")
+        self.assertTrue(dp["piiCandidates"])
+        self.assertIn("Models/Customer.cs", dp["files"])
+        self.assertIn("tests/Todo.Tests/fixtures/customers.json", dp["files"])
 
     def test_init_rejects_out_file_inside_target_and_unknown_subject(self):
         code, out = self.run_cmd(cr.init_run, self.target, "all", "off", "auto",

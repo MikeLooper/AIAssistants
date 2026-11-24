@@ -46,30 +46,38 @@ committed `.env` files), container and orchestrator definitions, admin/audit cod
    signal files to find evidence. Mark a check N/A with a reason when no element applies (e.g. SEC-OP-07 when no
    production configuration is in the files; SEC-OP-10 when there are no multi-step writes or security
    decisions in the files).
-4. Evidence rules: fail an element only on concrete code or configuration in the files (see the evidence notes in
+4. **Secret candidates.** When the payload has `secretCandidates` (file, line, rule, confidence from the step-01
+   pattern pass and, with `--advanced`, `gitleaks`; never the value), read each candidate line with ±3 lines of
+   context, even when the file isn't in your own list, and decide whether it is a placeholder or a real secret.
+   Real secrets fail SEC-OP-05, with `confidence: high` for a format match (`aws-access-key-id`, `github-token`,
+   `private-key-block`, `gitleaks:*`, …) that the context confirms and `medium` otherwise. A name-only candidate
+   (a key file or keystore, `line: null`) fails SMG-02 when the file is in the repository. When
+   `secretCandidatesTotal` is larger than the list, add `secret-candidates-truncated: <total>` to `notes`.
+5. Evidence rules: fail an element only on concrete code or configuration in the files (see the evidence notes in
    `checklist.md`). A missing setting counts only when a localized element states the insecure default; for
    libraries without one, add `localized-standard-gap: <library> default for <setting> not localized` to `notes`.
    Platform-injected environment variables are acceptable secret delivery; SMG-07 and DNO-11 never fail on their
    own. Don't fail on speculation. Use confidence `medium` unless the evidence is unambiguous.
-5. Ownership: management-endpoint network placement is judged here (ORS-01 under SEC-OP-07). Don't report
+6. Ownership: management-endpoint network placement is judged here (ORS-01 under SEC-OP-07). Don't report
    authentication/authorization/session-failure logging or management-endpoint authorization (identity-access), SQL injection in log writes (input-injection), HTTP headers (web-api),
    telemetry attributes, correlation IDs, audit/diagnostic log separation or health-endpoint detail
    (observability), alerting, SIEM routing, retention or telemetry-store access (monitoring), general robustness
    outside security paths (software-quality), rate limits and quotas (reliability), library versions
-   (dependency-management) or error-response format (api-design). Logging rejected input verbatim is judged here.
-6. Severity: MUST/REVIEW elements take the check's default from `checklist.md`; SHOULD elements one level lower
+   (dependency-management), error-response format (api-design) or personal-data storage, exposure, sharing and test
+   data (review-data-protection). Logging rejected input verbatim is judged here.
+7. Severity: MUST/REVIEW elements take the check's default from `checklist.md`; SHOULD elements one level lower
    (Error → Warning, Warning → Information). Always Error, whatever the check's default: production debug mode,
    developer exception page or stack-trace/message exposure (PYO-01 `DEBUG = True` in production settings; DNO-06
    `UseDeveloperExceptionPage()` not gated on Development; JVO-01 `include-stacktrace`/`include-message` =
    `always`), and Actuator `env`/`configprops` exposed over HTTP with `show-values: always` (JVO-03). When several
    elements fail on the same evidence, write one finding at the highest severity. `checkResults.severityIfFailed`
    is the check's default.
-7. Citations: set `element` to the failed element's ID (e.g. `LOG-01`); the report script derives `standard` and `url`
+8. Citations: set `element` to the failed element's ID (e.g. `LOG-01`); the report script derives `standard` and `url`
    from it, so don't write them. Prefer a vendor element, then a cheat-sheet element, then an A09/A10 element (cite
    A09/A10 only when nothing more specific fits; otherwise name the Top 10 ID in the recommendation). For an element
    marked (Default), cite the OWASP element it supports and name the vendor element in the recommendation. Where
    vendor guidance is weaker than an OWASP element, the OWASP element decides.
-8. If the reference date (date part of `startedAt`) is more than 9 months after a standards file's "Localized"
+9. If the reference date (date part of `startedAt`) is more than 9 months after a standards file's "Localized"
    date, add `localized-standard-stale: <file> localized <date>` to `notes`.
 
 ## Output
