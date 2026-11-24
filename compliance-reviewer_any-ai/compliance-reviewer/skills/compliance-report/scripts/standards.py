@@ -290,16 +290,13 @@ def all_skills():
 
 
 def resolve(skill, eid, page=None):
-    """(standard, url) for an element cited by a finding of `skill`; other skills are searched as a fallback."""
+    """(standard, url) for an element cited by a finding of `skill`, or None when the element isn't in that
+    skill's own standards. Other skills are never searched: a citation of another skill's element is
+    reported by `validate` and cited as plain text."""
     eid = (eid or "").strip()
     if not eid:
         return None
     sf = skill_index(skill).get(eid)
-    if sf is None:
-        for other in all_skills():
-            sf = skill_index(other).get(eid)
-            if sf is not None:
-                break
     if sf is None:
         return None
     standard, url = sf.resolve(eid, page)

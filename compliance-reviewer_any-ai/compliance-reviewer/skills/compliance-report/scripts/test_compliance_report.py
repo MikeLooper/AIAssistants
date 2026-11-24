@@ -223,6 +223,18 @@ class CitationTests(unittest.TestCase):
                          "https://modelcontextprotocol.io/specification/2026-07-28/basic/transports/stdio")
         self.assertIsNone(r("review-api-design", "NOPE-1"))
 
+    def test_resolution_is_scoped_to_the_citing_skill(self):
+        r = cr.standards.resolve
+        self.assertIsNotNone(r("review-reliability", "AZRL-32"))
+        self.assertIsNone(r("review-api-design", "AZRL-32"))  # owned by review-reliability only
+
+    def test_cross_skill_element_warns_and_cites_plain_text(self):
+        entry, warnings = {"id": "F-1", "element": "AZRL-32"}, []
+        cr.cite(entry, "review-api-design", warnings)
+        self.assertEqual((entry["standard"], entry["url"]), ("AZRL-32", ""))
+        self.assertEqual(len(warnings), 1)
+        self.assertIn("not in review-api-design's standards", warnings[0])
+
 
 class InventoryAndRunTests(unittest.TestCase):
     """Scripted steps 00/01, N/A files, dispatch payloads, validate --mark and resume."""
