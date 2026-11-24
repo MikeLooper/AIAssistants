@@ -6,8 +6,11 @@ Reads the target's working files only: it never runs Git and never reads `.git/`
 import json
 import os
 import re
+import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+if HERE not in sys.path:
+    sys.path.insert(0, HERE)
 MAP_PATH = os.path.normpath(os.path.join(HERE, "..", "references", "subject-file-map.json"))
 PROJECT_FILES = re.compile(r"(?:^|/)(?:[^/]+\.(?:cs|fs|vb)proj|pom\.xml|build\.gradle(?:\.kts)?|package\.json|pyproject\.toml|setup\.py|requirements\.txt)$")
 TEST_NAME_RE = re.compile(r"(?i)(?:^test_.+|.+_test|.+tests?|.+\.(?:test|spec)|.+IT)\.\w+$")
@@ -156,10 +159,10 @@ class Inventory:
             out += self.cfg[special[g]] if g in special else [g]
         return out
 
-    def usable(self, files, tests="exclude", subject_iac_only=False):
+    def usable(self, files, tests="exclude", subject_iac_only=False, include_excluded=False):
         out = []
         for f in files:
-            if f in self.dropped or f in self.generated:
+            if (f in self.dropped or f in self.generated) and not include_excluded:
                 continue
             if not self.advanced and f in self.iac:
                 continue
@@ -185,7 +188,7 @@ class Inventory:
             pool = list(self.source)
         else:
             pool = []
-        pool = self.usable(pool, tier.get("tests", "exclude"), iac_only)
+        pool = self.usable(pool, tier.get("tests", "exclude"), iac_only, bool(tier.get("includeExcluded")))
         if tier.get("exclude"):
             ex = set(t.match(tier["exclude"], pool))
             pool = [f for f in pool if f not in ex]
@@ -403,6 +406,7 @@ def build_inventory(root, subjects, advanced, picks=None, cfg=None):
     web_servers = inv.usable(inv.t.match(cfg["webServerGlobs"]))
     http_surface = api_found or web_fw or bool(web_servers) or any("http" in s["transports"] for s in servers)
     iac_found = bool(advanced) and bool(inv.usable(sorted(inv.iac), tests="include"))
+    scan = sensitive_candidates(inv)
     skipped = {}
     for skill in subjects:
         scfg = cfg["subjects"].get(skill)
@@ -419,6 +423,8 @@ def build_inventory(root, subjects, advanced, picks=None, cfg=None):
             skipped[skill] = "no HTTP surface (stdio-only MCP server)"
         elif skill == "review-api-design" and not api_found:
             skipped[skill] = "no API found"
+        if skill == "review-data-protection" and not scan["personalDataFound"]:
+            skipped[skill] = "no personal data found"
     lists, meta = {}, {}
     picks = picks or {}
     for skill in subjects:
@@ -471,10 +477,30 @@ def build_inventory(root, subjects, advanced, picks=None, cfg=None):
                      for s, m in meta.items() if m and not m.get("picked")},
         "targetFiles": len(inv.t.files),
         "targetTruncated": inv.t.truncated,
+        **scan,
     }
     if "review-testing" in subjects:
         out["testInventory"] = inv.test_inventory(cfg["subjects"]["review-testing"])
     return out
+
+
+def sensitive_candidates(inv):
+    """Secret and personal-data candidates (file, line, rule, confidence; never the value) and `personalDataFound`.
+
+    Every walked text file is scanned for secrets, except IaC files when advanced usage is off. Test, fixture,
+    seed and sample files are also scanned for personal data.
+    """
+    import sensitive_scan  # noqa: E402
+    rules = sensitive_scan.load()
+    t = inv.t
+    files = [f for f in t.files if inv.advanced or f not in inv.iac]
+    scope = inv.tests | inv.dropped | set(t.match(rules.pii_scope))
+    pii_files = [f for f in files if f in scope]
+    secrets, s_total, pii, p_total = sensitive_scan.scan_target(t, files, pii_files, rules)
+    found, signals = sensitive_scan.personal_data_signals(inv, pii, rules)
+    return {"secretCandidates": secrets, "secretCandidatesTotal": s_total,
+            "piiCandidates": pii, "piiCandidatesTotal": p_total,
+            "personalDataFound": found, "personalDataSignals": signals}
 
 
 def lint_map(cfg=None):

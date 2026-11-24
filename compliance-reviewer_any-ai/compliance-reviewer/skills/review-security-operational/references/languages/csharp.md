@@ -1,7 +1,7 @@
 # Detection signals — C#/.NET (Security: Operational)
 
 Detection signals only. They cite no standard. Report findings against the element IDs listed (defined in
-`../standards/`). A signal is evidence only on concrete code or an explicit setting (`SKILL.md` step 4). The only .NET
+`../standards/`). A signal is evidence only on concrete code or an explicit setting (`SKILL.md` step 5). The only .NET
 defaults a worker may rely on are those stated in `dotnet-operational.md` (DNO-06, DNO-07, DNO-10, DNO-11, DNO-12,
 DNO-14). Serilog, NLog and log4net defaults are not localized: report explicit values only, and add a
 `localized-standard-gap` note for a missing setting.

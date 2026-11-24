@@ -1,7 +1,7 @@
 # Detection signals — Python (Security: Operational)
 
 Detection signals only. They cite no standard. Report findings against the element IDs listed (defined in
-`../standards/`). A signal is evidence only on concrete code or an explicit setting (`SKILL.md` step 4). The only
+`../standards/`). A signal is evidence only on concrete code or an explicit setting (`SKILL.md` step 5). The only
 Python defaults a worker may rely on are those stated in `python-operational.md` (PYO-01, PYO-03, PYO-05, PYO-08).
 Flask, FastAPI, `python-dotenv`, structlog and loguru defaults are not localized: report explicit values only, and add
 a `localized-standard-gap` note for a missing setting.

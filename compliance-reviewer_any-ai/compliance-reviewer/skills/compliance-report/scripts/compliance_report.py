@@ -79,6 +79,11 @@ def band(score):
     return "Excellent" if score >= 90 else "Good" if score >= 75 else "Fair" if score >= 60 else "Poor"
 
 
+def fmt_score(score):
+    """Report/console text for a score: '87.50/100', or 'N/A' when no check applied (all subjects N/A)."""
+    return f"{score:.2f}/100" if score is not None else "N/A"
+
+
 # ---------------------------------------------------------------- checklist labels
 
 SKILLS_DIR = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
@@ -351,6 +356,44 @@ def labels_lint(skills):
     return 0 if ok else 1
 
 
+# ---------------------------------------------------------------- redaction (finding-schema.md "Redaction")
+
+_scan = None
+
+
+def scanner():
+    """The shared secret/personal-data pattern module (compliance-inventory/scripts/sensitive_scan.py)."""
+    global _scan
+    if _scan is None:
+        import_inventory()
+        import sensitive_scan as mod  # noqa: E402
+        _scan = mod
+    return _scan
+
+
+# Free-text fields a worker writes (finding-schema.md "Redaction"); `standard` is free text when `element` is omitted.
+REDACT_FIELDS = ("title", "recommendation", "reason", "standard")
+
+
+def redaction_problems(entry):
+    """Evidence excerpts and free-text fields of one finding, strength or check result that contain a secret
+    value or personal data. Free-text fields are scanned without file context, as `mask_obj` masks them."""
+    out = []
+    for i, ev in enumerate(entry.get("evidence") or []):
+        if not isinstance(ev, dict):
+            continue
+        hits = scanner().excerpt_hits(str(ev.get("excerpt") or ""), ev.get("file"))
+        if hits:
+            out.append(f"evidence[{i}] excerpt contains a secret or personal-data value ({', '.join(hits)}); "
+                       "replace the value with <redacted:kind>")
+    for k in REDACT_FIELDS:
+        hits = scanner().excerpt_hits(str(entry.get(k) or ""))
+        if hits:
+            out.append(f"{k} contains a secret or personal-data value ({', '.join(hits)}); "
+                       "replace the value with <redacted:kind>")
+    return out
+
+
 # ---------------------------------------------------------------- validate
 
 def check_labels(d, skill):
@@ -422,6 +465,14 @@ def validate(run_dir, mark=False):
             if k not in d:
                 problems.append({"file": name, "problem": f"missing {k}"})
         ids = set()
+        for kind in ("findings", "strengths"):
+            for e in d.get(kind, []) or []:
+                for p in redaction_problems(e):
+                    problems.append({"file": name, "problem": f"{kind[:-1]} {e.get('id')}: {p}"})
+        for c in d.get("checkResults", []) or []:
+            if isinstance(c, dict):
+                for p in redaction_problems(c):
+                    problems.append({"file": name, "problem": f"check {c.get('checkId')}: {p}"})
         for f in d.get("findings", []):
             if f.get("severity") not in SEV_WEIGHT:
                 problems.append({"file": name, "problem": f"finding {f.get('id')} has invalid severity"})
@@ -615,12 +666,12 @@ def aggregate(run_dir):
         "labelsNormalized": {r["skill"]: r["labelsNormalized"] for r in results},
         "notes": "checkResults are not embedded; render reads them from the per-subject transition files and applies suppressedChecks.",
     }
-    write_json(os.path.join(run_dir, "90-aggregate.json"), agg)
+    write_json(os.path.join(run_dir, "90-aggregate.json"), scanner().mask_obj(agg))  # no secret reaches step 90
     state.setdefault("steps", {})["90-aggregate"] = "completed"
     state["updatedAt"] = now_iso()
     write_json(os.path.join(run_dir, "state.json"), state)
     relabeled = sum(r["labelsNormalized"] for r in results)
-    print(f"aggregate: overall {overall}/100 {band(overall)}; Error {counts['Error']}, Warning {counts['Warning']}, "
+    print(f"aggregate: overall {fmt_score(overall)} {band(overall)}; Error {counts['Error']}, Warning {counts['Warning']}, "
           f"Information {counts['Information']}; {len(suppressed)} duplicate(s) suppressed; "
           f"{relabeled} label(s) normalized")
     return 0
@@ -747,9 +798,9 @@ def render(run_dir, out_path, copy_to=None):
         ctx = {
             "targetName": os.path.basename(str(state.get("targetPath", "")).rstrip("\\/")) or "target",
             "generatedAt": generated, "runId": state["runId"],
-            "overallScore": f"{agg['overallScore']:.2f}", "overallBand": agg["overallBand"],
-            "subjectScores": [{"subject": s["subject"], "score": f"{s['score']:.2f}", "band": s["band"]}
-                              for s in agg["subjectScores"] if s["score"] is not None],
+            "overallScore": fmt_score(agg["overallScore"]), "overallBand": agg["overallBand"],
+            "subjectScores": [{"subject": s["subject"], "band": s["band"], "score": fmt_score(s["score"])}
+                              for s in agg["subjectScores"]],
             "errorCount": agg["severityCounts"]["Error"], "warningCount": agg["severityCounts"]["Warning"],
             "infoCount": agg["severityCounts"]["Information"],
             "topRisks": [finding_row(by_id[t["findingId"]]) for t in agg["topRisks"]],
@@ -763,7 +814,7 @@ def render(run_dir, out_path, copy_to=None):
             "linkApprovals": json.dumps(state["linkApprovals"]) if state.get("linkApprovals") else "none",
             "runFlags": run_flags(state),
         }
-        return re.sub(r"\n{3,}", "\n\n", render_template(tpl, [ctx]))
+        return scanner().mask(re.sub(r"\n{3,}", "\n\n", render_template(tpl, [ctx])))
 
     for path in [out_path] + ([copy_to] if copy_to else []):
         report = build_report(path)
@@ -782,7 +833,7 @@ def render(run_dir, out_path, copy_to=None):
     print(f"report: {out_path}")
     if copy_to:
         print(f"copy: {os.path.abspath(copy_to)}")
-    print(f"overall {agg['overallScore']}/100 {agg['overallBand']}")
+    print(f"overall {fmt_score(agg['overallScore'])} {agg['overallBand']}")
     for t in agg["topRisks"]:
         print(f"  {t['rank']}. [{t['severity']}] {t['title']}")
     return 0
@@ -944,6 +995,8 @@ def run_inventory(run_dir, picks_path=None):
     emit({"ok": True, "languages": content["languages"], "frameworks": content["frameworks"],
           "apiSpecsFound": content["apiSpecsFound"], "mcpFound": content["mcpFound"],
           "httpSurfaceFound": content["httpSurfaceFound"], "iacFound": content["iacFound"],
+          "personalDataFound": content.get("personalDataFound"),
+          "secretCandidates": content.get("secretCandidatesTotal", 0), "piiCandidates": content.get("piiCandidatesTotal", 0),
           "targetFiles": content["targetFiles"], "batches": batches, "skippedSubjects": content["skippedSubjects"],
           "sampled": sampled})
     return 0
@@ -984,6 +1037,7 @@ def dispatch(run_dir, only=None):
             "targetPath": state["targetPath"], "targetGitHead": state.get("targetGitHead"),
             "inputsHash": state.get("inputsHash")}
     analyzers = os.path.join(run_abs, "02-analyzers.json")
+    secrets, secrets_total = merged_secret_candidates(run_dir, inv, state["targetPath"])
     for b in batches:
         subjects = []
         for skill in b["subjects"]:
@@ -996,6 +1050,15 @@ def dispatch(run_dir, only=None):
                 entry["folderListing"] = inv["folderListing"]
             if skill == "review-dependency-management" and os.path.exists(analyzers):
                 entry["analyzersFile"] = analyzers.replace("\\", "/")
+            if skill == "review-security-operational" and secrets:
+                entry["secretCandidates"] = secrets
+                entry["secretCandidatesTotal"] = secrets_total
+            if skill == "review-data-protection":
+                if inv.get("piiCandidates"):
+                    entry["piiCandidates"] = inv["piiCandidates"]
+                    entry["piiCandidatesTotal"] = inv.get("piiCandidatesTotal", len(inv["piiCandidates"]))
+                if inv.get("personalDataSignals"):
+                    entry["personalDataSignals"] = inv["personalDataSignals"]
             subjects.append(entry)
             state["steps"][sid] = "started"
         payload = {"runId": state["runId"], "batchId": b["batchId"], "targetRoot": state["targetPath"],
@@ -1006,6 +1069,59 @@ def dispatch(run_dir, only=None):
         emit(payload)
     save_state(run_dir, state)
     return 0
+
+
+GITLEAKS_RAW = "02-analyzer-gitleaks.raw.json"
+MAX_SECRET_CANDIDATES = 50
+
+
+def gitleaks_candidates(run_dir, target):
+    """Secret candidates from a `gitleaks dir --redact` JSON report in the run folder (file, line and rule only;
+    the report's Match/Secret fields are never read)."""
+    path = os.path.join(run_dir, GITLEAKS_RAW)
+    if not os.path.exists(path):
+        return []
+    try:
+        data = read_json(path)
+    except (OSError, ValueError):
+        return []
+    root = os.path.abspath(target)
+
+    def inside(path):
+        return os.path.normcase(path).startswith(os.path.normcase(root) + os.sep)
+
+    out = []
+    for item in data if isinstance(data, list) else []:
+        f = str(item.get("File") or "").strip() if isinstance(item, dict) else ""
+        if not f:
+            continue
+        full = os.path.abspath(f if os.path.isabs(f) else os.path.join(root, f))
+        if not inside(full):
+            full = os.path.abspath(f)  # a path relative to the folder gitleaks ran in
+        rel = os.path.relpath(full, root) if inside(full) else f
+        line = item.get("StartLine")
+        out.append({"file": rel.replace("\\", "/"), "line": line if isinstance(line, int) else None,
+                    "rule": f"gitleaks:{item.get('RuleID') or 'unknown'}", "confidence": "high"})
+    return out
+
+
+def merged_secret_candidates(run_dir, inv, target):
+    """(candidates, total): inventory `secretCandidates` plus gitleaks results, one per file and line, highest
+    confidence first, capped at 50. `total` counts every distinct candidate before the cap."""
+    rank = {"high": 0, "medium": 1, "low": 2}
+    own = list(inv.get("secretCandidates") or [])
+    extra = gitleaks_candidates(run_dir, target)
+    found = {}
+    for c in own + extra:
+        key = (c["file"].lower(), c.get("line"))
+        cur = found.get(key)
+        if cur is None or rank.get(c.get("confidence"), 3) < rank.get(cur.get("confidence"), 3):
+            found[key] = c
+    items = sorted(found.values(), key=lambda c: (rank.get(c.get("confidence"), 3), c["file"], c.get("line") or 0))
+    own_keys = {(c["file"].lower(), c.get("line")) for c in own}
+    new_extra = len({(c["file"].lower(), c.get("line")) for c in extra} - own_keys)
+    total = max(int(inv.get("secretCandidatesTotal") or 0), len(own)) + new_extra
+    return items[:MAX_SECRET_CANDIDATES], max(total, len(items))
 
 
 def set_step(run_dir, step_id, status, approval=None):

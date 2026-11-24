@@ -16,7 +16,10 @@ Check which of these are installed/available in the target's environment before 
 | `maven-dependency-check` | Java (Maven) | Vulnerability scan (OWASP Dependency-Check) | `mvn org.owasp:dependency-check-maven:check` — offer only if the plugin is already installed or resolvable offline. It may download its vulnerability database: tell the user about the network use when offering it | no |
 | `gradle-dependency-check` | Java (Gradle) | Vulnerability scan (OWASP Dependency-Check) | `gradle dependencyCheckAnalyze` — offer only when the `org.owasp.dependencycheck` plugin is already configured in the build; same network note as Maven | no |
 | `pip-audit` | Python | Vulnerability scan | `pip-audit` | yes |
+| `gitleaks` | Generic | Secret scan of the working files (directory mode) | `gitleaks dir <target> --redact --no-banner --report-format json --report-path transitions/<runId>/02-analyzer-gitleaks.raw.json` — directory mode only, never `gitleaks git` or any history mode; the report goes to the run folder, outside the target. Exit code 1 means leaks were found, not a failure | yes |
 | `lint` | Generic | Linters already configured in the repo | run the project's own configured lint script if one exists (e.g. `npm run lint`, `dotnet format --verify-no-changes`) | no |
+
+`gitleaks` is applicable to every target (it needs no language). Detect it with `gitleaks version`. With `--redact` its report holds no secret values; the report script reads only `File`, `StartLine` and `RuleID` from it, merges them with the inventory's `secretCandidates` (one entry per file and line) and passes them to `review-security-operational`.
 
 Why some are not in the auto set: OWASP Dependency-Check downloads a large vulnerability database and is slow; `lint` executes scripts defined by the target itself. The auto-set analyzers may still contact their package registry or advisory service (NuGet, Maven Central, PyPI/OSV) to look up versions and advisories.
 
@@ -39,6 +42,6 @@ Why some are not in the auto set: OWASP Dependency-Check downloads a large vulne
 }
 ```
 
-   Result keys are the **Key** column above. `findings` stays a list of free-text lines (one per reported package or issue).
+   Result keys are the **Key** column above. `findings` stays a list of free-text lines (one per reported package or issue). For `gitleaks`, record only the count and the raw report's name (e.g. `"3 leaks; see 02-analyzer-gitleaks.raw.json"`), never a finding's `Match` or `Secret` field.
 5. Write `02-analyzers.json`. The `review-dependency-management` skill (and others where relevant) reads this file if present, in addition to its own file-based checks.
 6. If an analyzer isn't installed or errors out, record that in `results` and continue — never block the pipeline on a missing analyzer.

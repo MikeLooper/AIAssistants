@@ -1,0 +1,152 @@
+{
+  "$comment": "Source pins for check_source_drift.py (maintainers only; never used during a review). Pins copied from the standards file headers must match them; 'baseline' marks values recorded by the script.",
+  "skill": "review-data-protection",
+  "checks": [
+    {
+      "id": "owasp-cs",
+      "file": "owasp-data-protection.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/Cryptographic_Storage_Cheat_Sheet.md",
+      "pinned": "87a1faf1",
+      "pinnedDate": "2026-10-30"
+    },
+    {
+      "id": "owasp-upp",
+      "file": "owasp-data-protection.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/User_Privacy_Protection_Cheat_Sheet.md",
+      "pinned": "d7951be5",
+      "pinnedDate": "2026-11-23"
+    },
+    {
+      "id": "owasp-h5",
+      "file": "owasp-data-protection.md",
+      "method": "github-commit",
+      "repo": "OWASP/CheatSheetSeries",
+      "path": "cheatsheets/HTML5_Security_Cheat_Sheet.md",
+      "pinned": "3919b1c4",
+      "pinnedDate": "2026-10-04",
+      "note": "Only the local-storage, client-side-databases and PII-input-hints sections are localized here (review-security-web-api pins the same sheet for CORS and offline applications)."
+    },
+    {
+      "id": "top10-a04",
+      "file": "owasp-data-protection.md",
+      "method": "github-commit",
+      "repo": "OWASP/Top10",
+      "path": "2025/docs/en/A04_2025-Cryptographic_Failures.md",
+      "pinned": "d4d000ec",
+      "pinnedDate": "2025-12-24"
+    },
+    {
+      "id": "api-security-api3",
+      "file": "owasp-data-protection.md",
+      "method": "github-commit",
+      "repo": "OWASP/API-Security",
+      "path": "editions/2023/en/0xa3-broken-object-property-level-authorization.md",
+      "pinned": "ea77cba5",
+      "pinnedDate": "2023-06-28"
+    },
+    {
+      "id": "owasp-community-qse",
+      "file": "owasp-data-protection.md",
+      "method": "github-commit",
+      "repo": "OWASP/www-community",
+      "path": "pages/vulnerabilities/Information_exposure_through_query_strings_in_url.md",
+      "pinned": "01e67c2f",
+      "pinnedDate": "2025-10-05"
+    },
+    {
+      "id": "nist-sp800-122-record",
+      "file": "nist-sp-800-122.md",
+      "method": "text-hash",
+      "url": "https://csrc.nist.gov/pubs/sp/800/122/final",
+      "pinned": "c464c1243e657010",
+      "watch": true,
+      "note": "Look for a new revision (Rev. 1) or a withdrawal notice.",
+      "baseline": "2026-11-24"
+    },
+    {
+      "id": "gdpr-eurlex",
+      "file": "gdpr-principles.md",
+      "method": "manual",
+      "note": "EUR-Lex refuses automated retrieval. Once a year, open https://eur-lex.europa.eu/eli/reg/2016/679/oj in a browser and check Art. 5, 25 and 32 for amendments (none since 2016 as of 2026-11-24)."
+    },
+    {
+      "id": "rfc-2606",
+      "file": "rfc-2606-reserved-names.md",
+      "method": "manual",
+      "note": "RFCs don't change. Check the RFC Editor info page (https://www.rfc-editor.org/info/rfc2606) for an 'Updated by' or 'Obsoleted by' entry."
+    },
+    {
+      "id": "sentry-dotnet",
+      "file": "third-party-sdks.md",
+      "method": "text-hash",
+      "url": "https://docs.sentry.io/platforms/dotnet/data-management/data-collected/",
+      "extract": "ids",
+      "pinned": "ebb0ce09227a3b49",
+      "baseline": "2026-11-24"
+    },
+    {
+      "id": "sentry-java",
+      "file": "third-party-sdks.md",
+      "method": "text-hash",
+      "url": "https://docs.sentry.io/platforms/java/data-management/data-collected/",
+      "extract": "ids",
+      "pinned": "826b5063abd668c2",
+      "baseline": "2026-11-24"
+    },
+    {
+      "id": "sentry-python",
+      "file": "third-party-sdks.md",
+      "method": "text-hash",
+      "url": "https://docs.sentry.io/platforms/python/data-management/data-collected/",
+      "extract": "ids",
+      "pinned": "ee1d7308c605a940",
+      "baseline": "2026-11-24"
+    },
+    {
+      "id": "sentry-javascript",
+      "file": "third-party-sdks.md",
+      "method": "text-hash",
+      "url": "https://docs.sentry.io/platforms/javascript/data-management/data-collected/",
+      "extract": "ids",
+      "pinned": "8a5e208a0c735bb2",
+      "baseline": "2026-11-24"
+    },
+    {
+      "id": "learn-ai-faq",
+      "file": "third-party-sdks.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/azure/azure-monitor/app/application-insights-faq",
+      "msDate": "2026-05-03"
+    },
+    {
+      "id": "learn-data-classification",
+      "file": "dotnet-data-protection.md",
+      "method": "learn-page",
+      "url": "https://learn.microsoft.com/dotnet/core/extensions/data-classification",
+      "msDate": "2025-03-21"
+    },
+    {
+      "id": "jackson-annotations-wiki",
+      "file": "java-data-protection.md",
+      "method": "text-hash",
+      "url": "https://github.com/FasterXML/jackson-annotations/wiki/Jackson-Annotations",
+      "startMarker": "Property Naming",
+      "endMarker": "Deserialization details",
+      "pinned": "9a58021092e2eb07",
+      "baseline": "2026-11-24"
+    },
+    {
+      "id": "drf-serializers",
+      "file": "python-data-protection.md",
+      "method": "github-commit",
+      "repo": "encode/django-rest-framework",
+      "path": "docs/api-guide/serializers.md",
+      "pinned": "94219574",
+      "pinnedDate": "2026-11-10"
+    }
+  ]
+}

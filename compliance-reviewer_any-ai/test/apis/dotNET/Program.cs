@@ -2,6 +2,8 @@ using TodoApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseSentry();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
@@ -28,6 +30,8 @@ app.UseCors();
 
 var apiKey = app.Configuration["ApiKey"];
 var logger = app.Logger;
+
+CustomerStore.Load(app.Environment.ContentRootPath);
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 
@@ -63,6 +67,14 @@ app.MapPut("/todos/{id:int}", (int id, TodoItem input) =>
     item.IsComplete = input.IsComplete;
     logger.LogInformation("Updated todo " + id + ": " + item.Title);
     return Results.Ok(item);
+});
+
+app.MapGet("/customers", () => CustomerStore.Items);
+
+app.MapGet("/customers/lookup", (string email) =>
+{
+    var customer = CustomerStore.Items.FirstOrDefault(c => c.Email == email);
+    return customer == null ? Results.NotFound() : Results.Ok(customer);
 });
 
 app.MapDelete("/todos/{id:int}", (int id, string? key) =>

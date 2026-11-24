@@ -12,6 +12,7 @@
         "CS-04", "AP-06",
         "API-01", "API-06", "API-07", "API-10", "API-11", "API-14", "API-15",
         "REL-05", "PERF-05", "PERF-08",
+        "DPR-06", "DPR-08",
         "DR-*", "MON-*", "COST-*"
       ],
       "flaws": [
@@ -41,7 +42,7 @@
           "checks": ["SEC-IA-01", "SEC-IA-02", "SEC-IA-07"],
           "locations": {
             "dotNET": ["Program.cs"],
-            "java": ["src/main/java/com/example/todoapi/TodoController.java"],
+            "java": ["src/main/java/com/example/todoapi/TodoController.java", "src/main/java/com/example/todoapi/CustomerController.java"],
             "python": ["main.py"]
           }
         },
@@ -130,6 +131,66 @@
           "title": "No automated tests",
           "checks": ["TST-*"],
           "locations": { "dotNET": [], "java": [], "python": [] }
+        },
+        {
+          "id": "A13",
+          "title": "Pattern-valid (fake) cloud access key in a staging fixture outside the configuration files",
+          "checks": ["SEC-OP-05", "SEC-OP-06"],
+          "locations": {
+            "dotNET": ["fixtures/deploy-settings.json"],
+            "java": ["fixtures/deploy-settings.json"],
+            "python": ["fixtures/deploy-settings.json"]
+          }
+        },
+        {
+          "id": "A14",
+          "title": "Committed .env file with an SMTP password",
+          "checks": ["SEC-OP-05", "SEC-OP-06", "TF-03"],
+          "locations": {
+            "dotNET": [".env"],
+            "java": [".env"],
+            "python": [".env"]
+          }
+        },
+        {
+          "id": "A15",
+          "title": "Customer records (name, email, phone, date of birth, card number) returned whole by GET /customers",
+          "checks": ["DPR-02"],
+          "locations": {
+            "dotNET": ["Program.cs", "Customer.cs", "CustomerStore.cs"],
+            "java": ["src/main/java/com/example/todoapi/CustomerController.java", "src/main/java/com/example/todoapi/Customer.java"],
+            "python": ["main.py"]
+          }
+        },
+        {
+          "id": "A16",
+          "title": "Error tracker configured to send user data (Sentry SendDefaultPii = true)",
+          "checks": ["DPR-04"],
+          "locations": {
+            "dotNET": ["appsettings.json", "Program.cs"],
+            "java": null,
+            "python": null
+          }
+        },
+        {
+          "id": "A17",
+          "title": "Seed data with real-looking personal data and Luhn-valid card numbers, stored in plaintext",
+          "checks": ["DPR-05", "DPR-01"],
+          "locations": {
+            "dotNET": ["Data/customers.seed.json", "Customer.cs", "CustomerStore.cs"],
+            "java": ["src/main/java/com/example/todoapi/CustomerSeed.java", "src/main/java/com/example/todoapi/Customer.java"],
+            "python": ["customers_seed.py"]
+          }
+        },
+        {
+          "id": "A18",
+          "title": "Customer email address sent in the query string (GET /customers/lookup?email=)",
+          "checks": ["DPR-03", "SEC-WA-10", "API-04"],
+          "locations": {
+            "dotNET": ["Program.cs"],
+            "java": ["src/main/java/com/example/todoapi/CustomerController.java"],
+            "python": ["main.py"]
+          }
         }
       ]
     },
@@ -258,6 +319,26 @@
           "title": "No automated tests",
           "checks": ["TST-*"],
           "locations": { "dotNET": [], "java": [], "python": [] }
+        },
+        {
+          "id": "U13",
+          "title": "Pattern-valid (fake) cloud access key in a staging fixture outside the configuration files",
+          "checks": ["SEC-OP-05", "SEC-OP-06"],
+          "locations": {
+            "dotNET": ["fixtures/deploy-settings.json"],
+            "java": ["fixtures/deploy-settings.json"],
+            "python": ["fixtures/deploy-settings.json"]
+          }
+        },
+        {
+          "id": "U14",
+          "title": "Committed .env file with an SMTP password",
+          "checks": ["SEC-OP-05", "SEC-OP-06", "TF-03"],
+          "locations": {
+            "dotNET": [".env"],
+            "java": [".env"],
+            "python": [".env"]
+          }
         }
       ]
     },
@@ -390,6 +471,26 @@
           "title": "No automated tests",
           "checks": ["TST-*"],
           "locations": { "dotNET": [], "java": [], "python": [] }
+        },
+        {
+          "id": "M13",
+          "title": "Pattern-valid (fake) cloud access key in a staging fixture outside the configuration files",
+          "checks": ["SEC-OP-05", "SEC-OP-06"],
+          "locations": {
+            "dotNET": ["fixtures/deploy-settings.json"],
+            "java": ["fixtures/deploy-settings.json"],
+            "python": ["fixtures/deploy-settings.json"]
+          }
+        },
+        {
+          "id": "M14",
+          "title": "Committed .env file with an SMTP password",
+          "checks": ["SEC-OP-05", "SEC-OP-06", "TF-03"],
+          "locations": {
+            "dotNET": [".env"],
+            "java": [".env"],
+            "python": [".env"]
+          }
         }
       ]
     }

@@ -18,11 +18,11 @@ Nine very small to-do applications (three APIs, three server-rendered UIs and th
 | Java MCP server | [mcps/java](mcps/java) | Java 25, MCP Java SDK `io.modelcontextprotocol.sdk:mcp` (floating range), Maven shaded jar, stdio | — |
 | Python MCP server | [mcps/python](mcps/python) | Python 3.12+, MCP Python SDK `mcp` 2.x (`MCPServer`), stdio | — |
 
-All nine use the same domain and store their data in memory only. Each app runs on its own: the UIs don't call the APIs, and the MCP servers don't call either. The MCP servers use the **stdio** transport only (their MCP client launches them as a subprocess), so they listen on no port; an HTTP-transport MCP test app can be added later.
+All nine use the same domain and store their data in memory only. Every app also holds a `fixtures/deploy-settings.json` file with a pattern-valid but fake AWS access key ID (`AKIAZQ4T7FAKEKEY2B9X`) and a committed `.env` file with a made-up SMTP password, for the secret-scanning flaws (A13/A14, U13/U14, M13/M14). The customer records, emails and Luhn-valid card numbers in the APIs are invented as well; none of these values is real. Each app runs on its own: the UIs don't call the APIs, and the MCP servers don't call either. The MCP servers use the **stdio** transport only (their MCP client launches them as a subprocess), so they listen on no port; an HTTP-transport MCP test app can be added later.
 
 The [logic/](logic) folder holds the automated tests that run the reviewer against these apps and score the results against the answer key below; see [Automated validation](#automated-validation).
 
-- **APIs:** `GET /health`, `GET /todos`, `GET /todos/{id}`, `POST /todos`, `PUT /todos/{id}`, `DELETE /todos/{id}?key=<api key>`. A to-do has `id`, `title` and a completed flag.
+- **APIs:** `GET /health`, `GET /todos`, `GET /todos/{id}`, `POST /todos`, `PUT /todos/{id}`, `DELETE /todos/{id}?key=<api key>`, plus `GET /customers` and `GET /customers/lookup?email=…`, which serve three seeded customer records (data-protection flaws A15–A18). A to-do has `id`, `title` and a completed flag.
 - **UIs:** one page that lists to-dos, with forms to add a to-do (title, priority, optional return URL) and to mark one done, plus an admin action `/admin/clear?password=…` (C#: `/?handler=Clear&password=…`) that deletes every to-do.
 - **MCP servers:** eight tools with the same names in every language: `list_todos`, `add_todo` (an object with a title and priority), `complete_todo` (C#/Java: `id`; Python: `todo_id`), `delete_all_todos`, `export_todos` (a file path), `archive_todos` (an archive name), `import_todos` (a URL) and `get_status`.
 
@@ -78,15 +78,15 @@ The scripts in [logic/](logic) do the review-and-compare work for you. Each test
 
 | Script | App | Answer key |
 |--------|-----|------------|
-| [logic/test_api_dotnet.py](logic/test_api_dotnet.py) | C# API ([apis/dotNET](apis/dotNET)) | A1–A12 |
-| [logic/test_ui_dotnet.py](logic/test_ui_dotnet.py) | C# UI ([uis/dotNET](uis/dotNET)) | U1–U12 |
-| [logic/test_api_java.py](logic/test_api_java.py) | Java API ([apis/java](apis/java)) | A1–A12 |
-| [logic/test_ui_java.py](logic/test_ui_java.py) | Java UI ([uis/java](uis/java)) | U1, U3–U9, U12 (U2, U10, U11 not scored) |
-| [logic/test_api_python.py](logic/test_api_python.py) | Python API ([apis/python](apis/python)) | A1–A12 |
-| [logic/test_ui_python.py](logic/test_ui_python.py) | Python UI ([uis/python](uis/python)) | U1, U3–U9, U12 (U2, U10, U11 not scored) |
-| [logic/test_mcp_dotnet.py](logic/test_mcp_dotnet.py) | C# MCP server ([mcps/dotNET](mcps/dotNET)) | M1–M12 |
-| [logic/test_mcp_java.py](logic/test_mcp_java.py) | Java MCP server ([mcps/java](mcps/java)) | M1–M12 |
-| [logic/test_mcp_python.py](logic/test_mcp_python.py) | Python MCP server ([mcps/python](mcps/python)) | M1–M12 |
+| [logic/test_api_dotnet.py](logic/test_api_dotnet.py) | C# API ([apis/dotNET](apis/dotNET)) | A1–A18 |
+| [logic/test_ui_dotnet.py](logic/test_ui_dotnet.py) | C# UI ([uis/dotNET](uis/dotNET)) | U1–U14 |
+| [logic/test_api_java.py](logic/test_api_java.py) | Java API ([apis/java](apis/java)) | A1–A15, A17, A18 (A16 not scored) |
+| [logic/test_ui_java.py](logic/test_ui_java.py) | Java UI ([uis/java](uis/java)) | U1, U3–U9, U12–U14 (U2, U10, U11 not scored) |
+| [logic/test_api_python.py](logic/test_api_python.py) | Python API ([apis/python](apis/python)) | A1–A15, A17, A18 (A16 not scored) |
+| [logic/test_ui_python.py](logic/test_ui_python.py) | Python UI ([uis/python](uis/python)) | U1, U3–U9, U12–U14 (U2, U10, U11 not scored) |
+| [logic/test_mcp_dotnet.py](logic/test_mcp_dotnet.py) | C# MCP server ([mcps/dotNET](mcps/dotNET)) | M1–M14 |
+| [logic/test_mcp_java.py](logic/test_mcp_java.py) | Java MCP server ([mcps/java](mcps/java)) | M1–M14 |
+| [logic/test_mcp_python.py](logic/test_mcp_python.py) | Python MCP server ([mcps/python](mcps/python)) | M1–M14 |
 | [logic/test_all.py](logic/test_all.py) | All nine, one after another (default) or at the same time (`--parallel`) | all |
 | [logic/selftest_harness.py](logic/selftest_harness.py) | No app: offline checks of the scoring logic and the answer-key file (no AI run, no cost) | — |
 
@@ -146,7 +146,7 @@ Common options (every script; run any script with `--help` for the full list):
 | Option | Default | What it does |
 |--------|---------|--------------|
 | `--tool auto\|claude\|copilot` | `auto` | AI tool that runs the review (see below). Also settable with the `COMPLIANCE_TEST_TOOL` environment variable. |
-| `--min-found PCT` | `90` | Share of the 12 seeded flaws that must be found for a pass (90% means 11). Also `COMPLIANCE_TEST_MIN_FOUND`. |
+| `--min-found PCT` | `90` | Share of the app's scored seeded flaws that must be found for a pass (for the C# API, 90% of 18 means 17). Also `COMPLIANCE_TEST_MIN_FOUND`. |
 | `--timeout MIN` | `60` | Time limit for each review, in minutes. Also `COMPLIANCE_TEST_TIMEOUT_MIN`. |
 | `--progress SEC` | `30` | While a review runs, print a line each time the reviewer finishes a step (read from `transitions/<runId>/state.json`), plus a "still running" heartbeat every SEC seconds. `0` turns progress output off. Also `COMPLIANCE_TEST_PROGRESS_SEC`. |
 | `--model NAME` | tool default | Model, passed to the tool's `--model` option. With Claude this sets the orchestrator's model only; the worker subagent always runs on Sonnet. |
@@ -195,7 +195,7 @@ Each run writes a folder under `test/logic/results/` (git-ignored), named `<time
 | `<app>-<tool>.log` | The AI tool's raw output and exit code, for troubleshooting |
 | `summary.md`, `summary.json` | `test_all.py` only: one row per app |
 
-The console shows the same result, ending with a one-line summary per app, for example `[PASS] apis-dotNET (claude): 11/12 flaws (92%, need 90%), missed: A9; unexpected errors: 0, unexpected warn/info: 2`.
+The console shows the same result, ending with a one-line summary per app, for example `[PASS] apis-dotNET (claude): 17/18 flaws (94%, need 90%), missed: A9; unexpected errors: 0, unexpected warn/info: 2`.
 
 ### Notes
 
@@ -223,6 +223,14 @@ The flaws are numbered so that the same number means the same flaw in every lang
 | A10 | Floating dependency version | DEP-01, DEP-02 | `TodoApi.csproj` `Swashbuckle.AspNetCore Version="*"` | `pom.xml` springdoc `[3.0.0,)` | `requirements.txt` (no versions at all) |
 | A11 | API explorer / debug features enabled in every environment | SEC-OP-07 | `Program.cs` `UseSwagger`/`UseSwaggerUI` without an environment check | springdoc enabled by default; stack traces always on | `debug=True`, `reload=True`, bound to `0.0.0.0` |
 | A12 | No automated tests | TST-07 (and other TST checks N/A or failed) | whole app | whole app | whole app |
+| A13 | Pattern-valid (fake) cloud access key in a staging fixture, outside the configuration files the Security — Operational sample reads (found through the inventory's `secretCandidates`) | SEC-OP-05, SEC-OP-06 | `fixtures/deploy-settings.json` | `fixtures/deploy-settings.json` | `fixtures/deploy-settings.json` |
+| A14 | Committed `.env` file with an SMTP password | SEC-OP-05, SEC-OP-06, TF-03 | `.env` | `.env` | `.env` |
+| A15 | Customer records (name, email, phone, date of birth, card number) returned whole by `GET /customers` | DPR-02 | `Program.cs` `MapGet("/customers")`, `Customer.cs`, `CustomerStore.cs` | `CustomerController.list`, `Customer.java` | `main.py` `list_customers` |
+| A16 | Error tracker configured to send user data | DPR-04 | `appsettings.json` `Sentry:SendDefaultPii = true`, `Program.cs` `UseSentry()` | not scored | not scored |
+| A17 | Seed data with real-looking personal data and Luhn-valid card numbers, stored in plaintext | DPR-05, DPR-01 | `Data/customers.seed.json`, `Customer.cs` `CardNumber` | `CustomerSeed.java`, `Customer.java` | `customers_seed.py` |
+| A18 | Customer email address in the query string, on a separate `lookup` action instead of a filter on the collection | DPR-03, SEC-WA-10, API-04 | `Program.cs` `/customers/lookup?email=` | `CustomerController.lookup` `@RequestParam String email` | `main.py` `lookup_customer(email)` |
+
+**A16** is seeded only in the C# API (Sentry for .NET documents `SendDefaultPii`; the Java and Python SDK pages localized for `review-data-protection` describe `dataCollection` options instead), so it is `null` for Java and Python.
 
 ### UIs
 
@@ -240,6 +248,8 @@ The flaws are numbered so that the same number means the same flaw in every lang
 | U10 | Commented-out code | SQ-08 | `OnPostComplete` | not scored | not scored |
 | U11 | No security headers (CSP, frame-ancestors, nosniff and so on) | SEC-WA-01, SEC-WA-03, SEC-WA-04, SEC-WA-11 | whole app | not scored | not scored |
 | U12 | No automated tests | TST-07 (and other TST checks N/A or failed) | whole app | whole app | whole app |
+| U13 | Pattern-valid (fake) cloud access key in a staging fixture | SEC-OP-05, SEC-OP-06 | `fixtures/deploy-settings.json` | `fixtures/deploy-settings.json` | `fixtures/deploy-settings.json` |
+| U14 | Committed `.env` file with an SMTP password | SEC-OP-05, SEC-OP-06, TF-03 | `.env` | `.env` | `.env` |
 
 **Java and Python UIs:** U2, U10 and U11 are not scored for the Java and Python apps (`null` locations in `answer_key.json`). Repeated runs with different models didn't report them, so they were dropped from those keys. Only the C# UI still scores them, and the flaws themselves are still in all three apps. If the reviewer does report one of their checks, the finding counts as incidental, not unexpected. The other UI numbers are unchanged, so a number still means the same flaw in every language.
 
@@ -261,6 +271,8 @@ All three servers use the stdio transport. "Tools file" means `TodoTools.cs` (C#
 | M10 | Floating MCP SDK version | DEP-01, DEP-02 | `TodoMcp.csproj` `ModelContextProtocol Version="*"` | `pom.xml` `[2.0.0,)` (resolves to a milestone release) | `requirements.txt` `mcp` (no version) |
 | M11 | Unsynchronized static/global mutable state used as the data store | DP-01, TF-06, REL-05, MCP-12 | `TodoStore.cs` static `Items`/`NextId` | `TodoStore.java` static `items`/`nextId` | `server.py` global `todos`/`next_id` |
 | M12 | No automated tests | TST-07 (and other TST checks N/A or failed) | whole app | whole app | whole app |
+| M13 | Pattern-valid (fake) cloud access key in a staging fixture | SEC-OP-05, SEC-OP-06 | `fixtures/deploy-settings.json` | `fixtures/deploy-settings.json` | `fixtures/deploy-settings.json` |
+| M14 | Committed `.env` file with an SMTP password | SEC-OP-05, SEC-OP-06, TF-03 | `.env` | `.env` | `.env` |
 
 For the stdio MCP servers, expect API Design and Security — Web & API to be N/A (no HTTP surface), MCP-15 (remote transport security) to be N/A, and the Identity & Access checks about authenticating callers to be N/A (a stdio server shares its client's trust domain).
 
@@ -283,6 +295,7 @@ These come from keeping the apps minimal rather than from seeded flaws. Expect t
 - **API design (APIs only):** no committed OpenAPI file (the spec is generated at run time), no versioning, no pagination, sequential integer IDs rather than opaque ones, no request-ID header or machine-readable error code, no ETags and no correlation headers (API-01, 06, 07, 10, 11, 14, 15). The UIs should be N/A for API design, or reviewed only for their form endpoints.
 - **Reliability and Performance:** mostly N/A, because the apps have no remote dependencies. The in-memory store and single instance may show up under REL-05 and PERF-08, the APIs' linear scans of the in-memory list for get, update and delete under PERF-05, and the UIs' linear scan to find the to-do to mark done under PERF-05 too.
 - **Disaster Recovery, Monitoring, Cost & Sustainability:** N/A, because there is no infrastructure as code.
+- **Data Protection:** N/A for the UIs and MCP servers (no personal data). In the APIs, the seeded customer data has no deletion or retention path and no data classification (DPR-06, DPR-08, next to A15–A17).
 - **MCP servers only:**
   - the general incidentals above for Maintainability, Software Lifecycle, Dependency Management (DEP-02, 05, 07, 08), Observability (OBS-02 to OBS-10, plus OBS-01 for unstructured `stdout` lines, next to M1, and OBS-09 for exceptions turned into text, next to M8), CS-04, CS-05 and AP-06;
   - no rate limiting of tool calls (MCP-13), no per-invocation audit log (MCP-14), no documented deployment shape (MCP-16), and the transport-fit check flagging the hard-coded token instead of an environment variable (MCP-03, next to M7);

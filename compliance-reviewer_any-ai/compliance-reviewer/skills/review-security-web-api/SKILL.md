@@ -52,7 +52,8 @@ endpoints, and HTML layout templates, per `compliance-inventory`.
    session IDs in URLs, JWT/API-key handling, method or management-endpoint authorization (identity-access), XSS
    encoding, request size limits or XXE (input-injection), method semantics, idempotency, status codes or error
    format (api-design), rate limits (reliability), caching of public assets (performance), or library versions
-   (dependency-management). CSP is defense in depth; never report a missing CSP as an XSS vulnerability.
+   (dependency-management), or personal data (not credentials) in URLs, client storage or API responses
+   (review-data-protection DPR-02/DPR-03). CSP is defense in depth; never report a missing CSP as an XSS vulnerability.
 6. Severity: MUST/REVIEW elements take the check's default from `checklist.md`; SHOULD elements one level lower
    (Error → Warning, Warning → Information); HDR-11 is advisory and never fails on its own. When several elements
    fail on the same evidence, write one finding at the highest severity. `checkResults.severityIfFailed` is the

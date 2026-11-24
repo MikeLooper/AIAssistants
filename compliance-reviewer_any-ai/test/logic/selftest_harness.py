@@ -8,8 +8,10 @@ from pathlib import Path
 
 import harness
 
+# Flaws per kind (APIs: A1-A18; UIs: U1-U14; MCP servers: M1-M14).
+FLAWS = {"apis": 18, "uis": 14, "mcps": 14}
 # Apps whose answer key leaves some flaws unscored (null locations): app name -> number of scored flaws.
-UNSCORED = {"uis-java": 9, "uis-python": 9}
+UNSCORED = {"uis-java": 11, "uis-python": 11, "apis-java": 17, "apis-python": 17}
 
 
 def finding(fid, check, file, severity="Warning", line=1):
@@ -29,11 +31,11 @@ def write_run(tmp: Path, subject_findings: dict, aggregate_findings: list, targe
 
 
 class AnswerKeyTests(unittest.TestCase):
-    def test_every_app_has_twelve_flaws_with_checks(self):
+    def test_every_app_has_its_flaws_with_checks(self):
         for kind in harness.KINDS:
             for lang in harness.LANGS:
                 key = harness.load_app_key(kind, lang)
-                self.assertEqual(len(key.flaws), UNSCORED.get(key.name, 12), key.name)
+                self.assertEqual(len(key.flaws), UNSCORED.get(key.name, FLAWS[kind]), key.name)
                 self.assertTrue(all(f.checks for f in key.flaws))
 
     def test_locations_exist_on_disk(self):
@@ -98,19 +100,19 @@ class ScoringTests(unittest.TestCase):
                  finding("SQ-03#1", "SQ-03", "Program.cs", "Warning")]            # unexpected, warning
         run = harness.load_run(write_run(self.tmp, {"review-x": hits + extra}, hits + extra))
         s = harness.score_run(run, self.key, 90)
-        self.assertEqual(len(s.found), 12)
+        self.assertEqual(len(s.found), FLAWS["apis"])
         self.assertEqual([x["id"] for x in s.incidental], ["MAINT-01#1"])
         self.assertEqual([x["id"] for x in s.related], ["SEC-II-01#9"])
         self.assertEqual([x["id"] for x in s.unexpected_other], ["SQ-03#1"])
         self.assertTrue(s.passed)
 
     def test_threshold_and_unexpected_error(self):
-        flaws = self.key.flaws[:10]  # 10/12 = 83% < 90%
+        flaws = self.key.flaws[:14]  # A1-A14; A2's SEC-WA-10 hit in Program.cs also finds A18: 15/18 = 83% < 90%
         hits = [finding(f"{f.id}#1", f.checks[0].replace("*", "07"), (f.locations or ["x"])[0]) for f in flaws]
         bad = finding("PERF-01#1", "PERF-01", "Program.cs", "Error")
         run = harness.load_run(write_run(self.tmp, {"review-x": hits + [bad]}, hits + [bad]))
         s = harness.score_run(run, self.key, 90)
-        self.assertEqual((len(s.found), s.required), (10, 11))
+        self.assertEqual((len(s.found), s.required), (15, 17))
         self.assertFalse(s.coverage_ok)
         self.assertEqual(len(s.unexpected_errors), 1)
         self.assertTrue(harness.score_run(run, self.key, 80).coverage_ok)

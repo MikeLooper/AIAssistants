@@ -43,7 +43,8 @@ middleware, health check endpoints and probe manifests, SLO docs, per `complianc
    as confidence `low`.
 6. Boundaries: don't report alert rules, dashboards, external probes, probe thresholds or telemetry retention
    (review-monitoring); routing and restart probe configuration (review-reliability AZRL-49/50); secrets/PII in log messages, log injection or security-event logging (security skills; if
-   both could fire on the same line, don't report it here); API header documentation (review-api-design).
+   both could fire on the same line, don't report it here); API header documentation (review-api-design); error-tracker
+   SDK switches that send user data, such as Sentry `SendDefaultPii` (review-data-protection DPR-04).
    OBS-10 covers only telemetry attributes, baggage and captured headers/bodies. OBS-07 is the only place a missing
    SLO is reported.
 7. OBS-06: the endpoint must exist and be wired to the host's probe mechanism when manifests are in scope. A

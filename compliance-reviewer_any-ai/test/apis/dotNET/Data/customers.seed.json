@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "fullName": "Maria Rossi",
+    "email": "maria.rossi@posta-rossi.it",
+    "phone": "+39 347 555 0192",
+    "dateOfBirth": "1984-03-17",
+    "cardNumber": "4024007184235611"
+  },
+  {
+    "id": 2,
+    "fullName": "James Okafor",
+    "email": "j.okafor@okafor-mail.co.uk",
+    "phone": "+44 7700 900461",
+    "dateOfBirth": "1979-11-02",
+    "cardNumber": "5168441223001580"
+  },
+  {
+    "id": 3,
+    "fullName": "Ana Lucía Méndez",
+    "email": "analucia.mendez@correo-mendez.mx",
+    "phone": "+52 55 5550 1287",
+    "dateOfBirth": "1991-07-25",
+    "cardNumber": "4556730192846709"
+  }
+]

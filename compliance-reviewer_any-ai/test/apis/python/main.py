@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 from pydantic import BaseModel
 
 from config import API_KEY
+from customers_seed import CUSTOMERS
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("todo-api")
@@ -73,6 +74,19 @@ def update_todo(todo_id: int, data: TodoItem):
             logger.info("Updated todo " + str(todo_id) + ": " + item.title)
             return item
     return {"error": "Todo " + str(todo_id) + " not found"}
+
+
+@app.get("/customers")
+def list_customers():
+    return CUSTOMERS
+
+
+@app.get("/customers/lookup")
+def lookup_customer(email: str):
+    for customer in CUSTOMERS:
+        if customer["email"] == email:
+            return customer
+    return JSONResponse({"error": "Not found"}, status_code=404)
 
 
 @app.delete("/todos/{todo_id}")

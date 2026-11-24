@@ -36,7 +36,7 @@ The cap is counted per skill per website and per host (plan DEC-6). `review-secu
     treated like `MUST`).
   - Vendor files: the level of the OWASP element the vendor element supports, or `SHOULD` when the vendor only recommends.
 - **(Default)** elements state API behaviour or a default. Add one only with the version it was read from and the source
-  sentence quoted in the localization log. Workers may rely on no other default (`SKILL.md` step 4).
+  sentence quoted in the localization log. Workers may rely on no other default (`SKILL.md` step 5).
 - Vendor elements state behaviour and defaults; they never relax an OWASP element (plan DEC-8).
 - SMG-07 and DNO-11 are advisory and never fail on their own (plan DEC-13, consistent with `review-twelve-factor` TF-03 / TFR-06).
 - Boundary with `review-software-quality` SQ-06: SQ-06 judges exception *design* (granularity, catch-alls only at boundaries, no exceptions as control flow); swallowed or unlogged errors are SEC-OP-02 and fail-safe handling is SEC-OP-10. Don't add elements for exception granularity.
