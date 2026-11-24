@@ -2,6 +2,12 @@
 
 All notable changes to the Compliance Reviewer are recorded here. The tool follows [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html); the current version is in [VERSION](VERSION). See [Versioning](compliance-reviewer/README.md#versioning) for what counts as a major, minor or patch change.
 
+## [2.1.1] - 2026-11-24
+
+- **Redaction check covers free-text fields.** `validate` now runs the secret and personal-data patterns over each finding's and strength's `title`, `recommendation` and free-text `standard`, and over every check `reason` (`checks.fail.*.reason`, `checks.na`), not only evidence excerpts, as the "Redaction" rule in `finding-schema.md` already required. A match blocks the subject like an excerpt match. New unit tests cover each field and a prose-only negative case.
+- **Fix.** `compliance-inventory/scripts/sensitive_scan.py` had an indentation error in `allowlisted()` that stopped the module from importing (step 01's scan, `validate` redaction and the scanner tests all failed).
+- **Fix.** `render` crashed with a `TypeError` when every selected subject was N/A (for example a Data Protection-only review of a target without personal data), because the overall score is `null` then. Overall and subject scores now share one formatter: `87.50/100`, or `N/A` when no check applies. The report template no longer appends `/100` itself, and the `aggregate`/`render` console lines print `N/A` instead of `None/100`. A new unit test covers the all-N/A run end to end.
+
 ## [2.1.0] - 2026-11-24
 
 Implements [docs/ai/plan-pii-secrets-checks_2026-11-24.md](docs/ai/plan-pii-secrets-checks_2026-11-24.md) (phases 1–5) in one release. Minor version: a new subject, a new analyzer and additive inventory fields; `schemaVersion` stays 2. **Overall scores aren't directly comparable with 2.0.0 runs** on targets that hold personal data, because the new Data Protection subject adds its checks to the overall score (it is N/A, and the overall score unchanged, when no personal data is found).

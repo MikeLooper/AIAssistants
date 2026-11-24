@@ -336,7 +336,7 @@ Every subject reviews against local, pinned summaries of its external sources (`
   - Workers read generated review packs instead of 4–7 skill files each.
   - Scores and dedup are unchanged: converting recorded runs to the new schema reproduced their scores, top risks and duplicates exactly. The default inventory may pick different sample files than the model-driven one did, so per-subject findings can differ between runs before and after this date.
 - **Secrets, personal data and Data Protection (2026-11-24, tool version 2.1.0; `docs/ai/plan-pii-secrets-checks_2026-11-24.md`).**
-  - Evidence excerpts are redacted (`<redacted:kind>`); `validate` rejects excerpts with secrets or personal data, and `aggregate`/`render` mask any left.
+  - Evidence excerpts are redacted (`<redacted:kind>`); `validate` rejects excerpts, titles, recommendations and reasons with secrets or personal data, and `aggregate`/`render` mask any left.
   - Step 01 records value-free `secretCandidates` and `piiCandidates` (rules in `secret-patterns.json`) and `personalDataFound`; `gitleaks` joined the auto analyzer set (advanced only, directory mode).
   - **Data Protection was added as subject 19** (`review-data-protection`, step 29, 8 checks DPR-01 … DPR-08, 46 elements). **Overall scores from runs before and after 2.1.0 aren't directly comparable**: on targets with personal data the new subject adds its checks to the overall score; on targets without it the subject is N/A and the overall score is unchanged.
   - The report's subject score table now also lists N/A subjects (score `N/A`).

@@ -38,7 +38,8 @@ short kind: `api-key`, `token`, `password`, `secret`, `private-key`, `connection
 `national-id`, `email`, `phone`.
 
 - `validate` runs the shared secret and personal-data patterns (`compliance-inventory/references/secret-patterns.json`)
-  over every evidence excerpt and reports a match as a problem, which blocks the subject until it is rewritten.
+  over every evidence excerpt and every `title`, `recommendation`, check `reason` and free-text `standard`, and
+  reports a match as a problem, which blocks the subject until it is rewritten.
 - `aggregate` and `render` also mask any remaining match, so no value reaches `90-aggregate.json`, `docs/reports/`
   or `--out-file`.
 

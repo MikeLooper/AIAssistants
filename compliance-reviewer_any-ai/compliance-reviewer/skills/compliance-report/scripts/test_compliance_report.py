@@ -321,7 +321,7 @@ class SecretPatternTests(unittest.TestCase):
 
 
 class RedactionTests(unittest.TestCase):
-    """Phase 1: validate rejects excerpts with secrets; aggregate and render mask them."""
+    """Phase 1: validate rejects excerpts and free-text fields with secrets; aggregate and render mask them."""
 
     def setUp(self):
         self.run = tempfile.mkdtemp()
@@ -335,14 +335,21 @@ class RedactionTests(unittest.TestCase):
             code = fn(*args)
         return code, out.getvalue()
 
-    def write_run(self, excerpt, title):
+    def write_run(self, excerpt, title, recommendation="Move it to a secret store.", fail_reason=None,
+                  na_reason=None):
         skill = "review-security-operational"
         ids = list(cr.load_checklist(skill)["checks"])
         finding = {"id": "SEC-OP-05#1", "checkId": "SEC-OP-05", "element": "SMG-02", "severity": "Error",
-                   "title": title, "recommendation": "Move it to a secret store.",
+                   "title": title, "recommendation": recommendation,
                    "confidence": "High", "effort": "Small",
                    "evidence": [{"file": "appsettings.json", "lineStart": 3, "lineEnd": 3, "excerpt": excerpt}]}
-        checks = {"pass": [i for i in ids if i != "SEC-OP-05"], "fail": {"SEC-OP-05": {"findingIds": ["SEC-OP-05#1"]}}}
+        fail = {"findingIds": ["SEC-OP-05#1"]}
+        if fail_reason:
+            fail["reason"] = fail_reason
+        passed = [i for i in ids if i != "SEC-OP-05"]
+        checks = {"pass": passed, "fail": {"SEC-OP-05": fail}}
+        if na_reason:
+            checks["pass"], checks["na"] = passed[1:], {passed[0]: na_reason}
         cr.write_json(os.path.join(self.run, "state.json"), {"runId": "t", "subjects": [skill], "targetPath": "t"})
         cr.write_json(os.path.join(self.run, "17-review-security-operational.json"),
                       v2_file(skill, "17", checks, [finding]))
@@ -365,6 +372,41 @@ class RedactionTests(unittest.TestCase):
 
     def test_redacted_excerpt_passes(self):
         self.write_run('"AwsKey": "<redacted:api-key>"', "Hardcoded AWS key")
+        code, out = self.quiet(cr.validate, self.run)
+        self.assertEqual(code, 0, out)
+
+    def assert_blocked(self, field, rule, value):
+        code, out = self.quiet(cr.validate, self.run)
+        self.assertEqual(code, 1, out)
+        self.assertIn(f"{field} contains a secret or personal-data value", out)
+        self.assertIn(rule, out)
+        self.assertNotIn(value, out)
+
+    def test_secret_in_title_fails_validate(self):
+        self.write_run('"AwsKey": "<redacted:api-key>"', f"Hardcoded AWS key {FAKE_AWS}")
+        self.assert_blocked("title", "aws-access-key-id", FAKE_AWS)
+
+    def test_personal_data_in_recommendation_fails_validate(self):
+        card = luhn_number("492900001234567")
+        self.write_run('"AwsKey": "<redacted:api-key>"', "Hardcoded AWS key",
+                       recommendation=f"Remove the test card {card} from the seed data.")
+        self.assert_blocked("recommendation", "payment-card-number", card)
+
+    def test_secret_in_fail_reason_fails_validate(self):
+        self.write_run('"AwsKey": "<redacted:api-key>"', "Hardcoded AWS key",
+                       fail_reason=f"The key {FAKE_GH} is committed in plain text.")
+        self.assert_blocked("reason", "github-token", FAKE_GH)
+
+    def test_personal_data_in_na_reason_fails_validate(self):
+        self.write_run('"AwsKey": "<redacted:api-key>"', "Hardcoded AWS key",
+                       na_reason="Not applicable; the only account is iban: DE44500105175407324931.")
+        self.assert_blocked("reason", "iban", "DE44500105175407324931")
+
+    def test_prose_mentioning_secrets_passes(self):
+        self.write_run('"Password": "<redacted:password>"', "Hard-coded password in appsettings.json",
+                       recommendation="Move the password and connection string to a secret store such as Key Vault.",
+                       fail_reason="A database password is stored in a committed config file.",
+                       na_reason="No API keys or tokens are used by this service.")
         code, out = self.quiet(cr.validate, self.run)
         self.assertEqual(code, 0, out)
 
@@ -519,6 +561,34 @@ class InventoryAndRunTests(unittest.TestCase):
         self.assertTrue(dp["piiCandidates"])
         self.assertIn("Models/Customer.cs", dp["files"])
         self.assertIn("tests/Todo.Tests/fixtures/customers.json", dp["files"])
+
+    def test_all_subjects_na_renders_na_overall_score(self):
+        # Data Protection only, on a target without personal data: the only subject is N/A, so no check applies
+        self.run_cmd(cr.init_run, self.target, "review-data-protection", "off", "auto", None, "r6",
+                     transitions_dir=self.transitions)
+        run = os.path.join(self.transitions, "r6")
+        code, out = self.run_cmd(cr.run_inventory, run)
+        self.assertEqual(code, 0, out)
+        self.assertFalse(out[0]["personalDataFound"])
+        self.run_cmd(cr.write_na, run)
+        code, out = self.run_cmd(cr.validate, run, True)
+        self.assertEqual(code, 0, out)
+        with contextlib.redirect_stdout(io.StringIO()) as log:
+            self.assertEqual(cr.aggregate(run), 0)
+        self.assertIn("overall N/A N/A", log.getvalue())
+        agg = cr.read_json(os.path.join(run, "90-aggregate.json"))
+        self.assertIsNone(agg["overallScore"])
+        self.assertEqual(agg["overallBand"], "N/A")
+        report_path = os.path.join(self.tmp, "reports", "app-compliance-review.md")
+        with contextlib.redirect_stdout(io.StringIO()) as log:
+            self.assertEqual(cr.render(run, report_path), 0)
+        self.assertIn("overall N/A N/A", log.getvalue())
+        with open(report_path, encoding="utf-8") as f:
+            report = f.read()
+        self.assertIn("**Overall score: N/A — N/A**", report)
+        self.assertIn("| Data Protection | N/A | N/A |", report)
+        self.assertNotIn("/100", report)
+        self.assertNotIn("None", report)
 
     def test_init_rejects_out_file_inside_target_and_unknown_subject(self):
         code, out = self.run_cmd(cr.init_run, self.target, "all", "off", "auto",

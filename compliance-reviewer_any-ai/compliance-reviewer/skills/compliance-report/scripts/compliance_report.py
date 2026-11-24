@@ -79,6 +79,11 @@ def band(score):
     return "Excellent" if score >= 90 else "Good" if score >= 75 else "Fair" if score >= 60 else "Poor"
 
 
+def fmt_score(score):
+    """Report/console text for a score: '87.50/100', or 'N/A' when no check applied (all subjects N/A)."""
+    return f"{score:.2f}/100" if score is not None else "N/A"
+
+
 # ---------------------------------------------------------------- checklist labels
 
 SKILLS_DIR = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
@@ -366,8 +371,13 @@ def scanner():
     return _scan
 
 
-def excerpt_problems(entry):
-    """Evidence excerpts of one finding or strength that contain a secret value or personal data."""
+# Free-text fields a worker writes (finding-schema.md "Redaction"); `standard` is free text when `element` is omitted.
+REDACT_FIELDS = ("title", "recommendation", "reason", "standard")
+
+
+def redaction_problems(entry):
+    """Evidence excerpts and free-text fields of one finding, strength or check result that contain a secret
+    value or personal data. Free-text fields are scanned without file context, as `mask_obj` masks them."""
     out = []
     for i, ev in enumerate(entry.get("evidence") or []):
         if not isinstance(ev, dict):
@@ -375,6 +385,11 @@ def excerpt_problems(entry):
         hits = scanner().excerpt_hits(str(ev.get("excerpt") or ""), ev.get("file"))
         if hits:
             out.append(f"evidence[{i}] excerpt contains a secret or personal-data value ({', '.join(hits)}); "
+                       "replace the value with <redacted:kind>")
+    for k in REDACT_FIELDS:
+        hits = scanner().excerpt_hits(str(entry.get(k) or ""))
+        if hits:
+            out.append(f"{k} contains a secret or personal-data value ({', '.join(hits)}); "
                        "replace the value with <redacted:kind>")
     return out
 
@@ -452,8 +467,12 @@ def validate(run_dir, mark=False):
         ids = set()
         for kind in ("findings", "strengths"):
             for e in d.get(kind, []) or []:
-                for p in excerpt_problems(e):
+                for p in redaction_problems(e):
                     problems.append({"file": name, "problem": f"{kind[:-1]} {e.get('id')}: {p}"})
+        for c in d.get("checkResults", []) or []:
+            if isinstance(c, dict):
+                for p in redaction_problems(c):
+                    problems.append({"file": name, "problem": f"check {c.get('checkId')}: {p}"})
         for f in d.get("findings", []):
             if f.get("severity") not in SEV_WEIGHT:
                 problems.append({"file": name, "problem": f"finding {f.get('id')} has invalid severity"})
@@ -652,7 +671,7 @@ def aggregate(run_dir):
     state["updatedAt"] = now_iso()
     write_json(os.path.join(run_dir, "state.json"), state)
     relabeled = sum(r["labelsNormalized"] for r in results)
-    print(f"aggregate: overall {overall}/100 {band(overall)}; Error {counts['Error']}, Warning {counts['Warning']}, "
+    print(f"aggregate: overall {fmt_score(overall)} {band(overall)}; Error {counts['Error']}, Warning {counts['Warning']}, "
           f"Information {counts['Information']}; {len(suppressed)} duplicate(s) suppressed; "
           f"{relabeled} label(s) normalized")
     return 0
@@ -779,9 +798,8 @@ def render(run_dir, out_path, copy_to=None):
         ctx = {
             "targetName": os.path.basename(str(state.get("targetPath", "")).rstrip("\\/")) or "target",
             "generatedAt": generated, "runId": state["runId"],
-            "overallScore": f"{agg['overallScore']:.2f}", "overallBand": agg["overallBand"],
-            "subjectScores": [{"subject": s["subject"], "band": s["band"],
-                               "score": f"{s['score']:.2f}/100" if s["score"] is not None else "N/A"}
+            "overallScore": fmt_score(agg["overallScore"]), "overallBand": agg["overallBand"],
+            "subjectScores": [{"subject": s["subject"], "band": s["band"], "score": fmt_score(s["score"])}
                               for s in agg["subjectScores"]],
             "errorCount": agg["severityCounts"]["Error"], "warningCount": agg["severityCounts"]["Warning"],
             "infoCount": agg["severityCounts"]["Information"],
@@ -815,7 +833,7 @@ def render(run_dir, out_path, copy_to=None):
     print(f"report: {out_path}")
     if copy_to:
         print(f"copy: {os.path.abspath(copy_to)}")
-    print(f"overall {agg['overallScore']}/100 {agg['overallBand']}")
+    print(f"overall {fmt_score(agg['overallScore'])} {agg['overallBand']}")
     for t in agg["topRisks"]:
         print(f"  {t['rank']}. [{t['severity']}] {t['title']}")
     return 0

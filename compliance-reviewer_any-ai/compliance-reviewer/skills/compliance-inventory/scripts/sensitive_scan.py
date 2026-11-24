@@ -79,7 +79,7 @@ class Rules:
         return False
 
     def allowlisted(self, value):
-return any(value == a for a in self.allow)
+        return any(value == a for a in self.allow)
 
     def pii_valid(self, rule, value, groups):
         norm = re.sub(r"[\s-]", "", value).upper()
